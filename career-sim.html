@@ -1,0 +1,3053 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>职业体验模拟器 PRO</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ══ RESET & BASE ══ */
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:100%;height:100%;overflow:hidden;}
+body{font-family:'Noto Serif SC',serif;background:#0f0e0c;color:#e8e0d0;display:flex;flex-direction:column;}
+
+:root{
+  --bg:#0f0e0c;--s1:#1a1915;--s2:#232118;--s3:#2c2a24;
+  --bd:#3a3830;--bd2:#4a4840;
+  --t:#e8e0d0;--t2:#a09880;--t3:#6a6458;
+  --ac:#e8a030;--gr:#3a9060;--rd:#c03828;--bl:#3060c0;--pu:#8040c0;--cy:#208080;
+  --r:6px;
+}
+
+/* ══ SCREENS ══ */
+/* Each screen fills the full viewport, shown/hidden via .active */
+.screen{
+  position:absolute;inset:0;
+  display:none;
+  overflow:hidden;
+}
+.screen.active{display:flex;}
+
+/* ══════════════════════════════════════════
+   LANDING / SETUP SCREEN
+   Two-column: left=career wall, right=config
+══════════════════════════════════════════ */
+#setup{flex-direction:row;}
+
+/* Left column — career wall */
+.lp-left{
+  flex:1;min-width:0;
+  display:flex;flex-direction:column;
+  border-right:1px solid var(--bd);
+  overflow:hidden;
+}
+.lp-header{
+  flex-shrink:0;
+  display:flex;align-items:center;gap:12px;
+  padding:14px 18px;
+  border-bottom:1px solid var(--bd);
+  background:var(--s1);
+}
+.lp-logo{font-size:26px;line-height:1;}
+.lp-title{font-size:15px;font-weight:900;letter-spacing:-.3px;}
+.lp-subtitle{font-size:11px;color:var(--t2);margin-top:2px;}
+
+.lp-stats{
+  flex-shrink:0;
+  display:flex;
+  border-bottom:1px solid var(--bd);
+  background:var(--s1);
+}
+.lp-stat{
+  flex:1;padding:7px 0;text-align:center;
+  border-right:1px solid var(--bd);
+}
+.lp-stat:last-child{border-right:none;}
+.lp-sn{display:block;font-family:'JetBrains Mono';font-size:13px;font-weight:700;color:var(--ac);line-height:1.2;}
+.lp-sl{display:block;font-size:10px;color:var(--t3);margin-top:1px;}
+
+.lp-cats{
+  flex-shrink:0;
+  display:flex;flex-wrap:wrap;gap:5px;
+  padding:8px 14px;
+  border-bottom:1px solid var(--bd);
+  background:var(--bg);
+}
+.lp-cat{
+  padding:3px 11px;
+  border:1px solid var(--bd2);border-radius:20px;
+  font-size:11px;cursor:pointer;
+  color:var(--t3);background:transparent;
+  transition:all .15s;
+  font-family:'Noto Serif SC';
+}
+.lp-cat:hover{border-color:var(--ac);color:var(--ac);}
+.lp-cat.on{background:var(--ac);border-color:var(--ac);color:#0f0e0c;font-weight:700;}
+
+/* The scrollable card grid */
+.lp-wall{
+  flex:1;
+  overflow-y:auto;
+  padding:10px 12px;
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(175px,1fr));
+  gap:8px;
+  align-content:start;
+}
+.lp-wall::-webkit-scrollbar{width:3px;}
+.lp-wall::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:2px;}
+
+.lp-card{
+  background:var(--s1);border:1.5px solid var(--bd);border-radius:var(--r);
+  padding:11px 12px;cursor:pointer;
+  transition:border-color .18s,transform .18s,box-shadow .18s;
+}
+.lp-card:hover{
+  border-color:var(--ac);
+  transform:translateY(-2px);
+  box-shadow:0 6px 20px rgba(0,0,0,.35);
+}
+.lp-ce{font-size:22px;display:block;margin-bottom:5px;line-height:1;}
+.lp-cn{font-size:13px;font-weight:700;margin-bottom:2px;}
+.lp-cs{font-size:10px;color:var(--t3);margin-bottom:5px;line-height:1.3;}
+.lp-cd{font-size:11px;color:var(--t2);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.lp-ctags{display:flex;gap:4px;flex-wrap:wrap;margin-top:7px;}
+.lp-ctag{
+  font-family:'JetBrains Mono';font-size:9px;
+  padding:1px 6px;border-radius:10px;
+  background:rgba(255,255,255,.05);color:var(--t3);
+}
+.tag-high{color:#e06050!important;}
+.tag-mid{color:#d0a850!important;}
+.tag-low{color:#70b070!important;}
+
+.lp-features{
+  flex-shrink:0;
+  display:flex;flex-wrap:wrap;gap:5px;
+  padding:7px 12px;
+  border-top:1px solid var(--bd);
+  background:var(--s1);
+}
+.lp-feat{
+  font-size:10px;color:var(--t3);
+  background:var(--s2);border:1px solid var(--bd);
+  padding:3px 8px;border-radius:10px;white-space:nowrap;
+}
+
+/* Right column — config panel */
+.lp-right{
+  width:290px;flex-shrink:0;
+  display:flex;flex-direction:column;
+  overflow-y:auto;
+  background:var(--s1);
+}
+.lp-right::-webkit-scrollbar{width:3px;}
+.lp-right::-webkit-scrollbar-thumb{background:var(--bd2);}
+
+.lp-cfg{padding:18px 16px;display:flex;flex-direction:column;gap:12px;}
+.cfg-title{font-size:14px;font-weight:900;letter-spacing:-.3px;}
+.cfg-sub{font-size:11px;color:var(--t2);line-height:1.6;margin-top:-6px;}
+
+/* Provider grid — 2 cols */
+.pv-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;}
+.pv{
+  padding:8px 6px;text-align:center;cursor:pointer;
+  background:var(--s2);border:1.5px solid var(--bd);border-radius:var(--r);
+  transition:border-color .15s,background .15s;
+}
+.pv:hover{border-color:var(--bd2);background:var(--s3);}
+.pv.on{border-color:var(--ac);background:rgba(232,160,48,.08);}
+.pv-icon{font-size:16px;display:block;margin-bottom:2px;}
+.pv-name{font-size:10px;font-weight:700;line-height:1.2;color:var(--t);}
+.pv-free{font-family:'JetBrains Mono';font-size:8px;color:var(--gr);margin-top:2px;display:block;}
+
+/* Key input */
+.cfg-label{font-family:'JetBrains Mono';font-size:9px;letter-spacing:2px;color:var(--t3);display:block;margin-bottom:5px;}
+.cfg-input{
+  width:100%;background:var(--s2);
+  border:1.5px solid var(--bd2);border-radius:var(--r);
+  padding:9px 12px;
+  font-family:'JetBrains Mono';font-size:12px;color:var(--t);
+  outline:none;
+}
+.cfg-input:focus{border-color:var(--ac);}
+.cfg-input::placeholder{color:var(--t3);}
+.cfg-hint{
+  font-size:10px;color:var(--t3);line-height:1.65;
+  padding:8px 10px;
+  background:var(--s2);border:1px solid var(--bd);border-radius:4px;
+  margin-top:-6px;
+}
+.cfg-hint a{color:var(--ac);text-decoration:none;}
+.cfg-hint a:hover{text-decoration:underline;}
+.cfg-btn{
+  width:100%;padding:11px;
+  background:var(--ac);color:#0f0e0c;
+  border:none;border-radius:var(--r);
+  font-family:'Noto Serif SC';font-size:14px;font-weight:700;
+  cursor:pointer;letter-spacing:.5px;
+  transition:background .2s;
+  box-shadow:0 0 20px rgba(232,160,48,.15);
+}
+.cfg-btn:hover{background:#f0b040;}
+
+.cfg-steps{
+  background:var(--s2);border:1px solid var(--bd);border-radius:var(--r);
+  padding:11px 12px;
+  display:flex;flex-direction:column;gap:6px;
+}
+.cfg-steps-title{font-family:'JetBrains Mono';font-size:9px;letter-spacing:2px;color:var(--t3);}
+.cfg-step{display:flex;align-items:flex-start;gap:7px;font-size:11px;color:var(--t2);line-height:1.5;}
+.cfg-sn{font-family:'JetBrains Mono';font-size:9px;color:var(--ac);background:var(--s3);padding:1px 5px;border-radius:3px;flex-shrink:0;margin-top:1px;}
+.cfg-free{font-size:11px;color:var(--gr);line-height:1.5;padding-top:6px;border-top:1px solid var(--bd);}
+
+/* ══════════════════════════════════════════
+   HOME SCREEN
+   Two-column: sidebar list + JD detail
+══════════════════════════════════════════ */
+#home{flex-direction:row;}
+
+.hl{
+  width:250px;flex-shrink:0;
+  display:flex;flex-direction:column;
+  background:var(--s1);border-right:1px solid var(--bd);
+  overflow:hidden;
+}
+.hl-top{flex-shrink:0;padding:16px 14px 10px;border-bottom:1px solid var(--bd);}
+.app-name{font-size:13px;font-weight:900;letter-spacing:-.3px;}
+.app-tag{font-family:'JetBrains Mono';font-size:9px;color:var(--ac);letter-spacing:3px;margin-top:2px;}
+.srch{
+  margin-top:9px;width:100%;
+  background:var(--s2);border:1px solid var(--bd2);border-radius:var(--r);
+  padding:7px 10px;font-family:'Noto Serif SC';font-size:12px;color:var(--t);
+  outline:none;
+}
+.srch::placeholder{color:var(--t3);}
+.srch:focus{border-color:var(--ac);}
+
+.cpills{flex-shrink:0;display:flex;gap:4px;flex-wrap:wrap;padding:7px 12px;border-bottom:1px solid var(--bd);}
+.cp{
+  padding:3px 9px;border:1px solid var(--bd2);border-radius:12px;
+  font-size:11px;cursor:pointer;color:var(--t3);background:transparent;
+  transition:all .15s;font-family:'Noto Serif SC';
+}
+.cp:hover{border-color:var(--ac);color:var(--ac);}
+.cp.on{background:var(--ac);border-color:var(--ac);color:#0f0e0c;font-weight:700;}
+
+.clist{flex:1;overflow-y:auto;padding:6px;}
+.clist::-webkit-scrollbar{width:3px;}
+.clist::-webkit-scrollbar-thumb{background:var(--bd2);}
+
+.ci{
+  display:flex;align-items:center;gap:9px;
+  padding:8px 9px;border-radius:var(--r);
+  cursor:pointer;transition:all .15s;
+  border:1.5px solid transparent;margin-bottom:2px;
+}
+.ci:hover{background:var(--s2);}
+.ci.on{background:var(--s2);border-color:var(--ac);}
+.ci-emo{font-size:20px;flex-shrink:0;}
+.ci-nm{font-weight:700;font-size:12px;line-height:1.3;}
+.ci-cat{font-family:'JetBrains Mono';font-size:9px;color:var(--t3);letter-spacing:.3px;margin-top:1px;}
+
+/* Right detail pane */
+.hr{flex:1;overflow-y:auto;background:var(--bg);}
+.hr::-webkit-scrollbar{width:4px;}
+.hr::-webkit-scrollbar-thumb{background:var(--bd);}
+
+.empty-state{
+  height:100%;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  color:var(--t3);text-align:center;padding:40px;
+}
+.empty-state .big{font-size:44px;margin-bottom:12px;opacity:.3;}
+
+/* JD panel */
+@keyframes fd{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+.jd{padding:24px 28px;max-width:760px;animation:fd .3s ease;}
+.jd-hd{display:flex;align-items:flex-start;gap:16px;margin-bottom:20px;}
+.jd-ebox{width:64px;height:64px;background:var(--s2);border:2px solid var(--bd2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:32px;flex-shrink:0;}
+.jd-ht{flex:1;}
+.jd-title{font-size:20px;font-weight:900;letter-spacing:-.5px;margin-bottom:3px;}
+.jd-sub{font-size:13px;color:var(--t2);margin-bottom:7px;}
+.jd-tags{display:flex;gap:5px;flex-wrap:wrap;}
+.jtag{padding:2px 8px;border-radius:12px;font-family:'JetBrains Mono';font-size:9px;font-weight:600;letter-spacing:.3px;}
+.jt-s{background:rgba(58,144,96,.12);color:var(--gr);}
+.jdiv{height:1px;background:var(--bd);margin:16px 0;}
+.sec-t{
+  font-family:'JetBrains Mono';font-size:10px;letter-spacing:2px;color:var(--ac);
+  margin-bottom:9px;display:flex;align-items:center;gap:0;
+}
+.sec-t::after{content:'';height:1px;background:var(--bd);flex:1;margin-left:8px;}
+.jd-desc{font-size:13px;line-height:1.9;color:var(--t2);margin-bottom:14px;}
+.sk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:7px;margin-bottom:14px;}
+.sk{background:var(--s2);border:1px solid var(--bd2);border-radius:var(--r);padding:10px 12px;}
+.sk-ico{font-size:14px;margin-bottom:4px;}
+.sk-tx{font-size:12px;color:var(--t2);line-height:1.6;}
+.exp-list{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+.ei{display:flex;align-items:flex-start;gap:9px;background:var(--s2);border:1px solid var(--bd2);border-radius:var(--r);padding:9px 12px;}
+.ei-ico{font-size:13px;flex-shrink:0;margin-top:2px;}
+.ei-tx{font-size:12px;color:var(--t2);line-height:1.6;}
+.dp{display:flex;flex-direction:column;gap:4px;margin-bottom:14px;}
+.dp-row{display:flex;align-items:center;gap:7px;}
+.dp-t{font-family:'JetBrains Mono';font-size:10px;color:var(--t3);width:36px;flex-shrink:0;}
+.dp-b{flex:1;height:26px;border-radius:3px;display:flex;align-items:center;padding:0 9px;font-size:11px;gap:4px;}
+.dp-task{background:rgba(106,100,88,.2);color:var(--t2);}
+.dp-crisis{background:rgba(192,56,40,.15);color:#e06050;}
+.dp-dec{background:rgba(232,160,48,.12);color:var(--ac);}
+.dp-slack{background:rgba(58,144,96,.1);color:var(--gr);}
+.sp-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;margin-bottom:18px;}
+.sp-i{background:var(--s2);border:1px solid var(--bd2);border-radius:var(--r);padding:8px 11px;display:flex;align-items:center;gap:8px;}
+.sp-ico{font-size:14px;}
+.sp-nm{font-size:12px;font-weight:600;}
+.sp-h{font-size:11px;color:var(--t3);margin-top:1px;}
+.launch-box{background:var(--s2);border:1px solid var(--bd2);border-radius:var(--r);padding:16px;margin-top:6px;}
+.lb-t{font-size:13px;font-weight:700;margin-bottom:10px;}
+.dur-g{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px;}
+.dur-o{padding:8px 5px;border:1.5px solid var(--bd2);background:var(--s1);border-radius:var(--r);cursor:pointer;text-align:center;transition:all .2s;}
+.dur-o:hover{border-color:var(--gr);}
+.dur-o.on{border-color:var(--gr);background:rgba(58,144,96,.08);}
+.dur-days{font-family:'JetBrains Mono';font-size:18px;font-weight:600;color:var(--gr);display:block;}
+.dur-lbl{font-size:10px;color:var(--t3);margin-top:2px;}
+.go-btn{
+  width:100%;padding:12px;
+  background:var(--ac);color:#0f0e0c;
+  border:none;border-radius:var(--r);
+  font-family:'Noto Serif SC';font-size:14px;font-weight:700;
+  cursor:pointer;letter-spacing:.5px;
+  box-shadow:0 0 18px rgba(232,160,48,.18);
+  transition:all .2s;
+}
+.go-btn:hover{background:#f0b040;}
+
+/* ══════════════════════════════════════════
+   GAME SCREEN
+   Sidebar + timeline area
+══════════════════════════════════════════ */
+#game{flex-direction:row;}
+
+.sb{
+  width:210px;flex-shrink:0;
+  display:flex;flex-direction:column;
+  background:var(--s1);border-right:1px solid var(--bd);
+  overflow:hidden;
+}
+.sb-hd{flex-shrink:0;padding:12px 14px;border-bottom:1px solid var(--bd);}
+.sb-car{display:flex;align-items:center;gap:9px;margin-bottom:8px;}
+.sb-e{font-size:22px;}
+.sb-n{font-size:13px;font-weight:700;}
+.sb-r{font-size:10px;color:var(--t3);margin-top:1px;}
+.ddots{display:flex;gap:4px;flex-wrap:wrap;}
+.dd{
+  width:22px;height:22px;border-radius:4px;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'JetBrains Mono';font-size:10px;font-weight:700;
+  transition:all .2s;
+}
+.dd.done{background:rgba(58,144,96,.2);color:var(--gr);border:1px solid rgba(58,144,96,.4);}
+.dd.cur{background:var(--ac);color:#0f0e0c;}
+.dd.fut{background:var(--s2);color:var(--t3);border:1px solid var(--bd);}
+
+.sb-stats{flex-shrink:0;padding:12px 14px;border-bottom:1px solid var(--bd);display:flex;flex-direction:column;gap:7px;}
+.sr{}
+.sr-top{display:flex;justify-content:space-between;margin-bottom:3px;}
+.sr-n{font-size:11px;color:var(--t2);}
+.sr-v{font-family:'JetBrains Mono';font-size:11px;font-weight:700;}
+.sr-bar{height:4px;background:var(--s3);border-radius:2px;overflow:hidden;}
+.sr-f{height:100%;border-radius:2px;transition:width .4s;}
+.f-rep{background:var(--ac);}
+.f-str{background:var(--rd);}
+.f-rel{background:var(--bl);}
+.f-per{background:var(--gr);}
+
+.mentor-btn{
+  flex-shrink:0;
+  margin:8px 12px;padding:8px;
+  background:rgba(32,128,128,.1);border:1px solid rgba(32,128,128,.3);border-radius:var(--r);
+  font-size:12px;color:var(--cy);cursor:pointer;text-align:center;
+  transition:all .2s;
+}
+.mentor-btn:hover{background:rgba(32,128,128,.2);}
+.ach-btn{flex-shrink:0;margin:6px 12px 0;padding:7px 8px;background:rgba(232,160,48,.08);border:1px solid rgba(232,160,48,.25);border-radius:var(--r);font-size:11px;color:var(--ac);cursor:pointer;text-align:center;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px;}
+.ach-btn:hover{background:rgba(232,160,48,.15);}
+.ach-card{display:flex;align-items:flex-start;gap:10px;padding:10px 12px;border-radius:6px;border:1px solid var(--bd);}
+.ach-card.locked{opacity:.35;filter:grayscale(.9);}
+.ach-card.unlocked{border-color:var(--bd2);background:var(--s2);}
+.ach-card.unlocked.rare{border-color:rgba(128,64,192,.4);background:rgba(128,64,192,.06);}
+.ach-card.unlocked.epic{border-color:rgba(232,160,48,.4);background:rgba(232,160,48,.07);}
+.ach-ico{font-size:22px;flex-shrink:0;line-height:1.2;}
+.ach-body{flex:1;min-width:0;}
+.ach-name{font-size:12px;font-weight:700;color:var(--t);}
+.ach-desc{font-size:10px;color:var(--t3);margin-top:2px;line-height:1.5;}
+.ach-when{font-family:'JetBrains Mono';font-size:9px;color:var(--t3);margin-top:3px;}
+.ach-tag{font-family:'JetBrains Mono';font-size:9px;padding:1px 6px;border-radius:3px;margin-top:4px;display:inline-block;}
+.ach-tag.pos{background:rgba(58,144,96,.2);color:#4aaa70;}
+.ach-tag.neg{background:rgba(192,56,40,.2);color:var(--rd);}
+.ach-tag.neu{background:rgba(48,96,192,.15);color:#6090d0;}
+.ach-tag.wtf{background:rgba(128,64,192,.2);color:#a060e0;}
+.ach-toast-item{background:var(--s1);border:1px solid var(--bd2);border-radius:8px;padding:10px 14px;display:flex;align-items:center;gap:10px;min-width:260px;max-width:320px;box-shadow:0 4px 20px rgba(0,0,0,.4);animation:toastIn .3s ease;pointer-events:auto;}
+.ach-toast-item.rare{border-color:rgba(128,64,192,.5);}
+.ach-toast-item.epic{border-color:rgba(232,160,48,.5);}
+@keyframes toastIn{from{opacity:0;transform:translateX(30px);}to{opacity:1;transform:translateX(0);}}
+@keyframes toastOut{from{opacity:1;transform:translateX(0);}to{opacity:0;transform:translateX(30px);}}
+
+.sb-log{flex:1;overflow-y:auto;padding:8px 12px;}
+.sb-log::-webkit-scrollbar{width:3px;}
+.sb-log::-webkit-scrollbar-thumb{background:var(--bd2);}
+.log-hd{font-family:'JetBrains Mono';font-size:9px;letter-spacing:2px;color:var(--t3);margin-bottom:6px;}
+.le{margin-bottom:7px;}
+.le-d{font-family:'JetBrains Mono';font-size:8px;color:var(--t3);}
+.lp{font-size:11px;color:var(--gr);}
+.ln{font-size:11px;color:var(--rd);}
+.lu{font-size:11px;color:var(--t2);}
+
+.key-bar{
+  flex-shrink:0;
+  display:flex;align-items:center;gap:7px;
+  padding:7px 12px;margin:0 12px 10px;
+  background:var(--s2);border:1px solid var(--bd);border-radius:4px;
+  font-size:10px;color:var(--t3);cursor:pointer;
+  transition:all .2s;
+}
+.key-bar:hover{border-color:var(--ac);color:var(--ac);}
+
+/* Game main area */
+.gm{
+  flex:1;min-width:0;
+  display:flex;flex-direction:column;
+  overflow:hidden;
+}
+.gm-hd{
+  flex-shrink:0;
+  display:flex;align-items:center;gap:10px;
+  padding:10px 16px;
+  background:var(--s1);border-bottom:1px solid var(--bd);
+}
+.back-btn{
+  padding:5px 10px;background:transparent;
+  border:1px solid var(--bd2);border-radius:4px;
+  font-family:'Noto Serif SC';font-size:11px;color:var(--t3);cursor:pointer;
+  transition:all .2s;
+}
+.back-btn:hover{border-color:var(--t2);color:var(--t2);}
+.day-badge{font-family:'JetBrains Mono';font-size:11px;color:var(--ac);font-weight:700;}
+.day-ttl{font-size:13px;font-weight:700;flex:1;}
+.day-met{font-family:'JetBrains Mono';font-size:9px;color:var(--t3);padding:2px 7px;border:1px solid var(--bd2);border-radius:10px;}
+
+.tl{
+  flex:1;
+  overflow-y:auto;
+  padding:14px 16px;
+  display:flex;flex-direction:column;
+  gap:0;
+}
+.tl::-webkit-scrollbar{width:4px;}
+.tl::-webkit-scrollbar-thumb{background:var(--bd);}
+
+/* Timeline events */
+.evt{display:flex;align-items:flex-start;gap:10px;padding-bottom:8px;}
+.evt-t{font-family:'JetBrains Mono';font-size:10px;color:var(--t3);width:38px;flex-shrink:0;padding-top:9px;}
+.evt-dot{
+  width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:11px;
+  border:2px solid;
+}
+.d-task{background:var(--s3);border-color:var(--bd2);}
+.d-crisis{background:rgba(192,56,40,.3);border-color:var(--rd);}
+.d-dec{background:rgba(232,160,48,.25);border-color:var(--ac);}
+.d-slack{background:rgba(58,144,96,.25);border-color:var(--gr);}
+.d-neg{background:rgba(128,64,192,.25);border-color:var(--pu);}
+.d-done{background:rgba(58,144,96,.35);border-color:var(--gr);}
+
+.ecard{
+  flex:1;min-width:0;
+  background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);
+  overflow:hidden;transition:border-color .2s;
+}
+.ecard.oc{border-color:var(--bd2);}
+.crisis-c{border-color:rgba(192,56,40,.35);background:rgba(192,56,40,.04);}
+.dec-c{border-color:rgba(232,160,48,.3);background:rgba(232,160,48,.03);}
+.slack-c{border-color:rgba(58,144,96,.25);background:rgba(58,144,96,.03);}
+.neg-c{border-color:rgba(128,64,192,.3);background:rgba(128,64,192,.03);}
+.done-c{opacity:.7;}
+
+.etop{display:flex;align-items:center;gap:10px;padding:9px 12px;cursor:pointer;user-select:none;}
+.etop:hover{background:rgba(255,255,255,.02);}
+.eico{font-size:18px;flex-shrink:0;}
+.einf{flex:1;min-width:0;}
+.ettl{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.etags{display:flex;gap:5px;margin-top:3px;flex-wrap:wrap;}
+.etag{font-family:'JetBrains Mono';font-size:9px;padding:1px 7px;border-radius:10px;font-weight:600;}
+.et-task{background:rgba(106,100,88,.2);color:var(--t2);}
+.et-crisis{background:rgba(192,56,40,.18);color:#e06050;}
+.et-dec{background:rgba(232,160,48,.15);color:var(--ac);}
+.et-slack{background:rgba(58,144,96,.15);color:var(--gr);}
+.et-neg{background:rgba(192,56,40,.2);color:#e07060;}
+.et-done{background:rgba(58,144,96,.18);color:var(--gr);}
+.et-dur{background:rgba(255,255,255,.05);color:var(--t3);}
+.earr{flex-shrink:0;font-family:'JetBrains Mono';font-size:9px;color:var(--t3);}
+
+.ebody{max-height:0;overflow:hidden;transition:max-height .35s ease,padding .35s ease;padding:0 12px;}
+.ebody.open{max-height:900px;padding:0 12px 12px;}
+
+/* Event body */
+.explain-box{background:rgba(32,128,128,.08);border:1px solid rgba(32,128,128,.25);border-radius:4px;padding:9px 12px;margin-bottom:9px;}
+.explain-lbl{font-family:'JetBrains Mono';font-size:9px;letter-spacing:1px;color:var(--cy);margin-bottom:4px;}
+.explain-tx{font-size:12px;color:#90c0c0;line-height:1.7;}
+.ctx-box{padding-top:9px;margin-bottom:9px;font-size:12px;line-height:1.8;color:var(--t2);border-top:1px solid var(--bd);}
+.hbox{padding:7px 10px;border-radius:4px;font-size:11px;line-height:1.7;margin-bottom:7px;}
+.h-tip{background:rgba(48,96,192,.1);border-left:2px solid var(--bl);color:#8ab0f0;}
+.h-ch{background:rgba(232,160,48,.08);border-left:2px solid var(--ac);color:#d0a850;}
+.conseq{background:var(--s2);border:1px solid var(--bd2);border-radius:4px;margin-bottom:9px;overflow:hidden;}
+.conseq-hd{font-family:'JetBrains Mono';font-size:9px;letter-spacing:1px;color:var(--t3);padding:7px 10px;border-bottom:1px solid var(--bd);}
+.cq-row{display:flex;align-items:flex-start;gap:7px;padding:7px 10px;border-bottom:1px solid var(--bd);font-size:11px;line-height:1.6;}
+.cq-row:last-child{border:none;}
+.cq-ico{font-size:13px;flex-shrink:0;margin-top:1px;}
+.cq-label{font-family:'JetBrains Mono';font-size:8px;color:var(--t3);display:block;margin-bottom:1px;}
+.cq-tx{color:var(--t2);}
+.tacts{display:flex;gap:6px;margin-top:9px;}
+.btn-do{padding:7px 15px;background:var(--gr);color:white;border:none;border-radius:4px;font-family:'Noto Serif SC';font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;}
+.btn-do:hover{background:#2a7050;}
+.btn-skip{padding:7px 12px;background:transparent;color:var(--t3);border:1px solid var(--bd2);border-radius:4px;font-family:'Noto Serif SC';font-size:12px;cursor:pointer;transition:all .2s;}
+.btn-skip:hover{border-color:var(--t2);color:var(--t2);}
+.grade-btns{display:flex;flex-direction:column;gap:5px;margin-top:10px;}
+.grade-hint{font-size:10px;color:var(--t3);font-family:'JetBrains Mono';letter-spacing:1px;margin-bottom:2px;}
+.grade-btn{display:flex;align-items:center;gap:10px;padding:8px 12px;border:1.5px solid var(--bd);border-radius:var(--r);background:var(--s2);cursor:pointer;text-align:left;transition:all .15s;font-family:'Noto Serif SC';width:100%;}
+.gb-label{font-size:12px;font-weight:700;min-width:92px;flex-shrink:0;}
+.gb-desc{font-size:10px;color:var(--t3);}
+.grade-excellent{border-color:rgba(58,144,96,.35);}.grade-excellent .gb-label{color:#4aaa70;}.grade-excellent:hover{border-color:#4aaa70;background:rgba(58,144,96,.08);}
+.grade-good{border-color:rgba(48,96,192,.3);}.grade-good .gb-label{color:#6090d0;}.grade-good:hover{border-color:#6090d0;background:rgba(48,96,192,.06);}
+.grade-poor{border-color:rgba(200,130,30,.3);}.grade-poor .gb-label{color:var(--ac);}.grade-poor:hover{border-color:var(--ac);background:rgba(232,160,48,.06);}
+.grade-skip{border-color:rgba(192,56,40,.3);}.grade-skip .gb-label{color:var(--rd);}.grade-skip:hover{border-color:var(--rd);background:rgba(192,56,40,.06);}
+.grade-badge{display:inline-block;padding:2px 8px;border-radius:3px;font-size:10px;font-weight:700;font-family:'JetBrains Mono';margin-bottom:4px;}
+.gb-ex{background:rgba(58,144,96,.2);color:#4aaa70;}.gb-gd{background:rgba(48,96,192,.2);color:#6090d0;}
+.gb-po{background:rgba(232,160,48,.2);color:var(--ac);}.gb-sk{background:rgba(192,56,40,.2);color:var(--rd);}
+.opts{display:flex;flex-direction:column;gap:6px;margin-top:9px;}
+.opt{display:flex;align-items:center;gap:9px;padding:9px 12px;background:var(--s2);border:1.5px solid var(--bd);border-radius:var(--r);cursor:pointer;text-align:left;font-family:'Noto Serif SC';font-size:12px;color:var(--t2);transition:all .2s;}
+.opt:hover{border-color:var(--ac);color:var(--t);}
+.opt-lbl{font-family:'JetBrains Mono';font-size:10px;color:var(--ac);font-weight:700;flex-shrink:0;}
+.fb{padding:9px 12px;border-radius:4px;font-size:12px;line-height:1.7;margin-top:9px;}
+.fb-g{background:rgba(58,144,96,.1);border:1px solid rgba(58,144,96,.3);color:#80c090;}
+.fb-b{background:rgba(192,56,40,.1);border:1px solid rgba(192,56,40,.3);color:#e08070;}
+.fb-o{background:rgba(232,160,48,.08);border:1px solid rgba(232,160,48,.2);color:#c0a060;}
+.fb-eff{display:flex;gap:8px;flex-wrap:wrap;margin-top:5px;font-family:'JetBrains Mono';font-size:10px;}
+.ask-mentor{
+  display:inline-block;margin-top:9px;
+  padding:5px 11px;
+  background:rgba(32,128,128,.08);border:1px solid rgba(32,128,128,.25);border-radius:20px;
+  font-size:11px;color:var(--cy);cursor:pointer;
+  transition:all .2s;
+}
+.ask-mentor:hover{background:rgba(32,128,128,.18);}
+
+/* Loading / day-end / career-end */
+@keyframes bop{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-5px);}}
+.gload{display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;gap:8px;color:var(--t2);}
+.gload .big{font-size:32px;}
+.gload p{font-size:13px;}
+.ldots{display:flex;gap:5px;}
+.ld{width:6px;height:6px;border-radius:50%;background:var(--ac);animation:bop .8s infinite;}
+.ld:nth-child(2){animation-delay:.15s;}.ld:nth-child(3){animation-delay:.3s;}
+
+.day-end{
+  margin-top:12px;padding:18px;
+  background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);
+}
+.de-t{font-size:14px;font-weight:700;margin-bottom:6px;}
+.de-s{font-size:12px;color:var(--t2);line-height:1.7;margin-bottom:12px;}
+.de-row{display:flex;gap:8px;margin-bottom:14px;}
+.de-st{flex:1;text-align:center;background:var(--s2);border-radius:var(--r);padding:8px 4px;}
+.de-n{font-family:'JetBrains Mono';font-size:16px;font-weight:700;color:var(--ac);}
+.de-l{font-size:10px;color:var(--t3);margin-top:2px;}
+.nxt{padding:9px 20px;background:var(--ac);color:#0f0e0c;border:none;border-radius:var(--r);font-family:'Noto Serif SC';font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;margin-right:8px;}
+.nxt:hover{background:#f0b040;}
+.ret{padding:9px 14px;background:transparent;border:1px solid var(--bd2);border-radius:var(--r);font-family:'Noto Serif SC';font-size:13px;color:var(--t3);cursor:pointer;transition:all .2s;}
+.ret:hover{border-color:var(--t2);color:var(--t2);}
+
+.cend{text-align:center;padding:28px 20px;}
+.ce-e{font-size:44px;margin-bottom:10px;}
+.ce-t{font-size:20px;font-weight:900;margin-bottom:8px;}
+.ce-s{font-size:13px;color:var(--t2);line-height:1.8;margin-bottom:18px;}
+.ce-g{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:20px;}
+.cest{background:var(--s2);border:1px solid var(--bd);border-radius:var(--r);padding:10px 14px;min-width:80px;}
+.ce-n{font-family:'JetBrains Mono';font-size:18px;font-weight:700;color:var(--ac);}
+.ce-l{font-size:10px;color:var(--t3);margin-top:3px;}
+.rs{padding:11px 28px;background:var(--ac);color:#0f0e0c;border:none;border-radius:var(--r);font-family:'Noto Serif SC';font-size:14px;font-weight:700;cursor:pointer;letter-spacing:.5px;transition:all .2s;}
+.rs:hover{background:#f0b040;}
+
+/* ══════════════════════════════════════════
+   AI MENTOR OVERLAY
+══════════════════════════════════════════ */
+#mentor-overlay{
+  display:none;position:fixed;inset:0;
+  background:rgba(0,0,0,.65);z-index:1000;
+  align-items:flex-end;justify-content:center;
+  padding:16px;
+}
+#mentor-overlay.open{display:flex;}
+@keyframes slideUp{from{transform:translateY(30px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.mentor-panel{
+  width:100%;max-width:600px;
+  background:var(--s1);border:1.5px solid var(--cy);border-radius:10px 10px 0 0;
+  max-height:68vh;display:flex;flex-direction:column;
+  animation:slideUp .28s ease;
+}
+.mp-hd{flex-shrink:0;padding:12px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:9px;}
+.mp-icon{font-size:18px;}
+.mp-title{font-weight:700;font-size:13px;flex:1;}
+.mp-close{background:transparent;border:none;color:var(--t3);font-size:16px;cursor:pointer;padding:3px 7px;line-height:1;}
+.mp-close:hover{color:var(--t);}
+.mp-chat{flex:1;overflow-y:auto;padding:12px 16px;display:flex;flex-direction:column;gap:9px;}
+.mp-chat::-webkit-scrollbar{width:3px;}
+.mp-chat::-webkit-scrollbar-thumb{background:var(--bd2);}
+.mc-msg{display:flex;gap:8px;}
+.mc-msg.user{flex-direction:row-reverse;}
+.mc-av{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;background:var(--s2);border:1px solid var(--bd2);}
+.mc-msg.user .mc-av{background:var(--ac);color:#0f0e0c;}
+.mc-bubble{max-width:80%;padding:8px 11px;border-radius:7px;font-size:12px;line-height:1.7;}
+.mc-msg.ai .mc-bubble{background:var(--s2);border:1px solid var(--bd2);}
+.mc-msg.user .mc-bubble{background:rgba(232,160,48,.13);border:1px solid rgba(232,160,48,.22);}
+.mc-typing{display:flex;gap:3px;align-items:center;padding:2px 0;}
+.mc-dot{width:5px;height:5px;border-radius:50%;background:var(--cy);animation:bop .8s infinite;}
+.mc-dot:nth-child(2){animation-delay:.15s;}.mc-dot:nth-child(3){animation-delay:.3s;}
+.quick-chips{flex-shrink:0;padding:7px 16px;display:flex;gap:5px;flex-wrap:wrap;border-top:1px solid var(--bd);}
+.qchip{padding:4px 10px;background:rgba(32,128,128,.08);border:1px solid rgba(32,128,128,.28);border-radius:18px;font-size:11px;color:var(--cy);cursor:pointer;transition:all .2s;font-family:'Noto Serif SC';}
+.qchip:hover{background:rgba(32,128,128,.18);}
+.mp-input-row{flex-shrink:0;padding:10px 16px;border-top:1px solid var(--bd);display:flex;gap:7px;}
+.mp-input{flex:1;background:var(--s2);border:1px solid var(--bd2);border-radius:5px;padding:8px 11px;font-family:'Noto Serif SC';font-size:12px;color:var(--t);outline:none;}
+.mp-input:focus{border-color:var(--cy);}
+.mp-input::placeholder{color:var(--t3);}
+.mp-send{padding:8px 16px;background:var(--cy);color:white;border:none;border-radius:5px;font-family:'Noto Serif SC';font-size:12px;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap;}
+.mp-send:hover{background:#2a9090;}
+.mp-send:disabled{opacity:.5;cursor:not-allowed;}
+</style>
+</head>
+<body>
+
+<!-- ══ LANDING / SETUP ══ -->
+<div id="setup" class="screen active">
+
+  <div class="lp-left">
+    <div class="lp-header">
+      <span class="lp-logo">🎭</span>
+      <div>
+        <div class="lp-title">职业体验模拟器</div>
+        <div class="lp-subtitle">用 AI 模拟真实工作日 · 探索 <span id="careerCount">120+</span> 种职业</div>
+      </div>
+    </div>
+    <div class="lp-stats">
+      <div class="lp-stat"><span class="lp-sn" id="statTotal">54</span><span class="lp-sl">个职业</span></div>
+      <div class="lp-stat"><span class="lp-sn">6</span><span class="lp-sl">大行业</span></div>
+      <div class="lp-stat"><span class="lp-sn">AI</span><span class="lp-sl">实时生成</span></div>
+      <div class="lp-stat"><span class="lp-sn">∞</span><span class="lp-sl">每次不同</span></div>
+    </div>
+    <div class="lp-cats" id="lpCats"></div>
+    <div class="lp-wall" id="lpWall"></div>
+    <div class="lp-features">
+      <span class="lp-feat">🔍 外行人解释每个任务</span>
+      <span class="lp-feat">⚡ 真实后果与抉择</span>
+      <span class="lp-feat">😴 随机摸鱼事件</span>
+      <span class="lp-feat">🤖 AI 职业导师</span>
+      <span class="lp-feat">📊 声望·压力·人际·绩效</span>
+    </div>
+  </div>
+
+  <div class="lp-right">
+    <div class="lp-cfg">
+      <div class="cfg-title">选择 AI 提供商</div>
+      <div class="cfg-sub">填入你的 API Key，文件本地运行，Key 仅存在浏览器里</div>
+      <div class="pv-grid" id="pvGrid"></div>
+      <label class="cfg-label" id="keyLabel">API KEY</label>
+      <input class="cfg-input" id="keyInput" type="password" placeholder="" autocomplete="off">
+      <div class="cfg-hint" id="keyHint"></div>
+      <div id="modelSelectorWrap" style="display:none">
+        <label class="cfg-label" style="margin-top:4px">选择模型</label>
+        <select class="cfg-input" id="modelSelect" style="cursor:pointer" onchange="PROVIDERS[selProvider].model=this.value">
+        </select>
+      </div>
+      <button class="cfg-btn" onclick="saveKey()">立即开始体验 →</button>
+      <div class="cfg-steps">
+        <div class="cfg-steps-title">还没有 Key？</div>
+        <div class="cfg-step"><span class="cfg-sn">1</span>点上方提供商链接，注册账号</div>
+        <div class="cfg-step"><span class="cfg-sn">2</span>进入 API Keys 页面，创建密钥</div>
+        <div class="cfg-step"><span class="cfg-sn">3</span>复制粘贴到上方输入框</div>
+        <div class="cfg-free">💡 推荐新手：<strong>Google Gemini</strong> 完全免费，无需绑卡</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══ HOME ══ -->
+<div id="home" class="screen">
+  <div class="hl">
+    <div class="hl-top">
+      <div class="app-name">职业体验模拟器</div>
+      <div class="app-tag">CAREER SIM · AI POWERED</div>
+      <input class="srch" id="srch" placeholder="🔍 搜索职业…" oninput="filterC()">
+    </div>
+    <div class="cpills" id="cpills"></div>
+    <div class="clist" id="clist"></div>
+    <div class="key-bar" id="homeKeyBar" onclick="changeKey()" style="margin:8px 10px 10px;">🔑 <span id="homeKeyBarLabel" style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">API Key</span> <span style="font-size:10px;flex-shrink:0;color:var(--ac)">修改</span></div>
+  </div>
+  <div class="hr" id="hr">
+    <div class="empty-state">
+      <div class="big">👈</div>
+      <p style="font-size:13px;line-height:1.9;color:var(--t2)">从左侧选一个<br>感兴趣的职业</p>
+    </div>
+  </div>
+</div>
+
+<!-- ══ GAME ══ -->
+<div id="game" class="screen">
+  <div class="sb">
+    <div class="sb-hd">
+      <div class="sb-car">
+        <span class="sb-e" id="sbE">👔</span>
+        <div><div class="sb-n" id="sbN">职业</div><div class="sb-r" id="sbR">角色</div></div>
+      </div>
+      <div class="ddots" id="ddots"></div>
+    </div>
+    <div class="sb-stats">
+      <div class="sr"><div class="sr-top"><span class="sr-n">声望</span><span class="sr-v" id="vRep" style="color:var(--ac)">50</span></div><div class="sr-bar"><div class="sr-f f-rep" id="bRep" style="width:50%"></div></div></div>
+      <div class="sr"><div class="sr-top"><span class="sr-n">压力</span><span class="sr-v" id="vStr" style="color:var(--rd)">20</span></div><div class="sr-bar"><div class="sr-f f-str" id="bStr" style="width:20%"></div></div></div>
+      <div class="sr"><div class="sr-top"><span class="sr-n">人际</span><span class="sr-v" id="vRel" style="color:var(--bl)">50</span></div><div class="sr-bar"><div class="sr-f f-rel" id="bRel" style="width:50%"></div></div></div>
+      <div class="sr"><div class="sr-top"><span class="sr-n">绩效</span><span class="sr-v" id="vPer" style="color:var(--gr)">50</span></div><div class="sr-bar"><div class="sr-f f-per" id="bPer" style="width:50%"></div></div></div>
+    </div>
+    <div class="mentor-btn" onclick="openMentor()">🤖 问问职业导师</div>
+    <div class="ach-btn" id="achBtn" onclick="openAchievements()">🏅 成就 <span id="achCount" style="font-family:'JetBrains Mono';font-size:10px;color:var(--ac)">0</span></div>
+    <div class="sb-log"><div class="log-hd">TODAY LOG</div><div id="logEl"></div></div>
+    <div class="key-bar" id="keyBar" onclick="changeKey()">🔑 <span style="flex:1">API Key</span> <span style="font-size:10px">修改</span></div>
+  </div>
+
+  <div class="gm">
+    <div class="gm-hd">
+      <button class="back-btn" onclick="quitHome()">← 退出</button>
+      <span class="day-badge" id="dayBadge">DAY 1</span>
+      <span class="day-ttl" id="dayTtl">今日工作</span>
+      <span class="day-met" id="dayMet"></span>
+    </div>
+    <div class="tl" id="tl">
+      <div class="gload"><div class="big">⏳</div><p>正在生成今天的工作…</p><div class="ldots"><div class="ld"></div><div class="ld"></div><div class="ld"></div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ AI MENTOR OVERLAY ══ -->
+<div id="mentor-overlay" onclick="closeMentorOuter(event)">
+  <div class="mentor-panel">
+    <div class="mp-hd">
+      <span class="mp-icon">🤖</span>
+      <span class="mp-title">职业导师 — 随时提问</span>
+      <button class="mp-close" onclick="closeMentor()">✕</button>
+    </div>
+    <div class="mp-chat" id="mpChat">
+      <div class="mc-msg ai">
+        <div class="mc-av">🤖</div>
+        <div class="mc-bubble">你好！我是职业导师。可以问我任何关于当前职业的问题，比如：<br>• 这个任务是啥意思？<br>• 为什么要做这件事？<br>• 做砸了会有什么后果？</div>
+      </div>
+    </div>
+    <div class="quick-chips" id="quickChips"></div>
+    <div class="mp-input-row">
+      <input class="mp-input" id="mpInput" placeholder="问我任何关于这个职业的问题…" onkeydown="if(event.key==='Enter')sendMentor()">
+      <button class="mp-send" id="mpSend" onclick="sendMentor()">发送</button>
+    </div>
+  </div>
+</div>
+
+<script>
+window.onerror = function(msg, src, line, col, err){
+  console.error('[GameError]', msg, 'line:'+line, err);
+  var d=document.getElementById('_dbg');
+  if(!d){d=document.createElement('div');d.id='_dbg';d.style.cssText='position:fixed;bottom:0;left:0;right:0;background:#200a0a;border-top:2px solid #c03828;color:#e8e0d0;font-family:monospace;font-size:11px;padding:8px 12px;z-index:9999;max-height:150px;overflow:auto;';document.body.appendChild(d);}
+  d.innerHTML+='<div style="color:#e07060">ERR: '+String(msg).slice(0,150)+' (L'+line+')</div>';
+  return true;
+};
+window.addEventListener('unhandledrejection',function(e){
+  console.error('[Promise]',e.reason);
+  var d=document.getElementById('_dbg');
+  if(!d){d=document.createElement('div');d.id='_dbg';d.style.cssText='position:fixed;bottom:0;left:0;right:0;background:#200a0a;border-top:2px solid #c03828;color:#e8e0d0;font-family:monospace;font-size:11px;padding:8px 12px;z-index:9999;max-height:150px;overflow:auto;';document.body.appendChild(d);}
+  d.innerHTML+='<div style="color:#e8a030">PRO: '+String(e.reason?.message||e.reason).slice(0,150)+'</div>';
+  e.preventDefault();
+});
+const CAREERS = [
+  // 创意
+  {id:'director',e:'🎬',n:'电影导演',s:'独立剧情片拍摄期',cat:'creative',diff:'高压',sal:'项目制',
+   desc:'带领30人创作团队，把纸上的故事变成银幕影像。你同时是艺术家、心理师和项目经理。',
+   learns:['在有限资源下做创意取舍的能力','如何管理创作者脆弱的情绪与自尊','对视觉语言和叙事节奏的感知训练'],
+   experiences:['演员罢拍时你需要当场化解','预算超支逼你删掉最喜欢的场景','第一次看到粗剪时的混乱与期待'],
+   dp:[{t:'08:00',l:'晨会·确认拍摄计划',type:'task'},{t:'09:30',l:'突发·主演情绪崩溃',type:'crisis'},{t:'11:00',l:'拍摄·核心情感场景',type:'task'},{t:'14:00',l:'决策·预算超支方案',type:'dec'},{t:'16:00',l:'摸鱼·片场闲聊八卦',type:'slack'},{t:'18:00',l:'素材审看·给剪辑反馈',type:'task'}],
+   st:[{i:'🎭',n:'声望',h:'每个成功场景都在积累口碑'},{i:'😰',n:'压力',h:'拍摄期几乎每天都是高压'},{i:'🤝',n:'人际',h:'剧组关系决定现场配合质量'},{i:'⭐',n:'绩效',h:'素材质量直接反映在成片上'}]},
+
+  {id:'designer',e:'🎨',n:'UI设计师',s:'互联网产品设计团队',cat:'creative',diff:'中等',sal:'15-30k',
+   desc:'你是用户与产品之间的翻译官。你的设计决定数百万用户每天触摸屏幕时的感受。',
+   learns:['用数据驱动审美决策','理解技术可行性对设计的约束','在"用户需要"和"产品要"之间找平衡'],
+   experiences:['精心设计的方案被产品一句话推翻','用户测试发现自己完全想错了','方案上线后看到用户行为数据的紧张'],
+   dp:[{t:'09:30',l:'站会·同步进度',type:'task'},{t:'10:00',l:'用研·访谈用户',type:'task'},{t:'13:00',l:'突发·竞品改版了',type:'crisis'},{t:'14:30',l:'评审·向产品提案',type:'dec'},{t:'16:30',l:'摸鱼·刷设计网站',type:'slack'},{t:'17:00',l:'任务·完成高保真原型',type:'task'}],
+   st:[{i:'✨',n:'声望',h:'好设计让所有人记住你的名字'},{i:'🧠',n:'压力',h:'创意枯竭和反复改稿是日常'},{i:'💬',n:'人际',h:'需要同时搞定产品开发运营'},{i:'📐',n:'绩效',h:'可用性指标是最诚实的成绩单'}]},
+
+  {id:'chef',e:'👨‍🍳',n:'米其林主厨',s:'两星法餐厅',cat:'creative',diff:'极高压',sal:'项目制',
+   desc:'厨房是你的战场。在服务开始前的4小时里，你需要把一切准备到完美。一旦开始，就没有回头路。',
+   learns:['极致的细节控制力和标准化思维','高压下保持创造力的心理训练','团队执行力完全取决于主厨的状态'],
+   experiences:['服务高峰时厨房里奇异的混乱与秩序','食材临时出问题时的即兴创作','第一次收到客人来信感谢的时刻'],
+   dp:[{t:'07:00',l:'收货·检验食材质量',type:'task'},{t:'09:00',l:'突发·供应商出问题',type:'crisis'},{t:'10:00',l:'备餐·精确到克的准备',type:'task'},{t:'13:00',l:'摸鱼·偷吃试吃品',type:'slack'},{t:'15:00',l:'决策·今日菜单最终版',type:'dec'},{t:'17:30',l:'晚餐服务开始',type:'task'}],
+   st:[{i:'⭐',n:'声望',h:'米其林评审可能随时悄悄到访'},{i:'🔥',n:'压力',h:'厨房里每一秒都在燃烧'},{i:'👥',n:'人际',h:'厨师团队的信任每天都需要维护'},{i:'🍽️',n:'绩效',h:'每道菜都是你绩效的直接体现'}]},
+
+  {id:'photographer',e:'📸',n:'商业摄影师',s:'品牌广告拍摄',cat:'creative',diff:'中等',sal:'项目制',
+   desc:'你用一张照片讲一个故事。每次拍摄都是需要精密协调的表演，光线、情绪、客户期待同时管理。',
+   learns:['光线和构图是可以系统训练的感知','如何管理现场团队和客户期待','后期修图是和前期拍摄同等重要的技能'],
+   experiences:['完美光线消失前最后5分钟的飞速拍摄','客户看到照片时眼睛一亮的瞬间','模特发挥超预期的意外惊喜'],
+   dp:[{t:'08:00',l:'勘景·确认拍摄场地',type:'task'},{t:'10:00',l:'拍摄·产品主视觉',type:'task'},{t:'12:00',l:'突发·主要道具损坏',type:'crisis'},{t:'14:00',l:'摸鱼·和模特聊天',type:'slack'},{t:'15:00',l:'决策·是否推翻原定构图',type:'dec'},{t:'18:30',l:'选片·与客户确认',type:'dec'}],
+   st:[{i:'👁️',n:'声望',h:'作品集是你在行业的通行证'},{i:'⚡',n:'压力',h:'每个项目都有不可重来的拍摄窗口'},{i:'🎭',n:'人际',h:'让拍摄对象放松是核心技能'},{i:'🖼️',n:'绩效',h:'客户满意度决定下次是否找你'}]},
+
+  {id:'gamedev',e:'🎮',n:'游戏策划',s:'手游核心玩法设计',cat:'creative',diff:'中等',sal:'15-25k',
+   desc:'你设计的规则将让数百万玩家沉迷——或者让他们5分钟内卸载游戏。这是一个关于人类心理的游戏。',
+   learns:['游戏性背后的心理学和行为经济学','如何用数值设计影响玩家行为','从玩法文档到可玩原型的落地过程'],
+   experiences:['内测时玩家以完全意想不到的方式游玩','数值失衡导致的紧急热更新','玩家社区自发创造内容时的成就感'],
+   dp:[{t:'09:30',l:'站会·版本进度对齐',type:'task'},{t:'10:00',l:'任务·关卡数值平衡',type:'task'},{t:'11:30',l:'突发·玩家大规模反馈Bug',type:'crisis'},{t:'14:00',l:'决策·新付费点方案评审',type:'dec'},{t:'16:00',l:'摸鱼·打自己公司的游戏',type:'slack'},{t:'17:30',l:'决策·下版本功能优先级',type:'dec'}],
+   st:[{i:'🎯',n:'声望',h:'爆款游戏让你的名字被整个行业记住'},{i:'💭',n:'压力',h:'玩家反馈可以瞬间让一个月努力崩塌'},{i:'👾',n:'人际',h:'和程序美术的协作决定你能做什么'},{i:'📊',n:'绩效',h:'留存率和付费转化是最诚实的评分'}]},
+
+  {id:'writer',e:'✍️',n:'编剧',s:'长剧本创作（剧集）',cat:'creative',diff:'中等',sal:'项目制',
+   desc:'你要在120页纸上制造一个足以让人放弃睡眠的世界。孤独、返工、灵感与枯竭交替出现。',
+   learns:['结构性思维：故事骨架比细节更重要','如何把抽象情感转化为可拍摄的具体场景','理解影视工业对剧本的实际约束'],
+   experiences:['凌晨三点突然想通了卡了三周的情节','导演一句话推翻你精心设计的场景','演员把你的台词演活的感动'],
+   dp:[{t:'09:00',l:'任务·修改第三幕结构',type:'task'},{t:'11:00',l:'突发·导演要求改人物动机',type:'crisis'},{t:'14:00',l:'剧本会·与导演逐场过',type:'dec'},{t:'16:00',l:'摸鱼·刷剧找灵感',type:'slack'},{t:'17:00',l:'任务·完成新场景初稿',type:'task'},{t:'18:30',l:'决策·是否接受平台删改',type:'dec'}],
+   st:[{i:'📖',n:'声望',h:'一部口碑剧可以改变整个职业生涯'},{i:'🤯',n:'压力',h:'截稿日期和创意空白同时存在'},{i:'🎭',n:'人际',h:'和导演制片的关系决定你的话语权'},{i:'📝',n:'绩效',h:'稿件质量和交付速度缺一不可'}]},
+
+  // 自媒体 (新增)
+  {id:'blogger',e:'📱',n:'生活博主',s:'百万粉丝自媒体账号',cat:'media',diff:'中等',sal:'广告+电商',
+   desc:'你的生活就是你的内容。每天要拍摄、剪辑、发布、回复评论，还要和品牌谈合作——听起来很酷，实际上是全年无休的工作。',
+   learns:['内容创作的规律：什么内容会爆，为什么','如何建立与粉丝的真实连接','平台算法与个人创作之间的博弈'],
+   experiences:['一个随手拍的视频意外爆了100万播放','精心制作的内容没人看的失落','第一次收到品牌合作邮件时的惊喜'],
+   dp:[{t:'09:00',l:'任务·回复昨天的评论',type:'task'},{t:'10:00',l:'任务·外出拍摄内容素材',type:'task'},{t:'13:00',l:'突发·视频被举报下架',type:'crisis'},{t:'14:30',l:'摸鱼·刷同类博主内容',type:'slack'},{t:'15:30',l:'决策·是否接受争议品牌合作',type:'dec'},{t:'17:00',l:'任务·剪辑今日内容',type:'task'}],
+   st:[{i:'🌟',n:'声望',h:'粉丝量和互动率是你在这行的货币'},{i:'📲',n:'压力',h:'停更三天粉丝就会问你出了什么事'},{i:'❤️',n:'人际',h:'和粉丝的真实连接是你最大的护城河'},{i:'📈',n:'绩效',h:'播放量、涨粉量、商业变现是三维指标'}]},
+
+  {id:'youtuber',e:'🎥',n:'UP主/YouTuber',s:'百万订阅视频频道',cat:'media',diff:'高压',sal:'广告分成+合作',
+   desc:'从选题到拍摄到剪辑到发布，你一个人干着制片公司的活。算法是你的上司，粉丝是你的老板，内容是你的产品。',
+   learns:['选题能力：预判什么内容能触达更多人','视频叙事结构：开头5秒决定生死','如何在没有人监督的情况下持续产出'],
+   experiences:['为了一个5分钟视频剪辑了30小时的崩溃','评论区突然出现的恶意攻击','视频被算法推上首页时的震惊'],
+   dp:[{t:'09:00',l:'任务·选题研究和脚本',type:'task'},{t:'11:00',l:'任务·录制视频',type:'task'},{t:'13:30',l:'摸鱼·看粉丝评论',type:'slack'},{t:'14:30',l:'突发·竞品发布相似选题',type:'crisis'},{t:'15:30',l:'任务·剪辑和后期制作',type:'task'},{t:'18:00',l:'决策·发布时间和标题策略',type:'dec'}],
+   st:[{i:'▶️',n:'声望',h:'订阅量和完播率是你的核心指标'},{i:'⏰',n:'压力',h:'更新频率和内容质量始终对立'},{i:'💬',n:'人际',h:'评论区是你了解粉丝的最直接窗口'},{i:'💰',n:'绩效',h:'广告收入和品牌合作量是最终结果'}]},
+
+  {id:'podcaster',e:'🎙️',n:'播客主播',s:'知识类播客节目',cat:'media',diff:'中等',sal:'广告+会员',
+   desc:'在这个视觉化内容泛滥的时代，你选择了用声音建立深度连接。你的节目让通勤变得有意义。',
+   learns:['深度访谈能力：如何引导嘉宾说出真实想法','内容策略：系列化内容比单集更有生命力','声音媒介的独特表达方式和节奏感'],
+   experiences:['嘉宾在录制中分享了从未公开说过的故事','节目被一个陌生人说改变了他的某个决定','录完后发现录音设备出了问题'],
+   dp:[{t:'09:00',l:'任务·选题和嘉宾邀约',type:'task'},{t:'10:30',l:'任务·录制本期节目',type:'task'},{t:'13:00',l:'摸鱼·听竞品播客',type:'slack'},{t:'14:00',l:'突发·嘉宾临时放鸽子',type:'crisis'},{t:'15:30',l:'任务·剪辑和添加音效',type:'task'},{t:'17:00',l:'决策·是否涉及争议话题',type:'dec'}],
+   st:[{i:'🎙️',n:'声望',h:'口碑在小圈子里慢慢积累，但很牢固'},{i:'🤔',n:'压力',h:'选题和更新频率是持续的焦虑来源'},{i:'🗣️',n:'人际',h:'嘉宾资源是节目质量的关键变量'},{i:'👂',n:'绩效',h:'收听量和订阅增长是核心数据'}]},
+
+  {id:'kol',e:'🌸',n:'KOL带货主播',s:'直播电商',cat:'media',diff:'高压',sal:'佣金制',
+   desc:'三个小时，你要面对摄像头卖出几百万的货。选品、表达、互动、节奏——一分钟的失误就是真金白银。',
+   learns:['实时互动能力：边说话边处理弹幕评论','带货语言的结构：恐惧感+解决方案+紧迫感','如何建立让粉丝愿意为你的推荐买单的信任'],
+   experiences:['直播间突然掉进来十万人的慌乱与兴奋','一个产品被粉丝质量投诉的危机处理','连续直播5小时喉咙沙哑但还要保持热情'],
+   dp:[{t:'10:00',l:'任务·选品和谈品牌价格',type:'task'},{t:'13:00',l:'任务·直播前排练话术',type:'task'},{t:'15:00',l:'直播·三小时带货开始',type:'task'},{t:'18:00',l:'突发·产品质量被粉丝质疑',type:'crisis'},{t:'19:00',l:'摸鱼·刷今天的弹幕',type:'slack'},{t:'20:00',l:'决策·是否继续合作该品牌',type:'dec'}],
+   st:[{i:'📣',n:'声望',h:'粉丝信任度是你带货能力的天花板'},{i:'🔋',n:'压力',h:'直播是体力和精神的双重消耗'},{i:'💝',n:'人际',h:'和品牌方的关系决定你能卖什么好货'},{i:'💰',n:'绩效',h:'GMV（销售额）是这行唯一的语言'}]},
+
+  {id:'designer_gfx',e:'✏️',n:'自由插画师',s:'接稿接单独立创作',cat:'media',diff:'中等',sal:'项目制',
+   desc:'你在创作自由和温饱之间走钢丝。每一张接受了的稿子背后，都有一张你没说出口的"但是我有个想法"。',
+   learns:['接单管理：如何报价和保护自己的权益','客户沟通：把"我要红色"翻译成可执行的方案','风格化：在保持商业性的同时建立个人辨识度'],
+   experiences:['客户改了十几稿后说"算了还是用第一版"','作品在社交媒体意外传播的既惊喜又焦虑','第一次有人说"我认识你的风格"的感动'],
+   dp:[{t:'09:30',l:'任务·整理今日待回款',type:'task'},{t:'10:00',l:'任务·新稿件创作',type:'task'},{t:'13:00',l:'突发·客户要求大改',type:'crisis'},{t:'15:00',l:'摸鱼·逛小红书找灵感',type:'slack'},{t:'16:00',l:'决策·是否接价格低但有趣的案子',type:'dec'},{t:'17:30',l:'任务·发稿和跟进款项',type:'task'}],
+   st:[{i:'🖌️',n:'声望',h:'作品集的积累决定你能接到什么量级的稿'},{i:'🌀',n:'压力',h:'截稿日期和创意焦虑同步出现'},{i:'📩',n:'人际',h:'客户关系是稳定接稿的关键'},{i:'💵',n:'绩效',h:'月收入和稿件完成率是你的绩效'}]},
+
+  // 服务
+  {id:'doctor',e:'👨‍⚕️',n:'急诊科医生',s:'三甲医院急诊科',cat:'service',diff:'极高压',sal:'25-50k',
+   desc:'当所有人都慌乱时，你必须是最冷静的那个人。急诊室没有普通的一天，只有程度不同的危机。',
+   learns:['在信息不完整时快速做出高质量决策','极度疲劳下维持专业标准的能力','用沟通管理患者和家属的情绪预期'],
+   experiences:['第一次独立处理危重患者的手抖与镇定','宣布坏消息时家属的眼神让你久久无法忘记','抢救成功后和团队相视一笑的默契'],
+   dp:[{t:'07:30',l:'交班·接收夜班病人',type:'task'},{t:'09:30',l:'紧急·车祸颅内压升高',type:'crisis'},{t:'11:30',l:'门诊·处理加号急症',type:'task'},{t:'13:30',l:'摸鱼·躲在办公室吃盒饭',type:'slack'},{t:'14:30',l:'决策·告知家属肿瘤晚期',type:'dec'},{t:'17:30',l:'交班·向夜班移交',type:'task'}],
+   st:[{i:'⚕️',n:'声望',h:'口碑在患者和同行中静静积累'},{i:'😓',n:'压力',h:'生死一线的决策是最重的心理负担'},{i:'🤝',n:'人际',h:'科室关系影响你的会诊和支援资源'},{i:'📊',n:'绩效',h:'治疗结果和差错率是核心指标'}]},
+
+  {id:'lawyer',e:'⚖️',n:'诉讼律师',s:'大型律所争议解决',cat:'service',diff:'高压',sal:'20-60k',
+   desc:'你是用语言战斗的人。在法庭上，你的每一句话都可能改变委托人的命运。准备充分是唯一的武器。',
+   learns:['逻辑严密的论证和反驳能力','高压对抗中保持情绪稳定的训练','快速消化大量陌生专业知识的方法'],
+   experiences:['庭审中对方突然出示意外证据时的应变','委托人第一次说"我相信你"时的重量','胜诉后看到委托人的眼泪'],
+   dp:[{t:'08:00',l:'任务·庭审前准备',type:'task'},{t:'10:00',l:'庭审·出庭质证',type:'task'},{t:'13:30',l:'摸鱼·午休刷新闻',type:'slack'},{t:'14:00',l:'突发·对方提交新证据',type:'crisis'},{t:'16:00',l:'决策·建议委托人和解？',type:'dec'},{t:'17:30',l:'任务·撰写诉状',type:'task'}],
+   st:[{i:'⚖️',n:'声望',h:'胜诉记录是你最有力的简历'},{i:'🧠',n:'压力',h:'一个败诉可能影响整个案件团队'},{i:'🤝',n:'人际',h:'委托人信任需要持续维护'},{i:'📋',n:'绩效',h:'胜诉率和客户满意度是硬指标'}]},
+
+  {id:'teacher',e:'📚',n:'高中班主任',s:'市重点高中高三班',cat:'service',diff:'中等',sal:'8-15k',
+   desc:'你不只在教知识，你在影响18个生命在关键时刻的走向。这是一份没人告诉你有多难的工作。',
+   learns:['因材施教：读懂每个孩子的真实需求','在权威和共情之间找到微妙平衡','管理数十个家庭的期待和焦虑'],
+   experiences:['一个后进生突然开窍时的喜悦','家长会上无端被质疑的委屈','高考出成绩后学生打来的电话'],
+   dp:[{t:'07:00',l:'早自习·班级管理',type:'task'},{t:'08:00',l:'任务·授课3节',type:'task'},{t:'10:30',l:'突发·学生之间矛盾激化',type:'crisis'},{t:'13:00',l:'摸鱼·办公室喝茶聊天',type:'slack'},{t:'14:00',l:'决策·问题学生是否上报',type:'dec'},{t:'16:30',l:'任务·批改作业',type:'task'}],
+   st:[{i:'📚',n:'声望',h:'学生的成长是你最好的名片'},{i:'😮‍💨',n:'压力',h:'高考压力传导到每个班主任'},{i:'❤️',n:'人际',h:'和学生家长关系错综复杂'},{i:'📈',n:'绩效',h:'班级升学率是最直接的考核'}]},
+
+  {id:'therapist',e:'🧠',n:'心理咨询师',s:'私人执业',cat:'service',diff:'中等',sal:'项目制',
+   desc:'你每天接受别人最脆弱的部分，同时必须保持自己的完整。这是一份需要持续自我修炼的职业。',
+   learns:['深度倾听：听到语言背后的真实需求','如何在帮助他人的同时保护自己不被消耗','理解心理问题的复杂性和漫长性'],
+   experiences:['来访者第一次突破心防时的静默','意识到某个案例超出自己能力范围的清醒','来访者数月后回来说"我好多了"'],
+   dp:[{t:'09:00',l:'任务·案例记录和备案',type:'task'},{t:'10:00',l:'咨询·焦虑症来访者',type:'task'},{t:'12:00',l:'摸鱼·冥想和自我调节',type:'slack'},{t:'14:00',l:'突发·来访者出现危机倾向',type:'crisis'},{t:'15:30',l:'决策·是否转介高危来访者',type:'dec'},{t:'17:00',l:'任务·个人督导记录',type:'task'}],
+   st:[{i:'🧘',n:'声望',h:'来访者口碑介绍是最好的背书'},{i:'💙',n:'压力',h:'共情消耗是最大的隐形成本'},{i:'🤗',n:'人际',h:'咨询关系是这份工作的核心资产'},{i:'❤️‍🩹',n:'绩效',h:'来访者改变是唯一有意义的绩效'}]},
+
+  {id:'journalist',e:'📰',n:'调查记者',s:'深度报道组',cat:'service',diff:'高压',sal:'10-20k',
+   desc:'你在黑暗中打手电筒。找到真相、核实真相、发出真相——这比任何时候都更难，也更重要。',
+   learns:['信息核实和逻辑推断的严格方法','在保护信源和追求真相之间的职业伦理','长周期项目的信息管理和情绪管理'],
+   experiences:['信源突然撤回证词时的崩溃','文章发出后在社会上引发讨论的激动','报道真正改变了某件事情的结果'],
+   dp:[{t:'09:00',l:'任务·整理采访录音',type:'task'},{t:'10:30',l:'采访·关键知情人',type:'task'},{t:'13:00',l:'摸鱼·在咖啡馆写稿',type:'slack'},{t:'14:00',l:'突发·信源反悔要撤稿',type:'crisis'},{t:'16:00',l:'决策·是否在证据不足时发稿',type:'dec'},{t:'17:30',l:'任务·完成初稿',type:'task'}],
+   st:[{i:'📰',n:'声望',h:'真实准确的报道是你的行业通行证'},{i:'🔍',n:'压力',h:'每个细节出错都可能引发严重后果'},{i:'🕵️',n:'人际',h:'信源关系是你最宝贵的隐形资产'},{i:'📢',n:'绩效',h:'报道影响力和准确度是核心评价'}]},
+
+  // 技术
+  {id:'engineer',e:'👨‍💻',n:'后端工程师',s:'互联网大厂支付系统',cat:'tech',diff:'高压',sal:'25-50k',
+   desc:'你写的代码每天处理数亿笔交易。正常时没人注意你；出问题时所有人的电话都会打给你。',
+   learns:['系统性思维：一个改动如何影响整个系统','在技术债和新需求之间做优先级决策','P0故障下的冷静排查和快速恢复能力'],
+   experiences:['第一次独立解决线上P0故障的肾上腺素','Code Review被反复打回时的挫败与成长','系统扛住大促峰值时悄悄松一口气'],
+   dp:[{t:'09:30',l:'站会·每日同步',type:'task'},{t:'10:00',l:'任务·代码审查',type:'task'},{t:'10:50',l:'紧急·生产P0故障',type:'crisis'},{t:'13:00',l:'摸鱼·刷技术论坛',type:'slack'},{t:'14:30',l:'任务·系统架构设计',type:'task'},{t:'17:30',l:'决策·技术债偿还计划',type:'dec'}],
+   st:[{i:'💻',n:'声望',h:'稳定的系统是你对团队最大的贡献'},{i:'⚡',n:'压力',h:'线上故障让时间突然变得极度紧迫'},{i:'🤝',n:'人际',h:'跨团队协作能力决定你的影响半径'},{i:'📈',n:'绩效',h:'故障率和需求完成率是最硬的数字'}]},
+
+  {id:'pm',e:'📱',n:'产品经理',s:'App核心功能迭代',cat:'tech',diff:'高压',sal:'20-40k',
+   desc:'你没有任何直接权力，但所有人都要听你协调。你是技术、设计、运营之间的粘合剂，也是背锅侠。',
+   learns:['需求分析：区分用户真实需求和表面诉求','如何在没有权力的情况下让事情发生','数据驱动的产品决策思维'],
+   experiences:['用户对你精心设计的功能完全不买账','开发说"做不了"你需要判断真假','产品上线时看到数据的紧张与期待'],
+   dp:[{t:'09:30',l:'站会·同步开发进度',type:'task'},{t:'10:30',l:'任务·用户调研分析',type:'task'},{t:'13:00',l:'摸鱼·刷产品评测视频',type:'slack'},{t:'13:30',l:'突发·竞品发布新功能',type:'crisis'},{t:'15:00',l:'任务·撰写PRD文档',type:'task'},{t:'17:00',l:'决策·下版本功能优先级',type:'dec'}],
+   st:[{i:'📱',n:'声望',h:'产品数据漂亮是你最好的背书'},{i:'🤯',n:'压力',h:'所有部门的诉求都汇集到你这里'},{i:'💬',n:'人际',h:'搞定所有人是PM最核心的能力'},{i:'📊',n:'绩效',h:'DAU留存率转化率是你的成绩单'}]},
+
+  {id:'datascientist',e:'📊',n:'数据科学家',s:'用户增长分析',cat:'tech',diff:'中等',sal:'25-45k',
+   desc:'你把混乱的数据变成清晰洞察，把洞察变成可执行决策。但首先你需要说服其他人你的结论是对的。',
+   learns:['数据直觉：快速判断哪些信号是噪音','统计思维在实际商业场景中的正确应用','如何用数据讲让非技术人听懂的故事'],
+   experiences:['发现数据异常，原来是系统Bug','你的分析推翻了高管的直觉判断','实验结果和预测完全一致的满足感'],
+   dp:[{t:'09:00',l:'任务·数据清洗和建模',type:'task'},{t:'11:00',l:'任务·A/B实验结果分析',type:'task'},{t:'13:00',l:'突发·数据异常警报',type:'crisis'},{t:'15:00',l:'摸鱼·在Excel里瞎玩数据',type:'slack'},{t:'15:30',l:'决策·向业务方汇报增长策略',type:'dec'},{t:'17:30',l:'任务·Dashboard搭建',type:'task'}],
+   st:[{i:'📊',n:'声望',h:'准确预测让你成为最可靠的人'},{i:'🧮',n:'压力',h:'数据结论错误直接影响业务决策'},{i:'🗣️',n:'人际',h:'说服业务方接受结论是最大挑战'},{i:'🎯',n:'绩效',h:'模型准确率和分析影响力是核心'}]},
+
+  {id:'aiengineer',e:'🤖',n:'AI工程师',s:'大模型产品落地',cat:'tech',diff:'高压',sal:'30-60k',
+   desc:'你站在技术最前沿，也站在最大不确定性上。今天有效的方法，明天可能被一篇论文颠覆。',
+   learns:['快速学习和迭代：跟上以周为单位进化的领域','工程直觉：分辨哪些技术在生产环境真正可用','如何向非技术人解释AI的能力边界'],
+   experiences:['模型测试时完美，上线后立刻出错','Prompt一个词改变导致结果天差地别','产品因AI能力获得用户好评的惊喜'],
+   dp:[{t:'09:00',l:'任务·模型效果评估',type:'task'},{t:'10:30',l:'突发·线上推理延迟飙升',type:'crisis'},{t:'13:00',l:'摸鱼·读最新arxiv论文',type:'slack'},{t:'14:30',l:'任务·Prompt优化迭代',type:'task'},{t:'16:00',l:'决策·技术方案选型',type:'dec'},{t:'17:30',l:'任务·与产品对齐能力边界',type:'task'}],
+   st:[{i:'🧠',n:'声望',h:'成功AI落地项目让你被行业记住'},{i:'🔄',n:'压力',h:'技术迭代速度让人有永远追不上的恐慌'},{i:'💡',n:'人际',h:'和产品协作决定你能做出什么影响'},{i:'⚡',n:'绩效',h:'延迟准确率用户满意度是核心指标'}]},
+
+  // 商业
+  {id:'entrepreneur',e:'🚀',n:'创业者',s:'A轮融资中',cat:'business',diff:'极高压',sal:'0+期权',
+   desc:'你押上了一切。没有固定薪水，没有退路，只有一个你相信的想法和一群愿意跟你冒险的人。',
+   learns:['极度不确定性中保持判断力和执行力','资源极度有限时的优先级取舍','融资产品团队三件事永远同时进行'],
+   experiences:['投资人第一次说"有意思，继续聊"时的心跳','发工资日账上余额不够的真实恐慌','用户自发分享你产品时无与伦比的感动'],
+   dp:[{t:'07:00',l:'任务·查数据回邮件',type:'task'},{t:'09:00',l:'全员会·方向对齐',type:'dec'},{t:'11:00',l:'融资·投资人DD回复',type:'task'},{t:'13:00',l:'摸鱼·打星际放空大脑',type:'slack'},{t:'14:30',l:'突发·核心员工想离职',type:'crisis'},{t:'17:30',l:'任务·投资人月报',type:'task'}],
+   st:[{i:'🌟',n:'声望',h:'投资人和用户认可会快速叠加'},{i:'🔥',n:'压力',h:'创业的压力是持续的存在状态'},{i:'👥',n:'人际',h:'团队信任是最重要的战略资产'},{i:'📈',n:'绩效',h:'增长数据是你向所有人交代的货币'}]},
+
+  {id:'investor',e:'💰',n:'风险投资人',s:'早期基金合伙人',cat:'business',diff:'中等',sal:'底薪+carry',
+   desc:'你每年见500家公司，投资其中3家。这份工作的核心是判断——对人、对市场、对时机的判断。',
+   learns:['在信息不完整时快速评估团队和机会','投资逻辑构建：从赛道研究到单个项目','资本游戏规则：估值、条款、董事会'],
+   experiences:['见到一个你认为会改变世界的创始人','三年后看到投资的公司上市','做错判断让LP的钱打水漂的愧疚'],
+   dp:[{t:'08:00',l:'任务·行业研究',type:'task'},{t:'09:30',l:'LP会·季度汇报',type:'dec'},{t:'11:00',l:'任务·项目见面',type:'task'},{t:'13:30',l:'摸鱼·和同行打高尔夫',type:'slack'},{t:'14:30',l:'投委会·三个项目投票',type:'dec'},{t:'16:30',l:'突发·被投企业发生危机',type:'crisis'}],
+   st:[{i:'🎯',n:'声望',h:'押中独角兽是这行最好的名片'},{i:'🤔',n:'压力',h:'每个决策都涉及几千万甚至几亿'},{i:'🤝',n:'人际',h:'与创始人和LP的关系是核心资产'},{i:'💎',n:'绩效',h:'基金IRR是10年后最终的成绩单'}]},
+
+  {id:'consultant',e:'📋',n:'战略顾问',s:'顶级咨询公司项目组',cat:'business',diff:'高压',sal:'30-80k',
+   desc:'你每隔几个月就成为一个新行业的"专家"。快速学习、结构思考、有说服力地呈现——这是你全部的武器。',
+   learns:['金字塔原理：先结论后论据的思维方式','在陌生领域快速建立结构性认知','把分析变成客户愿意买单的建议'],
+   experiences:['PPT做到凌晨两点次日九点出现在客户面前','客户按你的建议行动结果远超预期','发现你的分析框架根本没有切中问题核心'],
+   dp:[{t:'09:00',l:'任务·行业数据收集',type:'task'},{t:'11:00',l:'客户会·阶段性发现',type:'dec'},{t:'13:00',l:'摸鱼·公司楼下Manner喝咖啡',type:'slack'},{t:'14:00',l:'突发·客户高层有异议',type:'crisis'},{t:'16:30',l:'决策·最终建议框架定稿',type:'dec'},{t:'18:00',l:'任务·PPT制作和数据验证',type:'task'}],
+   st:[{i:'🧠',n:'声望',h:'每个成功项目在建立你的专业口碑'},{i:'⏱️',n:'压力',h:'随时都有周五发来的周末任务'},{i:'🤝',n:'人际',h:'客户关系决定能否带来下个项目'},{i:'📊',n:'绩效',h:'客户满意度和项目复购率是核心'}]},
+
+  {id:'trader',e:'📉',n:'股票交易员',s:'私募自营交易台',cat:'business',diff:'极高压',sal:'底薪+奖金',
+   desc:'你的战场是数字。每一秒都有机会，也都有风险。在这里，情绪是最昂贵的奢侈品。',
+   learns:['将数据和宏观判断转化为具体决策','严格的风险管理和止损纪律','在极度波动中控制自己情绪的心理训练'],
+   experiences:['一笔判断正确的大交易让账户飞速增长','错误判断让账户一小时内大幅回撤','平静地看着开盘，大脑格外清醒的状态'],
+   dp:[{t:'08:30',l:'任务·盘前研究',type:'task'},{t:'09:30',l:'开盘·实时交易',type:'task'},{t:'10:30',l:'突发·持仓标的异常波动',type:'crisis'},{t:'13:00',l:'摸鱼·吃午饭不看屏幕',type:'slack'},{t:'15:00',l:'任务·收盘复盘',type:'task'},{t:'16:30',l:'决策·隔夜仓位是否持有',type:'dec'}],
+   st:[{i:'💹',n:'声望',h:'稳定正收益让你成为最受尊重的人'},{i:'🫀',n:'压力',h:'实时亏损是最直接的心理压力'},{i:'🤝',n:'人际',h:'研究员和风控的关系影响信息质量'},{i:'💰',n:'绩效',h:'夏普比率和绝对收益是唯一评分'}]},
+
+  // 特殊
+  {id:'pilot',e:'✈️',n:'民航机长',s:'国际长途航班',cat:'special',diff:'高压',sal:'40-100k',
+   desc:'你负责数百名旅客的安全。大多数时候一切平静；极少数时候，你的判断决定所有人的命运。',
+   learns:['标准操作流程：程序是无数次事故的经验结晶','团队资源管理：如何在高压下协调机组','风险评估：在不完整信息下做保守而正确的决策'],
+   experiences:['第一次单独带航班落地时的专注与平静','飞越无线电盲区时漫长的宁静','颠簸时旅客恐慌，自己必须绝对冷静'],
+   dp:[{t:'08:00',l:'任务·飞行前检查',type:'task'},{t:'09:30',l:'任务·航前简报',type:'task'},{t:'11:00',l:'突发·遭遇异常天气',type:'crisis'},{t:'13:00',l:'摸鱼·巡航时听音乐',type:'slack'},{t:'16:00',l:'决策·备降还是继续飞',type:'dec'},{t:'18:00',l:'任务·落地后飞行记录',type:'task'}],
+   st:[{i:'✈️',n:'声望',h:'飞行记录和安全纪录是你全部的履历'},{i:'🧘',n:'压力',h:'表面平静下面是极度专注的大脑'},{i:'🧑‍✈️',n:'人际',h:'机组配合质量直接影响飞行安全'},{i:'📋',n:'绩效',h:'准点率和安全记录缺一不可'}]},
+
+  {id:'detective',e:'🕵️',n:'刑事侦探',s:'市公安局重案组',cat:'special',diff:'高压',sal:'8-15k',
+   desc:'你的工作是把碎片拼成真相。但真相有时候比你以为的更复杂，总是躲在你最意想不到的地方。',
+   learns:['观察和推断：从细节里读取别人不注意的信息','审讯心理学：如何让人在不知不觉中说出真相','在道德灰色地带仍然坚守职业底线'],
+   experiences:['拼图拼完那一刻所有碎片突然对齐','嫌疑人当场崩溃认罪时的复杂感受','发现真相并非最初想象时的认知重构'],
+   dp:[{t:'09:00',l:'任务·案卷分析和证据整理',type:'task'},{t:'10:30',l:'任务·现场走访',type:'task'},{t:'13:00',l:'摸鱼·泡方便面看录像',type:'slack'},{t:'14:00',l:'任务·嫌疑人审讯',type:'task'},{t:'16:00',l:'决策·逮捕时机判断',type:'dec'},{t:'17:30',l:'突发·关键证人失联',type:'crisis'}],
+   st:[{i:'🔍',n:'声望',h:'破案率是你在系统里的分量'},{i:'😔',n:'压力',h:'见过的事情会跟着你回家'},{i:'🤝',n:'人际',h:'线人和同事关系影响信息质量'},{i:'⚖️',n:'绩效',h:'破案率和证据质量是核心考核'}]},
+
+  {id:'astronaut',e:'🌌',n:'宇航员',s:'空间站日常任务',cat:'special',diff:'高压',sal:'政府薪资',
+   desc:'你距离地球400公里，距离回家还有6个月。这里没有天气，没有昼夜，只有任务和无尽的静默。',
+   learns:['极端环境下的心理稳定性和自我调节','在完全依赖团队的环境中维持个人效能','精确操作：在失重环境中完成复杂技术任务'],
+   experiences:['第一次透过舷窗看到整个地球的静默','关键设备故障时的冷静排查','和地球上家人通话时无法消除的距离感'],
+   dp:[{t:'06:00',l:'任务·晨间例程和体检',type:'task'},{t:'08:00',l:'任务·科学实验',type:'task'},{t:'10:00',l:'突发·关键设备故障',type:'crisis'},{t:'13:00',l:'摸鱼·窗口边看地球',type:'slack'},{t:'15:00',l:'决策·是否推迟出舱计划',type:'dec'},{t:'19:00',l:'任务·与地面控制中心汇报',type:'task'}],
+   st:[{i:'🚀',n:'声望',h:'你的每个决定都被全世界科学家审阅'},{i:'🧘',n:'压力',h:'与世隔绝六个月是真实的心理挑战'},{i:'🧑‍🚀',n:'人际',h:'三人乘组关系决定六个月的生活质量'},{i:'🔬',n:'绩效',h:'实验完成率和操作准确性是核心评估'}]},
+
+  {id:'ngo',e:'🌱',n:'NGO项目负责人',s:'国际公益组织',cat:'special',diff:'中等',sal:'10-20k',
+   desc:'你用有限的资源做着你认为世界最需要的事。没有人会说谢谢，但很多事情如果不是你，就真的不会有人管。',
+   learns:['在资源极度有限时实现最大影响力','倡导能力：让不关心的人开始关心','如何在系统性问题面前不崩溃还能推进'],
+   experiences:['项目受益者来信让你哭了很久','资金链紧张时的焦虑和坚持','看到政策因为你们倡导而改变'],
+   dp:[{t:'09:00',l:'任务·项目数据整理',type:'task'},{t:'10:30',l:'突发·核心资金方撤资',type:'crisis'},{t:'13:00',l:'摸鱼·和同事吃楼下盒饭聊天',type:'slack'},{t:'14:30',l:'任务·受益人实地走访',type:'task'},{t:'16:30',l:'决策·项目方向是否调整',type:'dec'},{t:'18:00',l:'任务·捐赠人报告撰写',type:'task'}],
+   st:[{i:'🌍',n:'声望',h:'影响力和公信力是NGO最核心资产'},{i:'💙',n:'压力',h:'资金不确定性是这行的慢性压力'},{i:'🤲',n:'人际',h:'与政府企业公众的关系网同等重要'},{i:'📊',n:'绩效',h:'受益人数量和项目可持续性是评估'}]},
+
+  // 更多自媒体
+  {id:'xiaohongshu',e:'📕',n:'小红书博主',s:'生活方式垂类账号',cat:'media',diff:'中等',sal:'带货+广告',
+   desc:'你的笔记是别人的购物决策。精致的图文、真实的体验、恰到好处的种草——你在生活美学和流量算法之间找平衡。',
+   learns:['视觉审美的系统化训练：好图是可以练的','如何用第一人称写出让人信任的内容','平台规则和商业变现之间的尺度拿捏'],
+   experiences:['一篇日记体笔记涨了5万粉丝的震惊','品牌联系你报价时完全不知道说多少钱','发现自己不知不觉影响了别人的消费决策'],
+   dp:[{t:'09:30',l:'任务·拍摄今日内容',type:'task'},{t:'11:00',l:'任务·写笔记和选图',type:'task'},{t:'13:00',l:'摸鱼·刷竞品博主',type:'slack'},{t:'14:30',l:'突发·笔记违规被限流',type:'crisis'},{t:'16:00',l:'决策·是否接受低价合作',type:'dec'},{t:'17:30',l:'任务·回复评论互动',type:'task'}],
+   st:[{i:'❤️',n:'声望',h:'收藏量和粉丝粘性是核心资产'},{i:'📸',n:'压力',h:'平台算法随时可能改变你的流量'},{i:'💬',n:'人际',h:'和品牌方和粉丝都需要维护关系'},{i:'💰',n:'绩效',h:'涨粉量和商业变现额是双重考核'}]},
+
+  {id:'tiktok',e:'🎵',n:'抖音达人',s:'生活类短视频账号',cat:'media',diff:'高压',sal:'直播打赏+广告',
+   desc:'15秒抓住眼球，或者什么都没有。你每天制造那个"前三秒"，剩下的交给算法。',
+   learns:['短视频叙事：没有铺垫，直接高潮','完播率是唯一的内容质量标准','如何让陌生人在3秒内决定不划走'],
+   experiences:['一个视频睡前发了10万播放，睡醒100万','直播间零观众时还要保持状态的心理建设','被路人拍到然后被迫出现在别人视频里'],
+   dp:[{t:'09:00',l:'任务·研究今日热门话题',type:'task'},{t:'10:30',l:'任务·拍摄脚本和录制',type:'task'},{t:'13:30',l:'摸鱼·刷热榜找灵感',type:'slack'},{t:'14:30',l:'任务·剪辑和添加字幕特效',type:'task'},{t:'16:00',l:'突发·账号被限流警告',type:'crisis'},{t:'18:00',l:'决策·今天是否开直播',type:'dec'}],
+   st:[{i:'🔥',n:'声望',h:'完播率和涨粉量是算法认可你的信号'},{i:'⏰',n:'压力',h:'停更即掉粉，更新压力无处不在'},{i:'👥',n:'人际',h:'粉丝评论区是你最重要的反馈场'},{i:'💵',n:'绩效',h:'播放量·直播收入·商单金额三连'}]},
+
+  {id:'newsletter',e:'📧',n:'独立通讯作者',s:'付费订阅内容',cat:'media',diff:'中等',sal:'订阅收入',
+   desc:'你不追热点，你创造视角。在信息爆炸的时代，你的读者愿意为一份真正有观点的文字付费。',
+   learns:['独立思考的生产方式：观点比信息更值钱','构建忠实读者群比追求流量更可持续','写作变现的商业逻辑：信任是唯一货币'],
+   experiences:['一期内容被大V转发带来几百新订阅的狂喜','写了三个小时发出去没人转发的沮丧','第一个付费订阅者付款时的不真实感'],
+   dp:[{t:'09:00',l:'任务·阅读资料和整理素材',type:'task'},{t:'11:00',l:'任务·撰写本期通讯',type:'task'},{t:'14:00',l:'摸鱼·和读者在评论区聊天',type:'slack'},{t:'15:00',l:'突发·一个重大错误需要更正',type:'crisis'},{t:'16:30',l:'决策·是否提高订阅价格',type:'dec'},{t:'18:00',l:'任务·发布和推广本期内容',type:'task'}],
+   st:[{i:'📖',n:'声望',h:'读者口碑是你唯一的获客渠道'},{i:'🤔',n:'压力',h:'每周必须有值得写的观点'},{i:'💌',n:'人际',h:'和读者的真实对话是最大的满足感'},{i:'💳',n:'绩效',h:'付费订阅数量是最直接的认可'}]},
+
+  {id:'streamer',e:'🎮',n:'游戏直播主播',s:'游戏垂直直播间',cat:'media',diff:'高压',sal:'打赏+平台分成',
+   desc:'你的直播间是你的主场。观众不只是来看游戏，是来看你。你的反应、你的话、你的人格才是内容本身。',
+   learns:['边玩边说话的多任务能力——这比听起来难得多','如何在直播间营造"在一起"的氛围感','读懂弹幕情绪并实时回应的即兴能力'],
+   experiences:['连麦黑粉最后变成铁粉的奇怪经历','直播间突然涌入大量新观众时的紧张兴奋','一个人直播四五小时后摘下耳机的寂静'],
+   dp:[{t:'13:00',l:'任务·直播前准备和热场',type:'task'},{t:'14:00',l:'直播·游戏对战内容',type:'task'},{t:'16:00',l:'摸鱼·和观众聊天水直播',type:'slack'},{t:'17:00',l:'突发·被竞争对手同时开播',type:'crisis'},{t:'18:30',l:'决策·是否参加平台官方赛事',type:'dec'},{t:'19:30',l:'任务·直播后数据复盘',type:'task'}],
+   st:[{i:'🎯',n:'声望',h:'粉丝粘性和人气值是你的核心资产'},{i:'🔋',n:'压力',h:'长时间高强度输出是体力精神双重消耗'},{i:'❤️',n:'人际',h:'和粉丝的情感连接是这行的护城河'},{i:'💰',n:'绩效',h:'打赏收入和平台扶持流量是核心'}]},
+
+  {id:'copywriter',e:'✍️',n:'文案策划',s:'品牌内容部门',cat:'media',diff:'中等',sal:'10-20k',
+   desc:'你用文字让人产生购买欲望、情感共鸣或行动意愿。好文案是感性和理性同时在线，两者缺一不可。',
+   learns:['洞察消费者心理：人为什么会被打动','如何在限制字数内说出最重要的话','从brief到创意概念的结构化思维过程'],
+   experiences:['写了一晚上被一句话否定的崩溃','自己写的文案被印在地铁广告牌上的自豪','客户说"这不是我要的味道"而你不知道是什么味道'],
+   dp:[{t:'09:30',l:'任务·研究竞品和目标人群',type:'task'},{t:'11:00',l:'提案·向客户呈现创意方向',type:'dec'},{t:'13:30',l:'摸鱼·看优秀广告案例',type:'slack'},{t:'14:30',l:'突发·客户要求紧急改稿',type:'crisis'},{t:'16:00',l:'任务·撰写最终版文案',type:'task'},{t:'17:30',l:'决策·是否坚持自己的创意方向',type:'dec'}],
+   st:[{i:'💡',n:'声望',h:'刷屏的文案让你在行业被记住'},{i:'🔄',n:'压力',h:'反复改稿是这份工作的日常状态'},{i:'🤝',n:'人际',h:'搞定客户的能力和创意一样重要'},{i:'📊',n:'绩效',h:'转化率和客户满意度是最终评价'}]},
+
+  // ── 日常生活中常见岗位 ──
+  {id:'courier',e:'🛵',n:'外卖骑手',s:'平台众包配送',cat:'daily',diff:'中等',sal:'5-12k',
+   desc:'你跟时间赛跑，跟红绿灯博弈，跟差评较劲。每一单背后是一个等吃饭的人，也是你今天的收入。',
+   learns:['城市路线的肌肉记忆：最快的路不一定是最短的','在高峰期同时处理多订单的调度能力','应对各种奇葩情况的心理韧性'],
+   experiences:['雨天高峰期手机屏幕湿了还要接单的狼狈','顾客因为等太久说谢谢时的复杂心情','找不到门牌号在小区里转了20分钟'],
+   dp:[{t:'10:00',l:'任务·接单出发商圈午餐高峰',type:'task'},{t:'11:30',l:'突发·餐厅出餐慢要超时',type:'crisis'},{t:'13:00',l:'摸鱼·停车场蹲着吃自己的饭',type:'slack'},{t:'14:00',l:'任务·跑下午茶散单',type:'task'},{t:'17:00',l:'决策·是否接偏远大单',type:'dec'},{t:'18:30',l:'突发·顾客投诉餐食撒漏',type:'crisis'}],
+   st:[{i:'⭐',n:'声望',h:'评分决定你能抢到多少优质订单'},{i:'🏃',n:'压力',h:'超时扣钱是每天最大的压力源'},{i:'📞',n:'人际',h:'和商家顾客的沟通决定你的评价'},{i:'📦',n:'绩效',h:'完单数和准时率是你唯一的KPI'}]},
+
+  {id:'cashier',e:'🏪',n:'超市收银员',s:'大型连锁超市',cat:'daily',diff:'低',sal:'3-5k',
+   desc:'你见过这座城市形形色色的人，他们买什么、什么时候买、买多少，你比任何人都清楚。',
+   learns:['极度重复中保持专注和准确的能力','快速识别商品条码和处理异常的经验','与陌生人短暂但友好互动的社交技能'],
+   experiences:['遇到不会用自助机的老人你主动帮他们','顾客结账时才发现忘带钱包的尴尬','双十一前一天大采购队伍排到门外'],
+   dp:[{t:'08:00',l:'任务·开台盘点零钱备用金',type:'task'},{t:'09:30',l:'任务·早高峰连续扫码结账',type:'task'},{t:'11:00',l:'突发·顾客坚持说扫错了价',type:'crisis'},{t:'13:00',l:'摸鱼·轮班休息喝水刷手机',type:'slack'},{t:'14:00',l:'任务·下午散客期处理退换货',type:'task'},{t:'17:00',l:'决策·晚高峰是否开第二通道',type:'dec'}],
+   st:[{i:'😊',n:'声望',h:'被顾客记住名字是最好的认可'},{i:'🦶',n:'压力',h:'站8小时腿的感受你懂'},{i:'🤝',n:'人际',h:'处理投诉顾客的方式影响整体氛围'},{i:'✅',n:'绩效',h:'差错率和结账速度是考核核心'}]},
+
+  {id:'barista',e:'☕',n:'咖啡师',s:'精品咖啡连锁门店',cat:'daily',diff:'中等',sal:'4-7k',
+   desc:'你每天制作几百杯咖啡，每一杯背后是一个需要被叫醒的人。你比闹钟更重要。',
+   learns:['咖啡豆、研磨度、水温的细微差异对风味的影响','高压环境下精准操作的肌肉记忆','快速记住常客口味偏好的服务细节'],
+   experiences:['早高峰20杯队列时手速极限的心流状态','第一次拉出漂亮拉花时的成就感','常客告诉你"只有你做的才是对的味道"'],
+   dp:[{t:'07:30',l:'任务·开店准备磨豆校机',type:'task'},{t:'08:00',l:'任务·早高峰连续出品',type:'task'},{t:'10:00',l:'突发·意式机故障报警',type:'crisis'},{t:'13:00',l:'摸鱼·给自己做一杯测试新配方',type:'slack'},{t:'14:30',l:'决策·是否向店长反映供货商换豆问题',type:'dec'},{t:'16:00',l:'任务·下午茶时段维持出品质量',type:'task'}],
+   st:[{i:'☕',n:'声望',h:'回头客和好评是你的行业认可'},{i:'🌡️',n:'压力',h:'高峰时段每分钟都是压力'},{i:'💬',n:'人际',h:'和常客建立关系是工作最大乐趣'},{i:'⏱️',n:'绩效',h:'出品速度和质量稳定性是核心'}]},
+
+  {id:'nurse',e:'💉',n:'护士',s:'三甲医院内科病房',cat:'daily',diff:'高压',sal:'6-12k',
+   desc:'医生下医嘱，护士执行。你是最了解病人实际状态的人，也是最容易被忽视的人。',
+   learns:['在嘈杂环境中精确执行操作的专注力','观察细微变化早于仪器发现异常的临床直觉','安抚患者和家属情绪的沟通技巧'],
+   experiences:['夜班凌晨患者突然状况，独自处理到医生赶到','老人出院时握着你手说谢谢的温度','打错药的噩梦，虽然幸好被自己发现'],
+   dp:[{t:'07:30',l:'任务·交班接班查看昨夜记录',type:'task'},{t:'08:30',l:'任务·晨间护理和发药',type:'task'},{t:'10:00',l:'突发·患者血压骤降紧急处置',type:'crisis'},{t:'12:00',l:'摸鱼·护士站偷吃午饭',type:'slack'},{t:'14:00',l:'任务·输液巡视更换药袋',type:'task'},{t:'16:30',l:'决策·家属要求特殊安排是否上报',type:'dec'}],
+   st:[{i:'❤️',n:'声望',h:'患者的信任是最真实的职业认可'},{i:'😓',n:'压力',h:'零差错要求和高工作量长期并存'},{i:'🤲',n:'人际',h:'和患者家属的关系每天都要经营'},{i:'📋',n:'绩效',h:'护理质量评分和差错率是考核核心'}]},
+
+  {id:'driver',e:'🚗',n:'网约车司机',s:'平台全职跑车',cat:'daily',diff:'中等',sal:'6-15k',
+   desc:'你的车就是你的办公室。每天接触几十个不同的人，他们说的话比任何书更真实。',
+   learns:['城市交通规律和时间管理的精确感知','在封闭空间与陌生人维持舒适距离的社交分寸','平台接单逻辑和收益最大化的策略'],
+   experiences:['深夜送一个喝醉哭泣的乘客到家的沉默','顾客主动加价说"谢谢你今晚陪我说话"','被差评投诉了根本不存在的问题'],
+   dp:[{t:'07:00',l:'任务·早高峰抢单接通勤乘客',type:'task'},{t:'09:30',l:'任务·跑散单保持在线率',type:'task'},{t:'12:00',l:'摸鱼·停路边吃自带午饭',type:'slack'},{t:'13:00',l:'突发·乘客遗失贵重物品',type:'crisis'},{t:'16:30',l:'任务·晚高峰冲单冲奖励',type:'task'},{t:'20:00',l:'决策·是否继续跑夜单还是收车',type:'dec'}],
+   st:[{i:'⭐',n:'声望',h:'评分是你能接到好单的通行证'},{i:'🛣️',n:'压力',h:'堵车和平台派单逻辑是最大压力源'},{i:'🗣️',n:'人际',h:'乘客体验决定你的口碑评价'},{i:'💰',n:'绩效',h:'日流水和完单量是你的收入基础'}]},
+
+  {id:'security',e:'🔒',n:'保安',s:'商业综合体',cat:'daily',diff:'低',sal:'3-5k',
+   desc:'你负责一栋楼的秩序。大多数时候什么都不发生，但你必须随时准备好它发生。',
+   learns:['长时间保持警觉的专注训练','处理突发情况不激化矛盾的技巧','熟悉建筑结构和应急疏散路线'],
+   experiences:['拦下一个翻包的小偷后的复杂感受','大爷大妈强闯要找人时的沟通拉锯','深夜一个人巡逻整栋楼的特殊安静'],
+   dp:[{t:'08:00',l:'任务·交班巡逻检查各出入口',type:'task'},{t:'09:30',l:'任务·大厅秩序维护和引导',type:'task'},{t:'11:00',l:'突发·顾客和商户发生激烈争执',type:'crisis'},{t:'13:00',l:'摸鱼·岗亭里刷手机',type:'slack'},{t:'15:00',l:'任务·停车场巡查记录违规',type:'task'},{t:'17:00',l:'决策·可疑人员是否上报处置',type:'dec'}],
+   st:[{i:'🏢',n:'声望',h:'处置得当让上级和商户信任你'},{i:'😴',n:'压力',h:'长时间值守的无聊和疲倦是真实挑战'},{i:'🤝',n:'人际',h:'和商户顾客的关系影响每天工作质量'},{i:'📊',n:'绩效',h:'事故率和出勤率是最直接考核'}]},
+
+  {id:'waiter',e:'🍽️',n:'餐厅服务员',s:'中高档中餐厅',cat:'daily',diff:'中等',sal:'3-6k',
+   desc:'你是厨房和餐桌之间的桥梁。一桌好的体验，七分靠菜，三分靠你。',
+   learns:['同时照看多桌的注意力分配','快速读懂顾客需求但不打扰的服务分寸','处理投诉和挑剔顾客的情绪管理'],
+   experiences:['服务好一桌客人临走时主动要求加你微信','端了一下午菜手腕突然开始疼','顾客吃完说难吃要求退款但盘子空了'],
+   dp:[{t:'10:30',l:'任务·开餐前摆台备餐',type:'task'},{t:'11:30',l:'任务·午市高峰翻台接待',type:'task'},{t:'12:30',l:'突发·顾客投诉菜里有异物',type:'crisis'},{t:'14:00',l:'摸鱼·下午茶时候坐着休息',type:'slack'},{t:'17:00',l:'任务·晚市备场',type:'task'},{t:'19:00',l:'决策·客满时是否给熟客加位',type:'dec'}],
+   st:[{i:'😊',n:'声望',h:'好口碑让顾客专门点名要你服务'},{i:'🦶',n:'压力',h:'站一天脚是这工作最诚实的代价'},{i:'❤️',n:'人际',h:'顾客体验是你每天最重要的事'},{i:'⚡',n:'绩效',h:'翻台率和投诉率是门店考核你的方式'}]},
+
+  {id:'factory',e:'🏭',n:'流水线工人',s:'电子制造厂',cat:'daily',diff:'中等',sal:'4-7k',
+   desc:'你的双手每天重复同一个动作几千次。工厂的节奏是机械的，但每一个零件背后都是真实的产品。',
+   learns:['极度重复操作中保持精准度的身体控制','快速识别产品缺陷的质检眼力','在嘈杂环境中保持专注的心理适应'],
+   experiences:['第一次能跟上流水线速度时的轻微自豪','质检没过整条线停下来等你的压力','发工资那天大家一起去楼下吃饭的快乐'],
+   dp:[{t:'07:30',l:'任务·交班上线开始计件',type:'task'},{t:'09:00',l:'突发·设备卡料停线',type:'crisis'},{t:'10:00',l:'任务·恢复后加速赶进度',type:'task'},{t:'12:00',l:'摸鱼·食堂吃饭人声嘈杂',type:'slack'},{t:'13:00',l:'任务·下午班持续产线操作',type:'task'},{t:'16:00',l:'决策·是否加班完成今日计划',type:'dec'}],
+   st:[{i:'🔧',n:'声望',h:'技术熟练度决定你在班组里的地位'},{i:'⏰',n:'压力',h:'计件压力和站立时间是日常消耗'},{i:'👥',n:'人际',h:'和同班工友的关系决定工作氛围'},{i:'📊',n:'绩效',h:'日产量和良品率是唯一硬指标'}]},
+
+  // ── 有意思的小众岗位 ──
+  {id:'veterinarian',e:'🐾',n:'宠物医生',s:'连锁宠物医院',cat:'niche',diff:'高压',sal:'10-25k',
+   desc:'你的患者不会说话，只会用眼神看着你。它们的主人有时候比它们更难搞。',
+   learns:['从动物行为和体征快速判断问题的临床直觉','与高度焦虑的宠物主人沟通的特殊技能','跨物种诊疗知识：猫和狗的差异远超你想象'],
+   experiences:['一只流浪猫被好心人送来时已经太晚了','宠物手术成功后主人在候诊室哭出来','给必须安乐死的宠物的最后一针'],
+   dp:[{t:'09:00',l:'任务·晨间问诊开始',type:'task'},{t:'10:30',l:'突发·犬咬伤紧急处置',type:'crisis'},{t:'12:00',l:'摸鱼·办公室里有猫随便摸',type:'slack'},{t:'13:30',l:'任务·常规体检和疫苗',type:'task'},{t:'15:00',l:'决策·告知主人宠物确诊肿瘤',type:'dec'},{t:'16:30',l:'任务·手术安排和术前准备',type:'task'}],
+   st:[{i:'🐕',n:'声望',h:'治好一只宠物主人会把你推荐给所有朋友'},{i:'💔',n:'压力',h:'面对无法救治的动物是最大的情感消耗'},{i:'🤝',n:'人际',h:'宠物主人的信任是你最核心的资产'},{i:'🩺',n:'绩效',h:'治愈率和客户留存率是诊所考核'}]},
+
+  {id:'underwater_welder',e:'🤿',n:'水下焊工',s:'海洋工程作业',cat:'niche',diff:'极高压',sal:'项目制高薪',
+   desc:'你在零能见度的海底，穿着几十公斤的设备，用焊枪修复钻井平台。这是地球上最危险的职业之一，也是薪资最高的工种之一。',
+   learns:['潜水物理学：水压如何影响人体和设备','在极端环境中保持操作精确性的心理训练','水下焊接的特殊技术与安全规程'],
+   experiences:['第一次独立完成水下作业后浮上来的那口气','能见度不足一米时只能靠手感操作的专注','平台上同事的紧急救援演练变成了真实事故'],
+   dp:[{t:'06:00',l:'任务·装备检查和潜水前简报',type:'task'},{t:'08:00',l:'任务·下水执行焊接作业',type:'task'},{t:'10:30',l:'突发·减压异常紧急上浮',type:'crisis'},{t:'13:00',l:'摸鱼·减压舱里等待',type:'slack'},{t:'14:30',l:'任务·下午继续作业任务',type:'task'},{t:'17:00',l:'决策·天气转差是否继续明天计划',type:'dec'}],
+   st:[{i:'⚡',n:'声望',h:'完成高难度作业让你成为顶级工程师'},{i:'💀',n:'压力',h:'每次下水都有真实的生命风险'},{i:'🤝',n:'人际',h:'团队配合是你生命保障的关键'},{i:'🔧',n:'绩效',h:'作业质量和零事故率是最高标准'}]},
+
+  {id:'funeral',e:'🕯️',n:'殡仪师',s:'殡仪馆',cat:'niche',diff:'中等',sal:'6-15k',
+   desc:'你的工作是给生命画上最后一个句号，让逝者体面离开，让生者有机会说再见。没有人主动想做这份工作，但做了就很少有人离开。',
+   learns:['理解悲伤的不同形态：每个家庭都不一样','在情绪化的场合保持专业而不失温度','尸体防腐和仪容整理的专业技术'],
+   experiences:['为一位白发苍苍的老人整理遗容时想到了自己的家人','家属崩溃时你是唯一还站着的人','一个家庭因为仪式感到安慰而感谢你'],
+   dp:[{t:'08:30',l:'任务·接收遗体完成登记',type:'task'},{t:'10:00',l:'任务·遗体防腐和仪容整理',type:'task'},{t:'13:00',l:'摸鱼·午间休息',type:'slack'},{t:'14:00',l:'突发·家属对安排产生强烈异议',type:'crisis'},{t:'15:30',l:'任务·告别仪式主持准备',type:'task'},{t:'17:00',l:'决策·家属要求超规格安排如何协调',type:'dec'}],
+   st:[{i:'🕊️',n:'声望',h:'口碑在悲痛的家庭间悄悄传递'},{i:'🧘',n:'压力',h:'长期接触死亡的心理健康需要主动维护'},{i:'❤️',n:'人际',h:'和家属建立的信任是最短暂也最深刻的'},{i:'📋',n:'绩效',h:'服务完成质量和家属满意度是考核'}]},
+
+  {id:'somm',e:'🍷',n:'侍酒师',s:'米其林餐厅',cat:'niche',diff:'中等',sal:'项目制',
+   desc:'你是餐桌上隐形的艺术家。一瓶对的酒能让一顿晚餐从普通变成难忘。你的鼻子和味觉是你最贵的资产。',
+   learns:['数千种葡萄品种、产区、年份的系统记忆','如何在不了解客人的情况下精准推荐','在高端服务场合的礼仪和体态控制'],
+   experiences:['盲品猜中一款1986年的波尔多时的震撼','客人打开十万块的酒发现是坏的','一对老夫妻点了他们30年前订婚时喝的酒'],
+   dp:[{t:'11:00',l:'任务·检查酒窖库存和温度',type:'task'},{t:'14:00',l:'任务·为晚餐预订桌准备酒单',type:'task'},{t:'17:00',l:'摸鱼·和厨师试吃今日菜品配酒',type:'slack'},{t:'18:30',l:'突发·顾客投诉葡萄酒有异味',type:'crisis'},{t:'19:30',l:'任务·晚餐时段逐桌侍酒',type:'task'},{t:'21:00',l:'决策·是否向重要客人推荐稀有年份',type:'dec'}],
+   st:[{i:'🍇',n:'声望',h:'通过国际认证和口碑积累行业地位'},{i:'🎭',n:'压力',h:'高端客人的挑剔让每次服务都是考试'},{i:'💬',n:'人际',h:'和主厨及客人的关系是工作的全部'},{i:'💰',n:'绩效',h:'酒水销售额和客人回头率是核心'}]},
+
+  {id:'taxidermist',e:'🦊',n:'标本师',s:'博物馆/工作室',cat:'niche',diff:'中等',sal:'项目制',
+   desc:'你让死去的动物重新"活"着。这是艺术、科学和匠艺的结合，也是世界上最难解释给别人听的职业之一。',
+   learns:['动物解剖学：了解肌肉骨骼结构才能重现形态','防腐、填充、塑形的综合工艺技术','艺术眼光：标本的神态比形态更难'],
+   experiences:['完成一只狐狸标本，眼睛装上去那一刻活了','家长带孩子参观博物馆，孩子盯着你的标本看了很久','接到一个宠物主人的委托，把她的猫永久保存'],
+   dp:[{t:'09:00',l:'任务·处理新到标本初步剥制',type:'task'},{t:'11:00',l:'任务·骨架和填充物制作',type:'task'},{t:'13:30',l:'摸鱼·看竞争对手的作品找灵感',type:'slack'},{t:'14:30',l:'突发·委托客人要求大改造型',type:'crisis'},{t:'15:30',l:'任务·细节修整和上色',type:'task'},{t:'17:00',l:'决策·是否接受争议动物的标本委托',type:'dec'}],
+   st:[{i:'🎨',n:'声望',h:'作品被博物馆收藏是最高认可'},{i:'🧪',n:'压力',h:'气味和化学品是每天的工作伴侣'},{i:'📸',n:'人际',h:'委托人对宠物的感情需要细心对待'},{i:'⏳',n:'绩效',h:'作品完成度和委托人满意度是标准'}]},
+
+  {id:'animator',e:'🎬',n:'动画师',s:'动漫工作室',cat:'niche',diff:'高压',sal:'8-20k',
+   desc:'你让图画动起来，赋予角色生命。每秒24帧，每帧都是你。听起来浪漫，实际上是最精确的体力劳动。',
+   learns:['运动规律：重力、惯性如何影响动画真实感','关键帧和中间帧的节奏控制','如何在导演要求和自己审美之间找平衡'],
+   experiences:['角色第一次"活起来"时的不真实感','一段10秒的动画改了50遍还没通过','看到自己做的角色出现在影院大屏幕上'],
+   dp:[{t:'09:30',l:'任务·审看导演分镜确认要求',type:'task'},{t:'10:30',l:'任务·制作今日分配的关键帧',type:'task'},{t:'13:00',l:'摸鱼·看参考视频研究动作',type:'slack'},{t:'14:30',l:'突发·导演否掉整段动画要重来',type:'crisis'},{t:'16:00',l:'任务·中间帧填充和细节调整',type:'task'},{t:'18:00',l:'决策·是否加班完成本周进度',type:'dec'}],
+   st:[{i:'✨',n:'声望',h:'参与过的知名作品是你最好的名片'},{i:'👁️',n:'压力',h:'长时间盯屏幕和返工是最大消耗'},{i:'🤝',n:'人际',h:'和导演及团队的配合决定出品质量'},{i:'📐',n:'绩效',h:'帧数完成量和通过率是核心考核'}]},
+
+  {id:'archaeologist',e:'⛏️',n:'考古工作者',s:'田野发掘项目',cat:'niche',diff:'中等',sal:'8-15k',
+   desc:'你挖开的每一层土都是时间。发现一个文物的概率很低，但那一刻的感受没有任何工作能替代。',
+   learns:['地层学：土壤颜色和质地如何讲述历史','文物识别和现场保护的应急处置','野外生存和长期驻扎的身心适应'],
+   experiences:['刷出一枚汉代铜钱时手在微微发抖','住在工地旁简陋宿舍里第一个月','发现自己清了三周的竟然是现代排水管'],
+   dp:[{t:'06:30',l:'任务·早起趁凉快开始发掘',type:'task'},{t:'09:00',l:'任务·细刷清理疑似文物层',type:'task'},{t:'11:30',l:'摸鱼·树荫下吃干粮休息',type:'slack'},{t:'13:00',l:'突发·发现疑似重要遗迹需要上报',type:'crisis'},{t:'15:00',l:'任务·整理今日出土物和记录',type:'task'},{t:'17:30',l:'决策·天气预报下雨是否继续发掘',type:'dec'}],
+   st:[{i:'🏛️',n:'声望',h:'重大发现让你在学界留名'},{i:'☀️',n:'压力',h:'野外工作的体力消耗远超想象'},{i:'👥',n:'人际',h:'驻扎团队关系是几个月生活的全部'},{i:'🔍',n:'绩效',h:'发掘面积和文物出土记录是项目考核'}]},
+
+  {id:'voiceactor',e:'🎙️',n:'配音演员',s:'影视动画配音',cat:'niche',diff:'中等',sal:'项目制',
+   desc:'你的声音出现在几千万人的耳朵里，但没人知道你长什么样。用声音演戏，你需要把脸能做的所有事装进喉咙里。',
+   learns:['声音控制：语调、语速、气息的精确调节','角色理解：声音要配合画面但有独立个性','长时间高强度发声的嗓音保护技巧'],
+   experiences:['第一次在影院里听到自己的声音的奇异感','录了30遍还不对，喉咙哑了但导演不满意','在街上偶然听到有人模仿你配的角色'],
+   dp:[{t:'10:00',l:'任务·热嗓练习和台词预读',type:'task'},{t:'11:00',l:'任务·棚内录制角色主场景',type:'task'},{t:'13:30',l:'摸鱼·喝蜂蜜水保护嗓子',type:'slack'},{t:'14:30',l:'突发·导演要求改变角色整体语调',type:'crisis'},{t:'15:30',l:'任务·情感场景重录和细节调整',type:'task'},{t:'17:00',l:'决策·是否接受赶期但价格低的配音项目',type:'dec'}],
+   st:[{i:'🎭',n:'声望',h:'代表角色让你成为粉丝心中的声音'},{i:'🔴',n:'压力',h:'反复录制的精神消耗超过体力'},{i:'🎬',n:'人际',h:'和导演及其他演员的默契影响成片质量'},{i:'⏺️',n:'绩效',h:'通过率和导演满意度是核心考核'}]},
+
+  {id:'weather',e:'🌤️',n:'气象预报员',s:'省级气象台',cat:'niche',diff:'中等',sal:'8-15k',
+   desc:'你的判断影响的不只是今天带不带伞，还有航班、农业、防灾决策。预报错了，有人会骂你；预报对了，没人会谢你。',
+   learns:['数值预报模型的解读和经验修正方法','多源数据整合：卫星、雷达、地面站同时读','在不确定性中给出明确结论的决策能力'],
+   experiences:['提前准确预报了一场暴雨避免了重大灾害','误报大雪导致城市大面积停课之后的舆论','台风路径在最后关头发生偏转时的紧张'],
+   dp:[{t:'07:00',l:'任务·接班阅读夜间天气数据',type:'task'},{t:'08:00',l:'任务·制作上午天气预报',type:'task'},{t:'10:00',l:'突发·强对流天气需要紧急发布预警',type:'crisis'},{t:'13:00',l:'摸鱼·办公室看窗外天确认预报',type:'slack'},{t:'14:30',l:'任务·更新明后天预报',type:'task'},{t:'16:00',l:'决策·是否发布台风橙色预警',type:'dec'}],
+   st:[{i:'🌈',n:'声望',h:'准确率积累出专业信任和公众认可'},{i:'⛈️',n:'压力',h:'重大天气下每小时都要更新判断'},{i:'📡',n:'人际',h:'和防灾部门的配合关系影响决策效率'},{i:'📊',n:'绩效',h:'预报准确率是你被评价的唯一标准'}]},
+
+  // ── 普通但值得体验的岗位 ──
+  {id:'hr',e:'👔',n:'HR招聘专员',s:'中型互联网公司',cat:'office',diff:'中等',sal:'8-15k',
+   desc:'你是公司和求职者之间的第一道门。你每天看几十份简历，做出影响别人人生轨迹的决定，而他们永远不知道你是谁。',
+   learns:['快速从简历中识别真实能力的方法','面试提问如何绕过准备好的标准答案','候选人管理与用人部门需求的协调'],
+   experiences:['一个顶尖候选人因为薪资谈崩而拒绝offer','用人部门突然说要求变了你要重新找人','看到自己三年前也写过一模一样的简历'],
+   dp:[{t:'09:00',l:'任务·筛选昨日投递简历',type:'task'},{t:'10:30',l:'任务·电话初筛3名候选人',type:'task'},{t:'13:00',l:'摸鱼·在脉脉猎聘刷候选人',type:'slack'},{t:'14:00',l:'突发·候选人临时毁约',type:'crisis'},{t:'15:30',l:'任务·安排面试和协调用人部门',type:'task'},{t:'17:00',l:'决策·两个条件相近的候选人选谁',type:'dec'}],
+   st:[{i:'📋',n:'声望',h:'招到好人才让你赢得业务部门信任'},{i:'📱',n:'压力',h:'招聘周期压力和候选人管理同时来'},{i:'🤝',n:'人际',h:'和用人部门的关系决定你的工作效率'},{i:'📈',n:'绩效',h:'到岗率和试用期通过率是核心考核'}]},
+
+  {id:'accountant',e:'📊',n:'会计',s:'中型企业财务部',cat:'office',diff:'中等',sal:'8-15k',
+   desc:'你是公司资金流动的记录者和守门人。数字不会说谎，但数字背后的业务可以，你的工作是看穿两者之间的差异。',
+   learns:['会计准则与实际业务操作的差距','在混乱的原始凭证中找到真实数字','税务筹划和合规之间的边界判断'],
+   experiences:['月底结账发现账差了一分钱找了三小时','审计的人来了所有人的焦虑你感受得到','第一次独立完成年报时的成就感'],
+   dp:[{t:'09:00',l:'任务·整理昨日报销凭证',type:'task'},{t:'10:30',l:'任务·月度报表更新',type:'task'},{t:'13:00',l:'摸鱼·刷财税政策新闻',type:'slack'},{t:'14:00',l:'突发·业务部门发现报销被拒要理论',type:'crisis'},{t:'15:30',l:'任务·税务申报准备',type:'task'},{t:'17:00',l:'决策·某笔支出如何入账更合理',type:'dec'}],
+   st:[{i:'💼',n:'声望',h:'准确无误让老板和审计都信任你'},{i:'📅',n:'压力',h:'月末季末年末是高压的永恒节点'},{i:'🤝',n:'人际',h:'和各部门的关系影响报销审核效率'},{i:'📊',n:'绩效',h:'差错率和申报准时率是核心考核'}]},
+
+  {id:'customer_service',e:'🎧',n:'客服专员',s:'电商平台客服中心',cat:'office',diff:'中等',sal:'4-7k',
+   desc:'你是公司面对用户的声音。所有不满、愤怒、焦虑、委屈都先打到你这里，你要在几分钟内把它们变成满意。',
+   learns:['情绪接收而不被影响的心理边界','快速定位问题并给出解决方案的逻辑思维','在系统规则内找到灵活空间的经验'],
+   experiences:['一个骂了你二十分钟的客户最后道歉了','遇到真正有困难的用户帮他们解决时的满足','被恶意差评之后没有任何申诉渠道的无力'],
+   dp:[{t:'09:00',l:'任务·处理昨晚积压的文字工单',type:'task'},{t:'10:30',l:'任务·电话接入处理投诉',type:'task'},{t:'13:00',l:'摸鱼·休息区坐着发呆恢复状态',type:'slack'},{t:'14:00',l:'突发·大量同类投诉涌入疑似系统问题',type:'crisis'},{t:'15:30',l:'任务·处理售后纠纷工单',type:'task'},{t:'17:00',l:'决策·超出权限的赔付请求是否上报',type:'dec'}],
+   st:[{i:'📞',n:'声望',h:'满意率高让你获得更好的排班'},{i:'🧠',n:'压力',h:'情绪劳动是最看不见的消耗'},{i:'😊',n:'人际',h:'每个用户都是一次全新的人际考验'},{i:'📈',n:'绩效',h:'满意度评分和解决率是每日考核'}]},
+
+  {id:'realtor',e:'🏠',n:'房产经纪人',s:'连锁中介门店',cat:'office',diff:'高压',sal:'底薪+提成',
+   desc:'你销售的是人一生最大的决定。你见过最多的人性：有人谨慎到一平米都要算，有人冲动到看完就签。',
+   learns:['快速判断客户真实需求和预算的能力','对区域房产市场的深度了解','在买卖双方间做平衡的谈判技巧'],
+   experiences:['带客户看了20套房，最后买了第一套','客户在签合同前一天说不买了','帮一对老人卖掉住了三十年的房子'],
+   dp:[{t:'09:00',l:'任务·跟进昨日意向客户',type:'task'},{t:'10:30',l:'任务·带新客户实地看房',type:'task'},{t:'13:30',l:'摸鱼·门店喝茶等客户电话',type:'slack'},{t:'15:00',l:'突发·业主临时涨价买方要放弃',type:'crisis'},{t:'16:30',l:'任务·撮合谈判推进签约',type:'task'},{t:'18:30',l:'决策·是否接受零佣金换口碑的单',type:'dec'}],
+   st:[{i:'🏆',n:'声望',h:'成交量和口碑是你在门店的地位'},{i:'📉',n:'压力',h:'市场低迷时开单压力是真实的重量'},{i:'🤝',n:'人际',h:'和业主买家的信任关系是成交的基础'},{i:'💰',n:'绩效',h:'月成交套数和金额是最直接的考核'}]},
+
+  {id:'librarian',e:'📚',n:'图书管理员',s:'城市公共图书馆',cat:'office',diff:'低',sal:'4-7k',
+   desc:'你守护着这座城市最安静的地方。这里来的人有学生、老人、失业者、失眠者，他们都需要不同的东西，而你要帮助他们找到。',
+   learns:['图书分类系统和检索逻辑','读懂不同读者需求做精准推荐','维护公共空间秩序的非暴力沟通'],
+   experiences:['一个老人每天来看报纸，其实是来有个地方待','帮一个初中生找到改变了他人生的那本书','有人在最偏僻的角落哭泣，只是需要一个安静的地方'],
+   dp:[{t:'08:30',l:'任务·开馆整理归还书籍上架',type:'task'},{t:'10:00',l:'任务·帮读者检索和推荐书目',type:'task'},{t:'12:00',l:'摸鱼·安静的馆里翻自己喜欢的书',type:'slack'},{t:'14:00',l:'突发·有人在馆内大声喧哗起冲突',type:'crisis'},{t:'15:00',l:'任务·整理活动区域准备读书会',type:'task'},{t:'17:00',l:'决策·是否延长闭馆时间给未读完的读者',type:'dec'}],
+   st:[{i:'📖',n:'声望',h:'读者对你的信任是最好的职业认可'},{i:'🌿',n:'压力',h:'这是少数真正不高压的公共服务岗位'},{i:'❤️',n:'人际',h:'和老读者的长期关系是工作的温度'},{i:'📋',n:'绩效',h:'借阅率和活动参与量是考核指标'}]},
+
+  {id:'postman',e:'📮',n:'邮递员',s:'县城快递站',cat:'daily',diff:'中等',sal:'4-7k',
+   desc:'你比任何人更了解这片区域的每一条路、每一个门牌、每一个等待包裹的人。你是城市最后一公里的守护者。',
+   learns:['区域地理的完整心理地图','在最短路径中完成最多派件的优化本能','处理各类签收问题的灵活应对能力'],
+   experiences:['大雨天给一个老人送去她等了三个月的东西','在一栋楼转了45分钟找不到4楼A室','有人收到包裹后说这是她今天唯一开心的事'],
+   dp:[{t:'07:30',l:'任务·分拣装车出发前准备',type:'task'},{t:'08:30',l:'任务·按路线逐单派送',type:'task'},{t:'11:30',l:'突发·客户投诉包裹破损',type:'crisis'},{t:'13:00',l:'摸鱼·路边摊吃午饭歇脚',type:'slack'},{t:'14:00',l:'任务·下午派送和上门取件',type:'task'},{t:'17:00',l:'决策·无人签收的包裹今天是否再跑一趟',type:'dec'}],
+   st:[{i:'📦',n:'声望',h:'准时率和好评让你成为区域口碑最好的'},{i:'🌦️',n:'压力',h:'风吹日晒和派件量是每天的真实消耗'},{i:'😊',n:'人际',h:'和老客户的熟悉感是工作的意外收获'},{i:'✅',n:'绩效',h:'日派送量和签收率是最直接考核'}]},
+
+  // ══════════════════════════════════════
+  //  体制内
+  // ══════════════════════════════════════
+  {id:'civil_servant',e:'🏛️',n:'基层公务员',s:'县级政务服务大厅',cat:'gov',diff:'中等',sal:'5-10k',
+   desc:'你坐在窗口，处理老百姓最日常的诉求。证明你妈是你妈、盖章跑腿、材料不全——这是真实的基层公务员世界，没有电视里那么光鲜。',
+   learns:['行政法规和办事流程的系统掌握','在规则约束内帮群众解决实际问题','处理各种情绪激动市民的沉着应对'],
+   experiences:['一位老人因为一个手续跑了第四趟的眼神','发现流程本身有问题但你改不了','领导突然通知下午来检查所有人开始忙碌'],
+   dp:[{t:'08:30',l:'任务·开窗口接待第一批群众',type:'task'},{t:'09:30',l:'突发·群众情绪激动要投诉',type:'crisis'},{t:'11:30',l:'任务·整理归档今日受理材料',type:'task'},{t:'13:30',l:'摸鱼·办公室刷文件等下午',type:'slack'},{t:'15:00',l:'突发·领导突击检查窗口服务',type:'crisis'},{t:'16:30',l:'决策·超时办理还是让群众明天再来',type:'dec'}],
+   st:[{i:'🏅',n:'声望',h:'群众满意度决定你年终考核等级'},{i:'📋',n:'压力',h:'领导检查和群众投诉是两重压力'},{i:'🤝',n:'人际',h:'同事关系和领导印象影响你的晋升'},{i:'⭐',n:'绩效',h:'办件量和零差错率是硬指标'}]},
+
+  {id:'street_official',e:'🏘️',n:'街道办干事',s:'城区街道办事处',cat:'gov',diff:'高压',sal:'6-12k',
+   desc:'上面千条线，下面一根针。你就是那根针——城管、计划生育、社区治理、群众上访全都压在你身上，还要维稳。',
+   learns:['属地管理思维：什么都是你的责任','在资源极少的情况下协调多方力量','政策文件精神到基层落地的转化能力'],
+   experiences:['半夜接到群众投诉噪音电话','上面下来新任务，今天就要报材料','帮一个实在困难的家庭争取到低保资格'],
+   dp:[{t:'08:00',l:'任务·晨会传达上级最新文件精神',type:'task'},{t:'09:30',l:'任务·下社区巡查网格问题',type:'task'},{t:'11:00',l:'突发·辖区突发群体性事件',type:'crisis'},{t:'14:00',l:'任务·填报各类统计报表',type:'task'},{t:'16:00',l:'摸鱼·办公室喝茶等下班',type:'slack'},{t:'17:00',l:'决策·居民纠纷是否上报还是自行化解',type:'dec'}],
+   st:[{i:'🏆',n:'声望',h:'领导认可和辖区稳定是你的核心评价'},{i:'💢',n:'压力',h:'随时可能来的突发任务是常态压力'},{i:'🤝',n:'人际',h:'和居委会社区的关系决定工作效率'},{i:'📊',n:'绩效',h:'辖区零事故和任务完成率是考核'}]},
+
+  {id:'teacher_public',e:'📐',n:'体制内教师',s:'公立初中数学组',cat:'gov',diff:'中等',sal:'8-18k',
+   desc:'编制是铁饭碗，但铁饭碗里装的是什么你进来才知道。备课、上课、改卷、家长群、绩效工资、职称评比——每一件都是真实的重量。',
+   learns:['如何在40人班级同时照顾到不同程度的学生','把复杂知识用学生能理解的方式拆解表达','在教学任务和行政杂务之间保持平衡'],
+   experiences:['一个差生突然开窍做对了难题的喜悦','家长群里有人质疑你的教学方法','职称评比时发现努力不如关系重要'],
+   dp:[{t:'07:30',l:'任务·早读巡班',type:'task'},{t:'08:00',l:'任务·连上三节数学课',type:'task'},{t:'11:00',l:'突发·家长投诉体罚问题',type:'crisis'},{t:'13:00',l:'摸鱼·办公室改作业喝茶',type:'slack'},{t:'14:30',l:'任务·备课明天的内容',type:'task'},{t:'16:30',l:'决策·一个后进生是否推荐去补习班',type:'dec'}],
+   st:[{i:'📚',n:'声望',h:'学生成绩和家长口碑是你的行业资产'},{i:'📝',n:'压力',h:'改卷备课和行政任务填满每个空隙'},{i:'👨‍👩‍👧',n:'人际',h:'家长关系是你最复杂的外部挑战'},{i:'📈',n:'绩效',h:'班级均分和升学率是学校的核心考核'}]},
+
+  {id:'hospital_admin',e:'🏥',n:'公立医院行政',s:'三甲医院办公室',cat:'gov',diff:'中等',sal:'6-12k',
+   desc:'你不治病，但你是让医院运转的齿轮之一。院领导的指示、科室的需求、政府的检查——你是所有这些的中转站。',
+   learns:['医院行政管理的流程和规范','卫生系统的政策文件解读和执行','在医疗一线和行政后台之间协调资源'],
+   experiences:['卫健委突击检查前一天全院连夜准备材料','科室主任直接找院长投诉你办事慢','协调一件资源纠纷让两个科室都不满意'],
+   dp:[{t:'08:30',l:'任务·处理晨间院办公文和邮件',type:'task'},{t:'10:00',l:'任务·协调各科室会议安排',type:'task'},{t:'11:30',l:'突发·上级检查组临时提前到达',type:'crisis'},{t:'13:30',l:'摸鱼·食堂吃饭顺便打听消息',type:'slack'},{t:'14:30',l:'任务·起草季度工作总结报告',type:'task'},{t:'16:30',l:'决策·两个科室争一间会议室如何协调',type:'dec'}],
+   st:[{i:'🏥',n:'声望',h:'领导信任和科室认可是你的地位基础'},{i:'📄',n:'压力',h:'文件和检查从不消失只是换了形式'},{i:'🤝',n:'人际',h:'和各科室主任的关系是工作的关键'},{i:'✅',n:'绩效',h:'任务完成质量和领导满意度是考核'}]},
+
+  {id:'police',e:'👮',n:'派出所民警',s:'城区派出所',cat:'gov',diff:'高压',sal:'8-15k',
+   desc:'你的辖区里发生的所有事都和你有关。打架、盗窃、家暴、迷路的老人、找不到孩子的父母——你是离普通人最近的国家力量。',
+   learns:['快速判断现场情况和处置优先级','在混乱情绪中保持冷静的专业训练','法律条文和实际人情之间的灵活处置'],
+   experiences:['深夜处理家暴案件，被害人却不配合','成功找到走失儿童家长哭着握你的手','处理一件投诉发现双方都有问题'],
+   dp:[{t:'08:00',l:'任务·晨会交班了解辖区动态',type:'task'},{t:'09:30',l:'任务·出警处理邻里纠纷',type:'task'},{t:'11:00',l:'突发·辖区发生打架斗殴',type:'crisis'},{t:'14:00',l:'任务·处理行政审批和户籍业务',type:'task'},{t:'16:00',l:'摸鱼·所里喝茶等出警',type:'slack'},{t:'18:00',l:'决策·民事纠纷调解还是移交法院',type:'dec'}],
+   st:[{i:'⚖️',n:'声望',h:'辖区居民的信任是最真实的认可'},{i:'🚨',n:'压力',h:'随时出警和高危情况是真实的重量'},{i:'👥',n:'人际',h:'和辖区居民和上级的关系同等重要'},{i:'📋',n:'绩效',h:'案件处置率和投诉率是核心考核'}]},
+
+  {id:'military',e:'🎖️',n:'基层军官',s:'某部队连队',cat:'gov',diff:'极高压',sal:'政策薪资',
+   desc:'你管着一百个人的吃喝拉撒训练纪律。你是上级命令的执行者，也是战士们的父母官。集体荣誉、个人服从、使命感——这些词在这里是真实的。',
+   learns:['在高压环境下对团队的绝对管理和激励','计划执行的严格纪律性和细节把控','处理士兵思想问题和心理波动的能力'],
+   experiences:['带着连队拿下演习优胜时的骄傲','一个战士家里出事无法回家探望','高强度训练后和战士们一起席地而睡'],
+   dp:[{t:'05:30',l:'任务·出操带领全连晨练',type:'task'},{t:'08:00',l:'任务·战术训练科目推进',type:'task'},{t:'10:30',l:'突发·训练中有战士受伤',type:'crisis'},{t:'13:30',l:'任务·政治教育和思想工作',type:'task'},{t:'15:30',l:'摸鱼·连部处理日常文书',type:'slack'},{t:'17:00',l:'决策·问题战士是否上报部队管理',type:'dec'}],
+   st:[{i:'🎖️',n:'声望',h:'连队成绩和上级评价是你的晋升资本'},{i:'💪',n:'压力',h:'全连的训练和纪律问题都压在你身上'},{i:'🫂',n:'人际',h:'和战士的关系和上级的信任同样重要'},{i:'⭐',n:'绩效',h:'训练成绩和军事比武名次是硬考核'}]},
+
+  // ══════════════════════════════════════
+  //  同岗位·不同公司版本
+  // ══════════════════════════════════════
+
+  // 程序员系列
+  {id:'engineer_bigtech',e:'💻',n:'大厂程序员',s:'头部互联网·基础架构组',cat:'tech',diff:'高压',sal:'40-80k',
+   desc:'你在全球最顶尖的基础设施上写代码，每次部署影响数亿用户。技术天花板很高，但会议也很多，PPT写得比代码还多。',
+   learns:['超大规模系统的设计思维和工程实践','在巨型组织中推动技术决策的政治能力','如何在复杂协作中保持个人技术成长'],
+   experiences:['Review被架构师打回来改了七遍终于过了','双十一前一个月全组无休冲刺准备','在内网看到自己名字出现在重大故障报告里'],
+   dp:[{t:'10:00',l:'任务·处理Code Review反馈',type:'task'},{t:'11:00',l:'任务·设计方案评审会',type:'dec'},{t:'13:30',l:'摸鱼·工位摸鱼刷内网八卦',type:'slack'},{t:'14:30',l:'突发·线上核心服务P0故障',type:'crisis'},{t:'16:00',l:'任务·架构重构方案设计文档',type:'task'},{t:'19:00',l:'决策·是否同意加班赶版本节点',type:'dec'}],
+   st:[{i:'⚙️',n:'声望',h:'技术影响力决定你在组织里的话语权'},{i:'🔥',n:'压力',h:'大促备战和线上故障是周期性高压'},{i:'🗣️',n:'人际',h:'跨团队对齐和向上管理同样消耗精力'},{i:'📊',n:'绩效',h:'季度OKR达成和代码贡献量是考核核心'}]},
+
+  {id:'engineer_startup',e:'🚀',n:'创业公司程序员',s:'A轮早期创业公司',cat:'tech',diff:'高压',sal:'20-40k+期权',
+   desc:'公司就十几个人，你负责前端也负责后端，偶尔还要部署服务器。技术债从第一天开始积累，但速度是你的核心竞争力。',
+   learns:['全栈思维：快速学习陌生技术的能力','在极度不确定中做够用的技术决策','业务和技术之间的实用主义权衡'],
+   experiences:['产品方向连续改了三次代码全部重写','自己写的代码直接跑在正式生产环境','公司融资成功那天全组吃了顿好的'],
+   dp:[{t:'10:00',l:'任务·独立推进新功能开发',type:'task'},{t:'11:30',l:'突发·用户反馈核心功能崩溃',type:'crisis'},{t:'13:00',l:'任务·和CEO确认下周功能优先级',type:'dec'},{t:'15:00',l:'摸鱼·和同事吐槽产品需求',type:'slack'},{t:'16:00',l:'任务·修复一堆历史技术债',type:'task'},{t:'19:00',l:'决策·是否熬夜完成投资人演示demo',type:'dec'}],
+   st:[{i:'🏎️',n:'声望',h:'你的代码直接决定公司产品的存亡'},{i:'⏰',n:'压力',h:'资源不足和需求变化是每天的现实'},{i:'🤝',n:'人际',h:'创始人的信任是你在这里的一切'},{i:'💡',n:'绩效',h:'功能上线速度和系统稳定性是核心'}]},
+
+  {id:'engineer_foreign',e:'🌐',n:'外企程序员',s:'跨国科技公司中国研发中心',cat:'tech',diff:'中等',sal:'30-60k',
+   desc:'朝九晚六，Work-Life Balance是真实存在的。但也有另一面：本地化决策权有限，最重要的会议在你睡觉的时候开，晋升通道是真实的天花板。',
+   learns:['跨文化协作和异步沟通的国际化工作方式','英文技术文档写作和全球团队会议','外企流程体系下高质量工程实践'],
+   experiences:['深夜被美国总部紧急call起来的confused','申请购买一个开源工具走了两周审批流程','Performance Review拿了超预期但就是没晋升'],
+   dp:[{t:'09:00',l:'任务·Standup会议同步进度',type:'task'},{t:'10:00',l:'任务·完成Sprint任务开发',type:'task'},{t:'13:00',l:'摸鱼·食堂吃饭聊职场八卦',type:'slack'},{t:'14:00',l:'突发·总部临时要求变更需求',type:'crisis'},{t:'15:30',l:'任务·与美国团队视频技术对齐',type:'dec'},{t:'17:30',l:'决策·是否提出本地化方案向上申请权限',type:'dec'}],
+   st:[{i:'🌍',n:'声望',h:'英文能力和国际项目经验是你的溢价'},{i:'🏖️',n:'压力',h:'这是少数真正有边界感的技术岗位'},{i:'🤝',n:'人际',h:'本地和总部关系的平衡是隐形功课'},{i:'📋',n:'绩效',h:'Sprint完成率和季度OKR是考核基础'}]},
+
+  // 产品经理系列
+  {id:'pm_bigtech',e:'📱',n:'大厂产品经理',s:'头部APP核心业务线',cat:'tech',diff:'高压',sal:'35-70k',
+   desc:'你的一个需求影响几亿用户，但也意味着几十个人要check你的每一个字。数据、竞品、用户研究、老板意志——你要把这些变成一个方案。',
+   learns:['超大用户体量下产品决策的数据思维','在组织层级中向上管理和推动共识','如何在官僚流程中保持产品创造力'],
+   experiences:['做了三个月的功能因为战略调整直接砍掉','用户调研结论和老板直觉冲突时的为难','上线一个小改动指标涨了10%的成就感'],
+   dp:[{t:'10:00',l:'任务·分析昨日版本数据',type:'task'},{t:'11:30',l:'任务·与设计开发评审需求',type:'dec'},{t:'14:00',l:'摸鱼·刷竞品更新记录',type:'slack'},{t:'15:00',l:'突发·竞品发布相似功能需要快速响应',type:'crisis'},{t:'16:30',l:'任务·撰写Q2产品规划文档',type:'task'},{t:'18:30',l:'决策·是否向上提出推翻现有方案',type:'dec'}],
+   st:[{i:'📊',n:'声望',h:'爆款产品和漂亮数据是你在组织的底气'},{i:'🌀',n:'压力',h:'多方诉求汇聚到你这里是这岗位的宿命'},{i:'🗣️',n:'人际',h:'搞定所有人是PM最核心的能力'},{i:'📈',n:'绩效',h:'DAU增长和核心业务指标是终极评价'}]},
+
+  {id:'pm_b2b',e:'🏢',n:'To B产品经理',s:'企业软件公司',cat:'tech',diff:'中等',sal:'20-40k',
+   desc:'你的用户是公司里被迫用这个软件的员工，你的客户是掏钱的老板。这两个人要的东西永远不一样，你的产品要同时讨好他们。',
+   learns:['企业级软件的权限、流程、集成的复杂逻辑','理解甲方采购决策链路和影响决策的人','在定制化需求和标准化产品之间找平衡'],
+   experiences:['大客户要求一个功能说不做就不续费','用了半年发现一个核心流程设计有根本缺陷','去客户那边做需求调研，所有人都在讲领导想要的'],
+   dp:[{t:'09:30',l:'任务·整理客户反馈和支持工单',type:'task'},{t:'11:00',l:'任务·和销售对接大客户定制需求',type:'dec'},{t:'13:30',l:'摸鱼·看企业软件行业分析报告',type:'slack'},{t:'14:30',l:'突发·客户核心业务因产品Bug停摆',type:'crisis'},{t:'16:00',l:'任务·下季度路线图规划',type:'task'},{t:'17:30',l:'决策·是否接受高价值客户的特殊定制',type:'dec'}],
+   st:[{i:'🤝',n:'声望',h:'大客户续约率是你在公司最重要的指标'},{i:'📞',n:'压力',h:'客户随时可以投诉是永恒的背景压力'},{i:'💼',n:'人际',h:'和销售和客户成功团队的配合是关键'},{i:'💰',n:'绩效',h:'NPS分数和客户留存率是核心考核'}]},
+
+  // 销售系列
+  {id:'sales_luxury',e:'💎',n:'奢侈品销售',s:'高端商场品牌专柜',cat:'business',diff:'中等',sal:'底薪+提成',
+   desc:'你卖的不是产品，是一种感觉。你要让走进来的人觉得他们值得拥有这件东西，即使它的价格是他们一个月的工资。',
+   learns:['顶级客户服务：让人感觉被重视和理解','产品专业知识到情感叙事的转化','识别真实购买意向和建立长期客户关系'],
+   experiences:['一个客人在店里站了一小时最后买了最贵的','大促前一周每天接送VIP客户购物','被客人呼来喝去却还要保持微笑的修炼'],
+   dp:[{t:'10:00',l:'任务·开店陈列和产品知识温习',type:'task'},{t:'11:30',l:'任务·接待重要VIP客户',type:'task'},{t:'14:00',l:'摸鱼·店里安静时整理客户档案',type:'slack'},{t:'15:00',l:'突发·客户退货声称产品有问题',type:'crisis'},{t:'16:30',l:'任务·接待新客完成成交',type:'task'},{t:'18:30',l:'决策·是否为VIP客户破例申请折扣',type:'dec'}],
+   st:[{i:'✨',n:'声望',h:'VIP客户数量和回购率是你的核心资产'},{i:'😊',n:'压力',h:'业绩配额和每天的情绪管理同步消耗'},{i:'💝',n:'人际',h:'和顶级客户的长期关系决定你的收入'},{i:'💰',n:'绩效',h:'月度销售额和客单价是唯一语言'}]},
+
+  {id:'sales_insurance',e:'🛡️',n:'保险销售',s:'寿险公司个险部',cat:'business',diff:'高压',sal:'纯提成制',
+   desc:'你卖的是一个"万一"。大多数人不想谈这件事，而你每天的工作就是让他们正视它。这份工作让你彻底理解了人性和拒绝。',
+   learns:['如何引导人们思考他们不愿面对的风险','在反复被拒绝后维持动力的心理建设','通过真实需求分析而非套路建立信任'],
+   experiences:['打了100个电话只有3个人愿意见你','一个客户理赔成功后说当初幸好听了你的','被老朋友直接拉黑的那条消息'],
+   dp:[{t:'09:00',l:'任务·电话邀约潜在客户',type:'task'},{t:'11:00',l:'任务·登门拜访意向客户',type:'task'},{t:'13:30',l:'摸鱼·部门晒业绩群焦虑刷新',type:'slack'},{t:'14:30',l:'突发·签约客户犹豫要反悔',type:'crisis'},{t:'16:00',l:'任务·社群维护和老客户转介绍',type:'task'},{t:'18:00',l:'决策·是否向客户推荐超出需求的产品',type:'dec'}],
+   st:[{i:'🤝',n:'声望',h:'转介绍率是你在这行能走多远的根本'},{i:'💔',n:'压力',h:'纯提成制下每个月都是重新开始'},{i:'❤️',n:'人际',h:'客户信任是这份工作唯一真实的资产'},{i:'💰',n:'绩效',h:'签单保费和留存率是公司考核你的方式'}]},
+
+  // 设计师系列
+  {id:'designer_agency',e:'🎨',n:'广告公司设计师',s:'4A广告公司创意部',cat:'creative',diff:'高压',sal:'10-20k',
+   desc:'你做的设计会出现在几百万人面前，但你的名字不会出现在任何地方。客户永远是对的，即使客户说把logo再放大一点。',
+   learns:['在严苛商业限制中寻找创意可能性','快速理解客户品牌需求并转化为视觉','如何和文案、策略团队协作完成整合项目'],
+   experiences:['精心设计的方案被甲方一句"不够大气"否掉','熬夜赶提案结果客户临时说推迟','方案被完整执行出现在机场大屏上的成就感'],
+   dp:[{t:'10:00',l:'任务·阅读Brief开始概念发想',type:'task'},{t:'11:30',l:'任务·制作提案视觉稿',type:'task'},{t:'14:00',l:'摸鱼·刷设计网站找灵感',type:'slack'},{t:'15:00',l:'突发·客户要求临时大改方向',type:'crisis'},{t:'16:30',l:'任务·向客户提案展示',type:'dec'},{t:'19:00',l:'决策·是否接受明显不合理的修改要求',type:'dec'}],
+   st:[{i:'🎯',n:'声望',h:'获奖作品和大客户经历是你的作品集'},{i:'⏰',n:'压力',h:'永远不够的时间和永远在改的方案'},{i:'💬',n:'人际',h:'搞定客户和内部团队的能力同样重要'},{i:'📐',n:'绩效',h:'提案通过率和客户满意度是核心'}]},
+
+  {id:'designer_inhouse',e:'🖥️',n:'互联网公司设计师',s:'中型互联网公司UED',cat:'creative',diff:'中等',sal:'15-30k',
+   desc:'你在公司内部做设计，没有外部甲方，但有无数个内部甲方。产品、运营、市场、老板，每个人都有自己的审美意见。',
+   learns:['用户体验数据驱动设计决策的能力','在快速迭代节奏中保持设计一致性','组件化设计思维和设计系统的维护'],
+   experiences:['A/B测试数据证明了你的设计方案更好','连续三个版本在同一个地方改来改去','设计稿被开发直接"简化"上线'],
+   dp:[{t:'09:30',l:'任务·站会同步设计进度',type:'task'},{t:'10:30',l:'任务·设计新功能交互方案',type:'task'},{t:'13:00',l:'摸鱼·和同事讨论开发的魔改',type:'slack'},{t:'14:00',l:'突发·产品要求今天必须出稿',type:'crisis'},{t:'15:30',l:'任务·设计评审会',type:'dec'},{t:'17:30',l:'决策·是否同意开发的简化方案',type:'dec'}],
+   st:[{i:'📱',n:'声望',h:'产品数据和用户好评是你最好的作品集'},{i:'🔄',n:'压力',h:'内部需求不断涌入是日常节奏'},{i:'🤝',n:'人际',h:'和产品和开发的关系决定设计落地质量'},{i:'📊',n:'绩效',h:'需求按时完成率和设计走查通过率'}]},
+
+  // 运营系列
+  {id:'ops_ecommerce',e:'🛒',n:'电商运营',s:'品牌天猫旗舰店',cat:'business',diff:'高压',sal:'8-18k',
+   desc:'双十一的备战、日常的活动、选品、定价、推广、客服——你是这个店铺的CEO，但你没有CEO的权力，只有CEO的焦虑。',
+   learns:['电商平台算法和流量逻辑的运营实践','数据分析驱动选品和营销决策','活动策划从概念到执行落地的全链路'],
+   experiences:['大促前夜12点和客服一起蹲守系统','一款新品意外爆单导致发货来不及','和供应链吵架因为他们又延误了'],
+   dp:[{t:'09:00',l:'任务·查看昨日店铺数据复盘',type:'task'},{t:'10:30',l:'任务·上架新品和优化详情页',type:'task'},{t:'13:00',l:'摸鱼·刷竞品做对比分析',type:'slack'},{t:'14:00',l:'突发·平台算法调整流量骤降',type:'crisis'},{t:'15:30',l:'任务·策划下周活动方案',type:'task'},{t:'17:30',l:'决策·是否加大亏损投放换排名',type:'dec'}],
+   st:[{i:'📦',n:'声望',h:'GMV和店铺排名是你在行业的地位'},{i:'📉',n:'压力',h:'流量和转化的每日波动是真实焦虑源'},{i:'🤝',n:'人际',h:'和供应链客服和平台小二的关系'},{i:'💰',n:'绩效',h:'月销售额和ROI是你被考核的语言'}]},
+
+  {id:'ops_content',e:'📝',n:'内容运营',s:'知识付费平台',cat:'business',diff:'中等',sal:'8-15k',
+   desc:'你负责平台上的内容质量和创作者生态。你既要让创作者满意，又要让用户留下来，还要让老板看到数据增长——三个方向可能完全相反。',
+   learns:['内容质量判断和平台调性的把握能力','创作者关系维护和激励机制的设计','从内容到用户行为的漏斗拆解分析'],
+   experiences:['一个爆款课程带来十倍新增用户','顶级创作者说要去竞品平台你要挽留','一篇内容引发用户投诉的危机处理'],
+   dp:[{t:'09:30',l:'任务·审核今日待发布内容',type:'task'},{t:'11:00',l:'任务·和头部创作者沟通选题',type:'task'},{t:'13:00',l:'摸鱼·刷同类平台找差距',type:'slack'},{t:'14:30',l:'突发·某内容出现事实错误需紧急下架',type:'crisis'},{t:'16:00',l:'任务·月度内容数据报告',type:'task'},{t:'17:30',l:'决策·是否为某创作者破例政策',type:'dec'}],
+   st:[{i:'✍️',n:'声望',h:'优质内容比例和用户完课率是你的成绩'},{i:'📱',n:'压力',h:'内容质量和更新频率的双重要求'},{i:'❤️',n:'人际',h:'和创作者的信任关系是最核心的资产'},{i:'📊',n:'绩效',h:'内容消费时长和付费转化率是核心'}]},
+
+  // ══════════════════════════════════════
+  //  公司内不同部门岗位流程
+  // ══════════════════════════════════════
+
+  {id:'ceo_small',e:'👑',n:'小公司老板',s:'30人规模科技创业公司',cat:'business',diff:'极高压',sal:'自负盈亏',
+   desc:'你同时是CEO、CFO、销售总监、产品总监。今天的你要谈投资人，明天你要搞定离职危机，后天可能要亲自写代码。孤独是标配。',
+   learns:['在极度不确定中做高风险决策的底层逻辑','如何在有限资源下构建有战斗力的团队','融资、产品、人事、法务——每件都要懂一点'],
+   experiences:['发工资前夕账上只剩两个月现金的夜晚','一个核心员工提离职时的复杂情绪','投资人签了Term Sheet那天根本高兴不起来'],
+   dp:[{t:'09:00',l:'任务·全员晨会对齐本周目标',type:'task'},{t:'10:30',l:'任务·和潜在投资人路演',type:'task'},{t:'14:00',l:'突发·CTO提出离职',type:'crisis'},{t:'16:00',l:'摸鱼·一个人在会议室发呆',type:'slack'},{t:'17:00',l:'任务·处理法务合同和供应商谈判',type:'task'},{t:'20:00',l:'决策·是否接受低于预期的融资条款',type:'dec'}],
+   st:[{i:'🏆',n:'声望',h:'公司的成败就是你全部的外部评价'},{i:'💀',n:'压力',h:'所有问题的终点都是你，没有人能分担'},{i:'👥',n:'人际',h:'留住关键人才是你最重要的日常工作'},{i:'💰',n:'绩效',h:'公司活着还是死是唯一的绩效标准'}]},
+
+  {id:'middle_manager',e:'📊',n:'中层管理者',s:'500人互联网公司业务线',cat:'office',diff:'高压',sal:'25-50k',
+   desc:'你上面有战略要执行，下面有团队要带。KPI分解、绩效评定、向上汇报、向下辅导——你是组织机器里最重要也最容易被磨损的齿轮。',
+   learns:['目标拆解和向下赋能的管理方法论','处理团队冲突和绩效问题的人事能力','在组织政治中维持自己的立场和判断'],
+   experiences:['被迫给表现良好的下属打低绩效','老板临时要求今天出完整汇报PPT','一个被你培养的人得到了你梦想的机会'],
+   dp:[{t:'09:30',l:'任务·一对一辅导下属工作问题',type:'task'},{t:'11:00',l:'任务·向上汇报季度业务进展',type:'dec'},{t:'13:30',l:'摸鱼·午休和同级别管理者吃饭聊天',type:'slack'},{t:'14:30',l:'突发·团队成员之间发生严重冲突',type:'crisis'},{t:'16:00',l:'任务·制定下季度团队目标',type:'task'},{t:'18:00',l:'决策·年终绩效评级如何排名',type:'dec'}],
+   st:[{i:'🎯',n:'声望',h:'团队业绩和向上管理是你的双重评价'},{i:'🌀',n:'压力',h:'夹在上下之间是这个位置永恒的困境'},{i:'👥',n:'人际',h:'团队凝聚力和跨部门协作是核心能力'},{i:'📈',n:'绩效',h:'团队OKR达成率和人员稳定性是考核'}]},
+
+  {id:'intern',e:'🌱',n:'职场新人/实习生',s:'互联网公司运营部',cat:'office',diff:'中等',sal:'3-6k',
+   desc:'你什么都不懂，但你什么都想学。打杂、被忽视、被重用、被push——职场第一年发生的事会影响你很久。',
+   learns:['职场基本规则：什么能说什么不能说','把一件小事做到超出预期的执行能力','如何在陌生环境里快速建立信任'],
+   experiences:['第一次独立完成一个小项目被夸的兴奋','发现同事说的话背后还有另一层意思','做了很久的事被一句"这个方向不对"否定'],
+   dp:[{t:'09:30',l:'任务·整理会议纪要和数据报表',type:'task'},{t:'11:00',l:'任务·帮带教完成竞品调研',type:'task'},{t:'13:00',l:'摸鱼·午休时间和同期实习生聊天',type:'slack'},{t:'14:30',l:'突发·搞错了重要文件的格式要紧急重做',type:'crisis'},{t:'16:00',l:'任务·独立完成一个小型数据分析',type:'task'},{t:'18:00',l:'决策·是否主动争取留用机会',type:'dec'}],
+   st:[{i:'🌟',n:'声望',h:'给带教留下好印象是转正的基础'},{i:'😰',n:'压力',h:'什么都不懂又什么都要做的初期焦虑'},{i:'🤝',n:'人际',h:'和带教同事的关系决定你能学到什么'},{i:'✅',n:'绩效',h:'任务完成质量和主动学习态度是评价'}]},
+
+  {id:'legal_counsel',e:'⚖️',n:'企业法务',s:'中型上市公司法务部',cat:'office',diff:'中等',sal:'15-30k',
+   desc:'你是公司的法律防火墙。所有合同、纠纷、监管合规都经过你。你说不行，业务就不能做；但业务说要做，你要找到怎么能做。',
+   learns:['商业合同风险识别和谈判要点','公司法、劳动法、合规监管的实务应用','在法律边界内支持而非阻碍业务的思维'],
+   experiences:['为了一个条款和对方律师来回改了三十稿','业务部门绕过你直接签了一个有问题的合同','帮公司把一个本可能很麻烦的纠纷提前化解'],
+   dp:[{t:'09:30',l:'任务·审核今日待签合同',type:'task'},{t:'11:00',l:'任务·和业务部门沟通合规风险',type:'dec'},{t:'13:00',l:'摸鱼·看最新监管政策动向',type:'slack'},{t:'14:30',l:'突发·公司收到仲裁申请书',type:'crisis'},{t:'16:00',l:'任务·起草重要供应商框架协议',type:'task'},{t:'17:30',l:'决策·一个灰色业务是否出具法律意见支持',type:'dec'}],
+   st:[{i:'🛡️',n:'声望',h:'帮公司避免了多少麻烦是真实的价值'},{i:'📋',n:'压力',h:'任何合规漏洞都可能追溯到你'},{i:'💼',n:'人际',h:'和业务部门的关系影响你的工作质量'},{i:'⚠️',n:'绩效',h:'合规事故率和合同质量是考核基础'}]},
+
+  {id:'finance_analyst',e:'📈',n:'财务分析师',s:'集团战略财务部',cat:'office',diff:'高压',sal:'15-30k',
+   desc:'你把数字变成决策建议。你的Excel里是公司的未来，你的报告决定资源向哪里流。做得好没人知道，做错了所有人来找你。',
+   learns:['财务模型构建和敏感性分析的方法论','业财融合：从数字读懂业务本质','如何把复杂分析用最简单的语言讲给老板'],
+   experiences:['一个错误的公式导致整个预算模型要重来','你的分析支撑了一个亿级的投资决策','汇报时高管问了一个你没想到的问题'],
+   dp:[{t:'09:00',l:'任务·更新月度财务跟踪模型',type:'task'},{t:'11:00',l:'任务·各业务线收入预测分析',type:'task'},{t:'13:30',l:'摸鱼·午后边喝咖啡边刷行业报告',type:'slack'},{t:'14:30',l:'突发·CFO要求今天出一个未规划的专项分析',type:'crisis'},{t:'16:00',l:'任务·制作高管周报财务分析页',type:'task'},{t:'18:00',l:'决策·对一项不确定投资出具什么样的建议',type:'dec'}],
+   st:[{i:'📊',n:'声望',h:'准确的预测和有价值的洞察让CFO信任你'},{i:'⏰',n:'压力',h:'季报年报和临时分析轮番来袭'},{i:'🤝',n:'人际',h:'和业务部门的数据协作关系至关重要'},{i:'💡',n:'绩效',h:'预测准确率和分析质量是核心评价'}]},
+
+  // ══════════════════════════════════════
+  //  公检法
+  // ══════════════════════════════════════
+  {id:'prosecutor',e:'⚖️',n:'检察院检察官',s:'基层人民检察院',cat:'legal',diff:'高压',sal:'10-20k',
+   desc:'你是国家公诉权的行使者。案卷、证据、庭审、出庭支持公诉——你的工作决定一个人是否被起诉，是否被追究刑事责任。',
+   learns:['刑事诉讼程序和证据认定标准','出庭公诉的论证逻辑和临场应变','在法律框架内客观公正的职业素养'],
+   experiences:['审阅一份200页案卷发现关键漏洞','第一次独立出庭支持公诉的紧张','被辩护律师在庭上正面质疑时的沉着'],
+   dp:[{t:'08:30',l:'任务·审查新移送案件证据材料',type:'task'},{t:'10:00',l:'任务·讯问在押犯罪嫌疑人',type:'task'},{t:'13:30',l:'任务·准备明日庭审公诉意见',type:'task'},{t:'15:00',l:'突发·辩护律师提出非法证据排除申请',type:'crisis'},{t:'16:30',l:'摸鱼·办公室整理归档历史卷宗',type:'slack'},{t:'17:30',l:'决策·证据存疑的案件是否提起公诉',type:'dec'}],
+   st:[{i:'⚖️',n:'声望',h:'出庭质量和案件胜诉率是核心评价'},{i:'📁',n:'压力',h:'案件积压和庭审准备是持续高压'},{i:'🤝',n:'人际',h:'和法院公安的协作关系影响案件效率'},{i:'✅',n:'绩效',h:'案件办结数和起诉准确率是考核指标'}]},
+
+  {id:'judge',e:'🔨',n:'基层法院法官',s:'区级人民法院民事庭',cat:'legal',diff:'高压',sal:'10-20k',
+   desc:'你手中的一纸判决改变当事人的命运。离婚、债务、合同纠纷——每天都是别人人生最难过的时刻，你要在法律和情理之间找到平衡。',
+   learns:['民事案件的法律适用和裁判说理','庭审驾驭：控制节奏、查明事实、化解对抗','在有限证据下做出公正裁判的判断力'],
+   experiences:['一对老夫妻因为几万块遗产对簿公堂','当事人在庭上崩溃痛哭时的复杂心情','写了三稿判决书，每次都觉得还不够严谨'],
+   dp:[{t:'08:30',l:'任务·阅卷研究今日开庭案件',type:'task'},{t:'09:30',l:'任务·主持民事案件庭审',type:'task'},{t:'13:00',l:'摸鱼·午休翻翻最新指导案例',type:'slack'},{t:'14:00',l:'任务·撰写裁判文书',type:'task'},{t:'16:00',l:'突发·当事人情绪激动拒绝离开法院',type:'crisis'},{t:'17:30',l:'决策·证据不充分的案件是否当庭调解',type:'dec'}],
+   st:[{i:'🔨',n:'声望',h:'改判率低和当事人服判是真实口碑'},{i:'📝',n:'压力',h:'结案压力和文书质量要求同时施压'},{i:'⚖️',n:'人际',h:'与律师当事人的关系要保持合法边界'},{i:'📊',n:'绩效',h:'结案率和发改率是年终考核硬指标'}]},
+
+  {id:'court_clerk',e:'📋',n:'法院书记员',s:'基层人民法院',cat:'legal',diff:'中等',sal:'5-10k',
+   desc:'庭审的每一句话你都要记录，每一份文书你都要校对。你是法庭运转的幕后支撑，虽然不发言，但缺了你整个流程都转不起来。',
+   learns:['法庭速记和庭审笔录的专业规范','法院内部流程和诉讼文书的标准格式','在高度规范化环境下的细节管理能力'],
+   experiences:['一场庭审打了五个小时手指酸到不行','录音和记录出现细微差异引发律师异议','独立完成一件案件全流程文书整理'],
+   dp:[{t:'08:30',l:'任务·整理昨日庭审笔录归档',type:'task'},{t:'09:30',l:'任务·法庭记录开庭审理',type:'task'},{t:'11:30',l:'突发·庭审录音系统出现故障',type:'crisis'},{t:'13:30',l:'摸鱼·整理送达回执和材料',type:'slack'},{t:'14:30',l:'任务·协助法官起草裁定书',type:'task'},{t:'16:30',l:'决策·当事人要求修改笔录是否允许',type:'dec'}],
+   st:[{i:'📋',n:'声望',h:'零差错和快速响应是你在庭室的价值'},{i:'⏰',n:'压力',h:'开庭密度和文书期限是日常节奏'},{i:'🤝',n:'人际',h:'和法官律师的配合是工作顺利的基础'},{i:'✅',n:'绩效',h:'笔录准确率和归档及时率是考核标准'}]},
+
+  // ══════════════════════════════════════
+  //  监管机构
+  // ══════════════════════════════════════
+  {id:'market_regulator',e:'🔍',n:'市场监管局执法员',s:'区级市场监督管理局',cat:'legal',diff:'中等',sal:'6-12k',
+   desc:'食品安全、假冒伪劣、价格违法、无证经营——城市里每一个市场主体都在你的监管范围内。你是市场秩序的守护者，也是商家最怕见到的人。',
+   learns:['食品安全法规和现场快检技术','行政执法程序：检查、取证、立案、处罚','在执法权威和营商环境之间的平衡把握'],
+   experiences:['突击检查一家后厨，看到不想看到的东西','商家拿出"关系"想走人情，你该怎么办','成功查处一起伪劣产品案，媒体来报道'],
+   dp:[{t:'08:30',l:'任务·处理投诉举报筛查线索',type:'task'},{t:'09:30',l:'任务·突击检查辖区餐饮场所',type:'task'},{t:'11:30',l:'突发·被检查商家情绪激动阻碍执法',type:'crisis'},{t:'13:30',l:'摸鱼·办公室整理案卷材料',type:'slack'},{t:'14:30',l:'任务·制作行政处罚告知书',type:'task'},{t:'16:30',l:'决策·违规情节轻微是否给予警告还是罚款',type:'dec'}],
+   st:[{i:'🔍',n:'声望',h:'执法公正和群众满意是真实的职业口碑'},{i:'⚡',n:'压力',h:'随时出动的执法任务和投诉量是压力源'},{i:'🤝',n:'人际',h:'和商家打交道需要原则性与灵活性并存'},{i:'📊',n:'绩效',h:'案件查处数量和合格率是考核核心'}]},
+
+  {id:'securities_regulator',e:'📉',n:'证监会审核员',s:'证监会发行审核部门',cat:'legal',diff:'高压',sal:'15-30k',
+   desc:'你审核的每一份IPO申报材料，背后是一家公司能否走上资本市场。财务造假、信息披露违规——你的眼睛是市场公平的最后一道防线。',
+   learns:['上市公司财务审核和信息披露合规要求','识别财务数据异常和报表粉饰的能力','资本市场监管规则和发行审核标准'],
+   experiences:['在招股书里发现数据前后矛盾的关键细节','被券商保荐代表人反复游说的压力','一个被否决的项目后来证明确实有问题'],
+   dp:[{t:'09:00',l:'任务·审阅IPO申请招股说明书',type:'task'},{t:'11:00',l:'任务·财务数据核查和问询准备',type:'task'},{t:'13:30',l:'摸鱼·研究最新监管案例和规则变化',type:'slack'},{t:'14:30',l:'突发·发现申报材料存在疑似财务造假',type:'crisis'},{t:'16:00',l:'任务·起草审核问询函',type:'task'},{t:'17:30',l:'决策·边界案例是否建议上会审核',type:'dec'}],
+   st:[{i:'🏛️',n:'声望',h:'审核质量和零违规是你的职业根本'},{i:'📁',n:'压力',h:'审核时限和材料质量参差带来持续压力'},{i:'🤝',n:'人际',h:'与申请企业保持适当距离是职业红线'},{i:'⚖️',n:'绩效',h:'问询质量和审核通过率是绩效核心'}]},
+
+  // ══════════════════════════════════════
+  //  科研机构
+  // ══════════════════════════════════════
+  {id:'university_prof',e:'🎓',n:'高校教授',s:'双一流高校理工科院系',cat:'research',diff:'高压',sal:'15-40k+课题',
+   desc:'你要教书，要做科研，要发论文，要申课题经费，要带研究生，还要参加各种评审委员会。每一件都像全职工作，你只有一个人。',
+   learns:['前沿科学问题的深度研究和独立判断','如何培养下一代研究者的方法和耐心','在学术体制内运营实验室和课题组的能力'],
+   experiences:['学生在毕业前夕实验数据全部作废要重做','基金委评审专家对你的成果提出尖锐质疑','一篇憋了两年的文章终于被顶刊接收'],
+   dp:[{t:'09:00',l:'任务·为研究生组会汇报做点评',type:'task'},{t:'10:30',l:'任务·本科生专业课教学',type:'task'},{t:'13:30',l:'摸鱼·刷最新领域论文喝咖啡',type:'slack'},{t:'14:30',l:'突发·国家基金项目中期检查通知临时提前',type:'crisis'},{t:'16:00',l:'任务·撰写科研论文和项目申请书',type:'task'},{t:'18:00',l:'决策·是否在数据不完整时投稿截止日期前提交',type:'dec'}],
+   st:[{i:'🏆',n:'声望',h:'论文引用量和课题经费是学术地位的尺子'},{i:'🔬',n:'压力',h:'科研、教学、行政三线并行是常态'},{i:'👥',n:'人际',h:'与学生和学术圈同行的关系影响深远'},{i:'📜',n:'绩效',h:'发文数量、课题到账经费是年度考核'}]},
+
+  {id:'researcher',e:'🔬',n:'研究所研究员',s:'中科院下属研究所',cat:'research',diff:'高压',sal:'10-25k',
+   desc:'你没有教学任务，只需要做研究。听起来很美，实际上是另一种压力——课题结果、经费、成果转化，没有学生帮你打下手，很多实验你得自己做。',
+   learns:['专项领域的深度研究方法和实验设计','科研经费管理和课题执行的全流程','在高度专业化领域与国际同行的交流合作'],
+   experiences:['实验室设备故障导致一个月数据全失','所长说这个方向经费下一年可能砍掉','在国际学术会议上被提问，用英文现场答复'],
+   dp:[{t:'09:00',l:'任务·实验室数据采集和记录',type:'task'},{t:'11:00',l:'任务·课题组内部讨论进展',type:'task'},{t:'13:00',l:'摸鱼·午睡+看文献',type:'slack'},{t:'14:30',l:'突发·核心实验设备报警停机',type:'crisis'},{t:'16:00',l:'任务·向课题负责人汇报阶段性成果',type:'dec'},{t:'17:30',l:'决策·实验结果有偏差是否继续还是调整方向',type:'dec'}],
+   st:[{i:'🏅',n:'声望',h:'高影响因子期刊文章是学术声誉的货币'},{i:'⚗️',n:'压力',h:'实验进度和课题期中期末检查是压力节点'},{i:'🤝',n:'人际',h:'和合作单位及经费管理部门的关系'},{i:'📊',n:'绩效',h:'课题结题验收和专利成果数是考核'}]},
+
+  // ══════════════════════════════════════
+  //  公共场所
+  // ══════════════════════════════════════
+  {id:'museum_curator',e:'🏛️',n:'博物馆策展人',s:'省级历史博物馆',cat:'public',diff:'中等',sal:'6-15k',
+   desc:'你负责把历史文物变成普通人能看懂的展览。选文物、写说明牌、设计动线、联系出借机构——一个展览从立项到开幕需要两年，开幕那天你站在入口，看着人们走进去。',
+   learns:['历史文物的研究解读和大众化叙事转化','展览策划：动线、叙事、视觉的综合统筹','跨机构协调：文物借展、运输、安保的复杂流程'],
+   experiences:['一件借展文物在运输途中出现细小损伤','开幕当天看到小朋友对着展品睁大眼睛','写了三版说明牌，专家说还是不够通俗'],
+   dp:[{t:'09:00',l:'任务·与文物保管员核查展品状态',type:'task'},{t:'10:30',l:'任务·新展览方案汇报审议',type:'dec'},{t:'13:00',l:'摸鱼·馆内参观感受展示效果',type:'slack'},{t:'14:30',l:'突发·外借文物机构临时撤回展品',type:'crisis'},{t:'16:00',l:'任务·撰写展览图录文字',type:'task'},{t:'17:30',l:'决策·是否接受某企业赞助（附带冠名要求）',type:'dec'}],
+   st:[{i:'🏺',n:'声望',h:'展览观众量和口碑是你最直接的成绩'},{i:'📚',n:'压力',h:'展览筹备周期长、细节多、容错率低'},{i:'🤝',n:'人际',h:'与文博机构和出借方的关系至关重要'},{i:'⭐',n:'绩效',h:'展览数量和社会影响力是年度评价'}]},
+
+  {id:'librarian',e:'📚',n:'图书馆馆员',s:'市级公共图书馆',cat:'public',diff:'低压',sal:'4-8k',
+   desc:'很多人觉得图书馆工作很闲，实际是另一回事。采购编目、数字资源管理、读者服务、活动策划——你是知识的组织者，也是很多人安静角落的守护者。',
+   learns:['图书馆分类编目和信息资源管理体系','数字图书馆建设和阅读推广的方法','处理各类读者需求的服务意识与耐心'],
+   experiences:['一个老人每天来看报纸坐了三年叫你小李','发现馆藏里有本民国孤本无人知晓','阅读推广活动来了两个人，一个是同事带来的'],
+   dp:[{t:'09:00',l:'任务·开馆前检查各阅览区秩序',type:'task'},{t:'10:00',l:'任务·新到图书编目分类上架',type:'task'},{t:'11:30',l:'突发·读者因座位问题发生争执',type:'crisis'},{t:'13:30',l:'摸鱼·安静整理书架',type:'slack'},{t:'14:30',l:'任务·为读者提供参考咨询服务',type:'task'},{t:'16:30',l:'决策·馆藏破损严重的珍贵书籍是修缮还是数字化',type:'dec'}],
+   st:[{i:'📖',n:'声望',h:'读者满意度和活动参与量是你的评价'},{i:'🌿',n:'压力',h:'这是真正有边界感的少数公共服务岗位'},{i:'😊',n:'人际',h:'和常客读者的长期关系是工作的温暖来源'},{i:'✅',n:'绩效',h:'服务量和文献利用率是考核指标'}]},
+
+  {id:'park_ranger',e:'🌳',n:'公园管理员',s:'城市大型综合公园',cat:'public',diff:'低压',sal:'4-7k',
+   desc:'你的办公室是一整座公园。广场舞大妈、遛狗不拴绳的居民、拍婚纱照的新人、迷路的小孩——你负责让这片绿地秩序井然又充满生机。',
+   learns:['城市绿地管理和园林养护基础知识','应对各类公众需求的服务和沟通能力','突发事件现场处置和安全管理意识'],
+   experiences:['凌晨发现有人在公园里露营悄悄不走','春天樱花盛开时整个公园人满为患','帮一个哭着找不到妈妈的小孩找到了家长'],
+   dp:[{t:'07:30',l:'任务·晨间巡逻检查设施安全',type:'task'},{t:'09:00',l:'突发·游客投诉遛狗未拴绳发生冲突',type:'crisis'},{t:'11:00',l:'任务·协助绿化队完成季节性修剪',type:'task'},{t:'13:30',l:'摸鱼·管理站喝茶休息',type:'slack'},{t:'15:00',l:'任务·下午安全巡查和游客疏导',type:'task'},{t:'17:00',l:'决策·闭园时间有游客拒绝离开如何处理',type:'dec'}],
+   st:[{i:'🌳',n:'声望',h:'游客满意和设施安全是你工作的核心'},{i:'☀️',n:'压力',h:'这份工作真的不太高压，户外为主'},{i:'😄',n:'人际',h:'和周边居民的熟悉关系是日常温暖'},{i:'🔧',n:'绩效',h:'设施完好率和投诉率是管理评价'}]},
+
+  // ══════════════════════════════════════
+  //  管理机构（党政机关）
+  // ══════════════════════════════════════
+  {id:'govt_office',e:'🏢',n:'党政机关办公室干部',s:'市级政府办公室',cat:'gov',diff:'高压',sal:'8-15k',
+   desc:'你是政府机器的润滑剂。领导讲话要起草，文件要审核，重要会议要保障，内外协调靠你推动——你什么都不决定，但什么都要操办。',
+   learns:['党政公文写作：请示、报告、方案、讲话稿','重大会议活动的综合保障和细节管理','在科层体制中理解上级意图并有效落实'],
+   experiences:['领导讲话稿写了七遍，第八遍还在改','市委全会前三天全组几乎没有睡觉','一份文件漏了一个部门会签，整个流程重走'],
+   dp:[{t:'08:00',l:'任务·处理今日公文流转和会议通知',type:'task'},{t:'09:30',l:'任务·起草领导重要会议讲话稿',type:'task'},{t:'13:00',l:'摸鱼·办公室喝茶等下午安排',type:'slack'},{t:'14:30',l:'突发·领导临时要求下午出一份紧急报告',type:'crisis'},{t:'16:00',l:'任务·协调各部门重要活动后勤保障',type:'task'},{t:'18:00',l:'决策·领导要的稿子还没好是实话实说还是先交草稿',type:'dec'}],
+   st:[{i:'📄',n:'声望',h:'领导满意和文字质量是你在体制内立足的根本'},{i:'🌀',n:'压力',h:'随时可能来的紧急任务是常态，没有下班时间'},{i:'🤝',n:'人际',h:'和各部门的关系影响协调效率'},{i:'⭐',n:'绩效',h:'文字质量和任务完成率是考核核心'}]},
+
+  {id:'planning_official',e:'📐',n:'发改委规划干部',s:'省级发展改革委',cat:'gov',diff:'高压',sal:'10-18k',
+   desc:'你参与制定影响一个省份未来十年走向的规划文件。GDP目标、重点项目、产业布局——这些数字不是从天上掉下来的，是你和同事们一次次开会吵出来的。',
+   learns:['宏观经济政策分析和区域发展战略规划','统计数据读取和政策意图解读的结合能力','如何在各方利益博弈中找到政策平衡点'],
+   experiences:['某市一把手专程来汇报要争取重点项目','一份报告里的数据被国家部委质疑要重新核实','参与起草的规划文件在人代会通过的那一刻'],
+   dp:[{t:'09:00',l:'任务·研究国家最新政策文件精神',type:'task'},{t:'10:30',l:'任务·参加跨部门重大项目论证会',type:'dec'},{t:'13:30',l:'摸鱼·整理笔记喝咖啡看经济数据',type:'slack'},{t:'14:30',l:'突发·国家部委要求本月内上报特定数据',type:'crisis'},{t:'16:00',l:'任务·起草年度重点工作方案',type:'task'},{t:'17:30',l:'决策·某争议项目是否纳入重点推进清单',type:'dec'}],
+   st:[{i:'📊',n:'声望',h:'牵头起草重要文件的份数是你的隐性积累'},{i:'📋',n:'压力',h:'政策敏感性高，每个字都要字斟句酌'},{i:'🏛️',n:'人际',h:'和国家部委及各地政府的关系网络是资源'},{i:'⭐',n:'绩效',h:'重点工作完成情况和上级认可是考核核心'}]},
+
+  // ══════════════════════════════════════
+  //  制造业岗位
+  // ══════════════════════════════════════
+  {id:'factory_engineer',e:'⚙️',n:'制造业工艺工程师',s:'汽车零部件制造工厂',cat:'mfg',diff:'中等',sal:'10-20k',
+   desc:'你把设计图纸变成真实产品。工艺参数、良品率、设备调试——你在生产线和研发部门之间，要保证每天出来的零件都符合标准。',
+   learns:['制造工艺参数设计和过程质量控制','处理生产异常和快速溯源的问题分析能力','设计端和制造端的语言翻译能力'],
+   experiences:['一台关键设备凌晨报警，你被叫回厂里','良品率突然下降三个百分点必须今天找原因','工艺优化让生产效率提升了15%的成就感'],
+   dp:[{t:'08:00',l:'任务·交接班：了解昨夜生产异常情况',type:'task'},{t:'09:00',l:'突发·A线良品率异常下跌需立即处理',type:'crisis'},{t:'11:00',l:'任务·与设计部门对接新零件工艺可行性',type:'dec'},{t:'13:30',l:'摸鱼·食堂吃饭休息一下',type:'slack'},{t:'14:30',l:'任务·调试新引进设备工艺参数',type:'task'},{t:'16:30',l:'决策·工艺变更是否需要重新送样验证',type:'dec'}],
+   st:[{i:'⚙️',n:'声望',h:'工艺稳定性和解决问题的速度是你的口碑'},{i:'🔥',n:'压力',h:'生产异常随时出现是这份工作的节奏'},{i:'🤝',n:'人际',h:'和生产线长及设计部门的协作关系'},{i:'📈',n:'绩效',h:'良品率和工时效率是核心考核指标'}]},
+
+  {id:'quality_inspector',e:'🔎',n:'品质工程师',s:'消费电子代工厂',cat:'mfg',diff:'高压',sal:'8-18k',
+   desc:'每一个出厂产品都要经过你这一关。你是最后的防线——发现问题是你的价值，放过问题是你的责任。一旦有产品投诉，所有人都来找你。',
+   learns:['产品质量标准体系和检测方法的专业知识','不良品溯源分析和改善对策的制定','在生产压力下维持质量标准的坚守能力'],
+   experiences:['大客户审厂时发现你们文件不规范紧急补救','因为坚持扣留一批疑似不良品和生产部门吵架','出货后客户投诉，溯源发现漏检是你团队的问题'],
+   dp:[{t:'08:00',l:'任务·抽样检验昨日产线产品',type:'task'},{t:'09:30',l:'突发·客户投诉样品外观不良紧急核查',type:'crisis'},{t:'11:00',l:'任务·现场稽查生产工序规范性',type:'task'},{t:'13:30',l:'摸鱼·质量部例会喝茶等结果',type:'slack'},{t:'14:30',l:'任务·编写月度质量分析报告',type:'task'},{t:'16:30',l:'决策·边界不良品是否放行出货',type:'dec'}],
+   st:[{i:'🔎',n:'声望',h:'零客诉记录和检测准确率是你的职业资本'},{i:'⚠️',n:'压力',h:'生产交货压力和质量标准之间的永恒张力'},{i:'🤝',n:'人际',h:'和生产部门的摩擦是这个岗位的日常'},{i:'📊',n:'绩效',h:'客诉数量和内部不良率是核心考核'}]},
+
+  {id:'supply_chain',e:'🚚',n:'供应链采购员',s:'制造业集团采购部',cat:'mfg',diff:'中等',sal:'8-18k',
+   desc:'你决定公司买什么、从谁那里买、用什么价格买。每一次谈判都是博弈，每一次备货决策都是赌注。缺料停线是你的噩梦，积压库存是你的锅。',
+   learns:['供应商管理和多方询价谈判的实战能力','需求预测和库存管理的量化分析方法','供应链风险识别和应急备货的决策判断'],
+   experiences:['芯片短缺期间凌晨打电话联系全球供应商','一批原材料质量出问题整条线停了半天','谈下了一个比上年低8%的年度框架协议'],
+   dp:[{t:'09:00',l:'任务·处理今日物料需求计划',type:'task'},{t:'10:30',l:'任务·与核心供应商年度价格谈判',type:'dec'},{t:'13:00',l:'摸鱼·午餐和供应商代表吃饭',type:'slack'},{t:'14:30',l:'突发·关键物料供应商突然通知延期交货',type:'crisis'},{t:'16:00',l:'任务·评审新供应商资质',type:'task'},{t:'17:30',l:'决策·是否接受溢价以保障紧急备货',type:'dec'}],
+   st:[{i:'🏆',n:'声望',h:'降本成果和零停线记录是你在公司的价值'},{i:'📦',n:'压力',h:'缺料停线的风险随时悬在头上'},{i:'🤝',n:'人际',h:'和供应商的长期信任关系是核心资产'},{i:'💰',n:'绩效',h:'采购成本降低率和及时交付率是考核'}]},
+
+  // ── 公司架构岗位 ──
+  {id:'startup_ceo',e:'👔',n:'创业公司CEO',s:'A轮后扩张期',cat:'corp',diff:'极高压',sal:'期权为主',
+   company:'创业公司',dept:'C-Suite',
+   desc:'融资、招人、产品、战略全要管。每天都在救火，每周都在做关键决定。你是这艘船的船长。',
+   learns:['资源极限取舍的判断力','投资人沟通与融资叙事','组织从10人到100人的架构设计'],
+   experiences:['核心员工离职并带走整个团队','投资人在最后时刻撤资','竞品抄袭核心功能并烧钱降价'],
+   dp:[{t:'08:00',l:'晨会·OKR进展review',type:'task'},{t:'10:00',l:'投资人DD问题回复',type:'task'},{t:'13:00',l:'核心员工谈离职',type:'crisis'},{t:'15:30',l:'融资策略决策',type:'dec'},{t:'17:00',l:'摸鱼·看竞品动态',type:'slack'},{t:'19:00',l:'被催下季度规划',type:'negative'}],
+   stats:[{i:'⭐',n:'声望',h:'创始人背书是公司最重要的信用资产'},{i:'😰',n:'压力',h:'投融资和团队管理同时压着'},{i:'🤝',n:'人际',h:'投资人关系决定公司生死'},{i:'📈',n:'绩效',h:'GMV增速和融资估值是核心'}]},
+
+  {id:'product_manager',e:'📱',n:'产品经理',s:'互联网大厂',cat:'corp',diff:'高压',sal:'15-30K',
+   company:'互联网大厂',dept:'产品部',
+   desc:'用户要什么、技术能做什么、商业要赚什么——在三角形里找平衡点。没有直接权力，但要推动一切。',
+   learns:['无权力情况下推动跨部门协作','数据分析和用户研究方法','向上管理和向下对齐的技巧'],
+   experiences:['需求评审被技术当场喷得体无完肤','上线前夜发现核心功能有致命bug','KPI被老板临时改口径'],
+   dp:[{t:'09:30',l:'需求文档评审会',type:'task'},{t:'11:00',l:'技术说工期延期2周',type:'crisis'},{t:'14:00',l:'用户调研数据分析',type:'task'},{t:'16:00',l:'版本排期方案决策',type:'dec'},{t:'17:30',l:'摸鱼·刷竞品APP',type:'slack'},{t:'19:00',l:'写临时改出来的PRD',type:'negative'}],
+   stats:[{i:'⭐',n:'声望',h:'需求质量和迭代速度决定PM口碑'},{i:'😰',n:'压力',h:'夹在产品、技术、业务三方之间'},{i:'🤝',n:'人际',h:'跨部门关系是推进工作的关键'},{i:'📈',n:'绩效',h:'DAU、留存和转化率是核心指标'}]},
+
+  {id:'frontend_dev',e:'💻',n:'前端工程师',s:'互联网公司',cat:'corp',diff:'中等',sal:'20-40K',
+   company:'互联网公司',dept:'技术部',
+   desc:'把设计稿变成可以跑在浏览器里的代码。用户看到的每个按钮、每个动画都是你的作品。',
+   learns:['主流前端框架深度实践','性能优化和工程化体系','跨团队协作与需求沟通'],
+   experiences:['PM改了5次设计还说"就改一点点"','IE兼容性问题让你崩溃','上线后发现移动端全乱了'],
+   dp:[{t:'09:00',l:'Jira看今日任务',type:'task'},{t:'10:00',l:'联调后端接口报错',type:'crisis'},{t:'14:00',l:'组件开发与自测',type:'task'},{t:'16:30',l:'代码review被喷',type:'negative'},{t:'17:30',l:'摸鱼·逛技术论坛',type:'slack'},{t:'18:30',l:'上线前紧急改bug决策',type:'dec'}],
+   stats:[{i:'⭐',n:'声望',h:'代码质量和技术影响力'},{i:'😰',n:'压力',h:'deadline和需求变更是最大来源'},{i:'🤝',n:'人际',h:'和设计、后端的协作效率'},{i:'📈',n:'绩效',h:'需求交付率和Bug率'}]},
+
+  {id:'backend_dev',e:'⚙️',n:'后端工程师',s:'电商平台',cat:'corp',diff:'高压',sal:'25-50K',
+   company:'电商平台',dept:'技术部',
+   desc:'服务器、数据库、接口——你是互联网产品的"看不见的地基"，出问题全是你的锅。',
+   learns:['高并发系统设计与微服务架构','数据库调优和缓存策略','线上问题排查和应急处理'],
+   experiences:['大促凌晨服务崩了疯狂救火','被安全漏洞扫描吓出冷汗','数据库误删了一张表'],
+   dp:[{t:'09:30',l:'Review昨晚报警日志',type:'task'},{t:'11:00',l:'线上P0故障紧急排查',type:'crisis'},{t:'14:00',l:'新功能接口开发',type:'task'},{t:'16:00',l:'架构重构方案决策',type:'dec'},{t:'17:30',l:'摸鱼·刷LeetCode',type:'slack'},{t:'19:00',l:'补被催了三次的文档',type:'negative'}],
+   stats:[{i:'⭐',n:'声望',h:'系统稳定性和架构设计能力'},{i:'😰',n:'压力',h:'On-call随时可能被叫醒'},{i:'🤝',n:'人际',h:'前端和产品协作顺畅度'},{i:'📈',n:'绩效',h:'接口可用率和需求交付速度'}]},
+
+  {id:'hr_manager',e:'👥',n:'HR经理',s:'中型企业',cat:'corp',diff:'中等',sal:'8-18K',
+   company:'中型企业',dept:'人力资源部',
+   desc:'招人、留人、裁人——你是公司和员工之间的翻译官，也是背锅侠。',
+   learns:['招聘漏斗管理和面试技巧','劳动法实操和纠纷处理','企业文化建设与员工关系'],
+   experiences:['候选人offer谈好了又跳票','试用期员工刚培训完就辞职','被要求裁员还要做得"体面"'],
+   dp:[{t:'09:00',l:'简历筛选和面试安排',type:'task'},{t:'11:00',l:'员工投诉同事职场骚扰',type:'crisis'},{t:'14:00',l:'绩效评估结果谈话',type:'task'},{t:'15:30',l:'年终奖分配方案决策',type:'dec'},{t:'17:00',l:'摸鱼·刷脉脉八卦',type:'slack'},{t:'18:00',l:'老板要求裁掉某人',type:'negative'}],
+   stats:[{i:'⭐',n:'声望',h:'招聘效率和员工满意度'},{i:'😰',n:'压力',h:'夹在员工和管理层之间'},{i:'🤝',n:'人际',h:'维护各方关系是核心工作'},{i:'📈',n:'绩效',h:'招聘达成率和离职率'}]},
+
+  {id:'operations_mgr',e:'📈',n:'运营经理',s:'内容平台',cat:'corp',diff:'高压',sal:'10-20K',
+   company:'内容平台',dept:'运营部',
+   desc:'拉新、留存、促活、变现——DAU是你的命，每个数字波动都让你心跳加速。',
+   learns:['用户增长模型和AB测试','活动策划和效果评估','数据驱动的日常决策'],
+   experiences:['活动上线被羊毛党薅空了','爆款内容违规被强制下架','DAU连续下滑被老板约谈'],
+   dp:[{t:'09:00',l:'看昨日数据日报',type:'task'},{t:'10:30',l:'爆款内容被举报违规',type:'crisis'},{t:'14:00',l:'新活动方案策划',type:'task'},{t:'16:00',l:'预算分配方案决策',type:'dec'},{t:'17:30',l:'摸鱼·逛竞品平台',type:'slack'},{t:'18:30',l:'整理领导要的PPT',type:'negative'}],
+   stats:[{i:'⭐',n:'声望',h:'活动爆款率和口碑'},{i:'😰',n:'压力',h:'数据波动和KPI压力'},{i:'🤝',n:'人际',h:'内容、技术、商务的协调'},{i:'📈',n:'绩效',h:'DAU增长率和活动ROI'}]},
+
+  {id:'finance_analyst',e:'💹',n:'财务分析师',s:'上市公司',cat:'corp',diff:'中等',sal:'12-25K',
+   company:'上市公司',dept:'财务部',
+   desc:'Excel是你的武器，数字是你的语言。把公司的血液——钱——管理得井井有条。',
+   learns:['财务建模和DCF估值方法','三大报表深度分析','管理层财务汇报技巧'],
+   experiences:['季报截止前熬夜对账发现差了0.01元','审计师提了200条问题','被业务部门压着做有创意的报表'],
+   dp:[{t:'09:00',l:'月度财报数据核对',type:'task'},{t:'11:00',l:'审计发现账目异常',type:'crisis'},{t:'14:00',l:'季度预算分析报告',type:'task'},{t:'16:00',l:'投资项目立项决策',type:'dec'},{t:'17:30',l:'摸鱼·看财经新闻',type:'slack'},{t:'18:30',l:'临时要明天给董事会的PPT',type:'negative'}],
+   stats:[{i:'⭐',n:'声望',h:'报表准确率和分析深度'},{i:'😰',n:'压力',h:'季报期的高强度加班'},{i:'🤝',n:'人际',h:'与审计师和业务部门的关系'},{i:'📈',n:'绩效',h:'财务合规性和分析价值'}]},
+
+  {id:'sales_manager',e:'🤝',n:'销售经理',s:'B2B软件公司',cat:'corp',diff:'高压',sal:'底薪+高提成',
+   company:'B2B软件公司',dept:'销售部',
+   desc:'你的收入靠自己谈出来。客户的每一个"再考虑一下"背后，都是你深夜失眠的理由。',
+   learns:['大客户销售方法论（SPIN/MEDDIC）','谈判技巧和价格博弈','CRM管理和销售漏斗维护'],
+   experiences:['跟了8个月的大客户被竞争对手撬走','客户签了合同又反悔要退款','季末最后一天单子还差临门一脚'],
+   dp:[{t:'09:00',l:'CRM更新和跟进计划',type:'task'},{t:'10:30',l:'关键客户突然说暂停合作',type:'crisis'},{t:'14:00',l:'重要客户演示Demo',type:'task'},{t:'16:30',l:'大单报价策略决策',type:'dec'},{t:'17:30',l:'摸鱼·和同事聊客户八卦',type:'slack'},{t:'18:30',l:'老板要求改低报价损利润',type:'negative'}],
+   stats:[{i:'⭐',n:'声望',h:'客户口碑和行业影响力'},{i:'😰',n:'压力',h:'配额压力在月末季末到顶峰'},{i:'🤝',n:'人际',h:'客户关系是核心竞争力'},{i:'📈',n:'绩效',h:'签单金额和达成率'}]},
+
+  {id:'ux_designer',e:'🖌️',n:'UI/UX设计师',s:'互联网产品公司',cat:'corp',diff:'中等',sal:'12-25K',
+   company:'互联网产品公司',dept:'设计部',
+   desc:'用视觉和交互让产品好用又好看。但审美这东西，每个人都自以为自己有。',
+   learns:['用户体验设计方法论','设计系统和组件库搭建','向非设计师"卖"设计方案'],
+   experiences:['改了20版老板说"还是第一版好"','程序员说做不了然后用最丑的方式实现','用户调研结论和老板直觉相反'],
+   dp:[{t:'09:30',l:'整理用户反馈和迭代方向',type:'task'},{t:'11:00',l:'老板推翻昨天定好的方案',type:'crisis'},{t:'14:00',l:'核心页面重设计',type:'task'},{t:'16:00',l:'设计规范制定决策',type:'dec'},{t:'17:30',l:'摸鱼·逛Dribbble找灵感',type:'slack'},{t:'18:30',l:'给运营加急做活动banner',type:'negative'}],
+   stats:[{i:'⭐',n:'声望',h:'设计作品集和用户好评'},{i:'😰',n:'压力',h:'需求变更和改稿循环'},{i:'🤝',n:'人际',h:'和PM、研发的协作关系'},{i:'📈',n:'绩效',h:'设计交付率和用户体验评分'}]},
+
+  {id:'data_analyst',e:'🔢',n:'数据分析师',s:'电商公司',cat:'corp',diff:'中等',sal:'15-30K',
+   company:'电商公司',dept:'数据部',
+   desc:'挖掘数字背后的故事，告诉老板用户在干什么、为什么这么干、接下来会怎样。',
+   learns:['SQL深度应用和大数据工具链','AB测试设计和统计显著性','数据可视化和业务洞察表达'],
+   experiences:['花三天做的报告被说没有insight','AB测试结果被老板质疑说数据有问题','SQL跑了一晚上发现条件写错了'],
+   dp:[{t:'09:00',l:'日报数据取数和分析',type:'task'},{t:'11:00',l:'发现数据埋点有严重错误',type:'crisis'},{t:'14:00',l:'用户行为漏斗分析',type:'task'},{t:'16:00',l:'数据仓库重构方案决策',type:'dec'},{t:'17:30',l:'摸鱼·研究新的BI工具',type:'slack'},{t:'19:00',l:'临时要今晚给的竞品报告',type:'negative'}],
+   stats:[{i:'⭐',n:'声望',h:'分析准确率和业务影响力'},{i:'😰',n:'压力',h:'数据质量问题和紧急需求'},{i:'🤝',n:'人际',h:'与业务部门的信任关系'},{i:'📈',n:'绩效',h:'分析需求交付率和决策支持价值'}]},
+
+  {id:'supply_chain_mgr',e:'🚢',n:'供应链经理',s:'制造业大厂',cat:'corp',diff:'高压',sal:'15-35K',
+   company:'制造业集团',dept:'供应链部',
+   desc:'原材料从哪来、如何存、怎么用——断供一天，整条流水线停转。你是工厂的血液系统。',
+   learns:['供应商管理和备货策略','需求预测和库存优化','全球物流和清关流程'],
+   experiences:['供应商突然涨价50%谈判拉锯战','芯片短缺导致整季产品停线','货轮延误导致零件迟到影响交付'],
+   dp:[{t:'08:30',l:'供应商交货进度跟踪',type:'task'},{t:'10:00',l:'核心零件供应商通知断货',type:'crisis'},{t:'14:00',l:'季度备货计划制定',type:'task'},{t:'16:00',l:'更换供应商方案决策',type:'dec'},{t:'17:30',l:'摸鱼·和供应商吃饭',type:'slack'},{t:'19:00',l:'总部要求压低库存影响保供',type:'negative'}],
+   stats:[{i:'⭐',n:'声望',h:'供应保障率和成本控制能力'},{i:'😰',n:'压力',h:'断供风险随时悬在头上'},{i:'🤝',n:'人际',h:'与供应商的长期信任关系是核心'},{i:'📈',n:'绩效',h:'准时交付率和库存周转率'}]},
+
+  // ── 国家职业分类大典扩充 ──
+  {id:'civil_judge',e:'⚖️',n:'法官',s:'基层人民法院',cat:'legal',diff:'高压',sal:'编制工资',
+   company:'人民法院',dept:'民事庭',
+   desc:'手握公权，你的判决书是有执行力的国家意志。每一个案子背后都是真实的人生。',
+   learns:['民事诉讼程序和证据规则','法律推理和判决书写作','庭审控场和当事人心理'],
+   experiences:['当事人在法庭情绪失控嚎啕大哭','上级法院发回重审让你改判','受到当事人的骚扰和威胁'],
+   dp:[{t:'08:30',l:'庭前阅卷和准备',type:'task'},{t:'10:00',l:'当事人当庭推翻之前证词',type:'crisis'},{t:'14:00',l:'撰写裁判文书',type:'task'},{t:'15:30',l:'争议案件定性决策',type:'dec'},{t:'17:00',l:'摸鱼·和书记员聊天',type:'slack'},{t:'18:30',l:'被要求快结一批积压案件',type:'negative'}],
+   stats:[{i:'⭐',n:'声望',h:'判决质量和二审维持率'},{i:'😰',n:'压力',h:'案件积压和办案期限'},{i:'🤝',n:'人际',h:'和律师与当事人的中立关系'},{i:'📈',n:'绩效',h:'结案率和上诉率'}]},
+
+  {id:'meteorologist',e:'🌦️',n:'气象预报员',s:'省级气象台',cat:'research',diff:'中等',sal:'8-16K',
+   company:'气象台',dept:'天气预报科',
+   desc:'你的预报影响千万人的出行决定，甚至影响抗灾部署。报准了没人记得，报错了天下皆知。',
+   learns:['数值天气预报模式解读','雷达和卫星图像分析','极端天气识别和预警发布'],
+   experiences:['台风路径预报被质疑为何和实际偏差','高温红色预警发出后被说小题大做','夜间值班时发现强对流天气迅速发展'],
+   dp:[{t:'08:00',l:'接班阅读夜间天气实况',type:'task'},{t:'10:00',l:'强对流系统突然增强',type:'crisis'},{t:'14:00',l:'制作明日天气预报产品',type:'task'},{t:'16:00',l:'是否升级暴雨预警决策',type:'dec'},{t:'17:30',l:'摸鱼·看天空辨云识天',type:'slack'},{t:'19:00',l:'领导要求重新解释上次报错',type:'negative'}],
+   stats:[{i:'⭐',n:'声望',h:'预报准确率和公众信任度'},{i:'😰',n:'压力',h:'重大天气事件前极度紧张'},{i:'🤝',n:'人际',h:'与防汛减灾部门的协作'},{i:'📈',n:'绩效',h:'预报评分和预警及时率'}]},
+
+  {id:'environmental_engineer',e:'🌿',n:'环保工程师',s:'环保公司',cat:'niche',diff:'中等',sal:'8-20K',
+   company:'环保工程公司',dept:'技术部',
+   desc:'你和工厂谈判让他们少排放，和政府汇报环评结果，和公众解释污染数据。夹在中间不容易。',
+   learns:['环境影响评价标准和程序','大气水土壤污染治理技术','环保监测设备操作和数据分析'],
+   experiences:['现场监测发现数据异常被企业施压','环评报告公示期遭到周边居民反对','项目因政策变化被迫整体推倒重来'],
+   dp:[{t:'09:00',l:'昨日监测数据整理分析',type:'task'},{t:'11:00',l:'发现企业偷排证据',type:'crisis'},{t:'14:00',l:'现场环境影响核查',type:'task'},{t:'15:30',l:'是否上报违规数据决策',type:'dec'},{t:'17:00',l:'摸鱼·在野外透气',type:'slack'},{t:'18:30',l:'被甲方要求修改检测数据',type:'negative'}],
+   stats:[{i:'⭐',n:'声望',h:'技术水平和职业操守'},{i:'😰',n:'压力',h:'企业和监管的双重压力'},{i:'🤝',n:'人际',h:'协调企业、政府、公众三方'},{i:'📈',n:'绩效',h:'项目验收率和合规率'}]},
+
+  {id:'social_worker',e:'❤️',n:'社会工作者',s:'街道民政部门',cat:'public',diff:'高压',sal:'5-10K',
+   company:'街道办',dept:'民政科',
+   desc:'帮助最脆弱的人。老人、残障人士、困难家庭——你是他们和社会资源之间的桥梁。',
+   learns:['个案工作和小组工作方法','社会救助政策和申请流程','危机干预和心理支持技巧'],
+   experiences:['独居老人去世三天后才被发现','服务对象的家属对你横加指责','申请了三个月的补贴还没批下来'],
+   dp:[{t:'09:00',l:'走访困难家庭',type:'task'},{t:'11:00',l:'服务对象出现自伤危机',type:'crisis'},{t:'14:00',l:'整理个案记录和报告',type:'task'},{t:'15:30',l:'资源分配是否公平决策',type:'dec'},{t:'17:00',l:'摸鱼·和同事喝茶解压',type:'slack'},{t:'18:00',l:'被要求填写繁复的绩效表格',type:'negative'}],
+   stats:[{i:'⭐',n:'声望',h:'服务对象满意度和口碑'},{i:'😰',n:'压力',h:'高情感劳动消耗和人手不足'},{i:'🤝',n:'人际',h:'与服务对象建立信任'},{i:'📈',n:'绩效',h:'案件结案率和服务覆盖率'}]},
+
+  {id:'food_inspector',e:'🔬',n:'食品检验员',s:'食品加工厂',cat:'mfg',diff:'中等',sal:'5-12K',
+   company:'食品加工厂',dept:'质检部',
+   desc:'你是食品出厂前的最后一道门。放过一个不合格品，可能影响一万个消费者。',
+   learns:['食品安全标准（GB/HACCP）','微生物检测和理化分析','质量问题溯源和改进'],
+   experiences:['发现批次产品有异物却被压着放行','飞行检查突然杀到几乎心跳停止','检验设备坏了但还要继续出货'],
+   dp:[{t:'08:00',l:'抽检今日第一批次产品',type:'task'},{t:'10:00',l:'发现异物污染紧急处理',type:'crisis'},{t:'14:00',l:'书写质量检验报告',type:'task'},{t:'15:30',l:'不合格品是否放行决策',type:'dec'},{t:'16:30',l:'摸鱼·车间外透气',type:'slack'},{t:'17:30',l:'领导要求降低检验标准',type:'negative'}],
+   stats:[{i:'⭐',n:'声望',h:'检验准确率和职业操守'},{i:'😰',n:'压力',h:'来自管理层的放行压力'},{i:'🤝',n:'人际',h:'与生产部门的协调关系'},{i:'📈',n:'绩效',h:'合格率和不良品拦截率'}]},
+
+  {id:'er_nurse',e:'💉',n:'急诊科护士',s:'三甲医院',cat:'service',diff:'极高压',sal:'5-12K',
+   company:'三甲医院',dept:'急诊科',
+   desc:'每分钟都可能关乎生死。你的双手既要快准狠，也要温柔。永远比医生更早见到患者。',
+   learns:['急救操作和生命体征判断','高压环境下的情绪管理','多科室协调和快速转运流程'],
+   experiences:['同时处理5个危重患者没有空档','被患者家属情绪失控推搡','连续上班16小时忘记吃饭'],
+   dp:[{t:'08:00',l:'交班和床位情况核查',type:'task'},{t:'09:30',l:'突发大量工伤患者涌入',type:'crisis'},{t:'11:00',l:'执行医嘱和病情监测',type:'task'},{t:'14:00',l:'医疗纠纷处理决策',type:'dec'},{t:'16:30',l:'摸鱼·护士站补觉五分钟',type:'slack'},{t:'18:00',l:'被安排做不是自己班次的事',type:'negative'}],
+   stats:[{i:'⭐',n:'声望',h:'患者满意度和技术口碑'},{i:'😰',n:'压力',h:'高强度工作和情感消耗'},{i:'🤝',n:'人际',h:'与医生和患者家属的关系'},{i:'📈',n:'绩效',h:'护理质量和差错率'}]},
+];
+
+// ════════════════════════════════════════
+//  MULTI-PROVIDER API CONFIG
+// ════════════════════════════════════════
+const PROVIDERS = {
+  anthropic: {
+    name:'Anthropic Claude', icon:'🤖', free:'有免费额度',
+    placeholder:'sk-ant-api03-…',
+    hint:`🔒 Key 保存在本地浏览器，不上传<br>📖 申请地址：<a href="https://console.anthropic.com/keys" target="_blank">console.anthropic.com/keys</a><br>💡 推荐模型：Claude Sonnet，中文理解最佳`,
+    model:'claude-sonnet-4-20250514',
+    models:[
+      {id:'claude-sonnet-4-20250514',label:'Claude Sonnet 4（推荐）'},
+      {id:'claude-haiku-4-5-20251001',label:'Claude Haiku 4.5（最快）'},
+      {id:'claude-opus-4-5',label:'Claude Opus 4.5（最强）'},
+    ],
+  },
+  openai: {
+    name:'OpenAI ChatGPT', icon:'🟢', free:'新账号有额度',
+    placeholder:'sk-proj-…',
+    hint:`🔒 Key 保存在本地浏览器，不上传<br>📖 申请地址：<a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com/api-keys</a><br>💡 推荐模型：gpt-4o-mini（最省钱）`,
+    model:'gpt-4o-mini',
+    models:[
+      {id:'gpt-4o-mini',label:'GPT-4o mini（省钱推荐）'},
+      {id:'gpt-4o',label:'GPT-4o（最强）'},
+      {id:'gpt-4.1-mini',label:'GPT-4.1 mini（新）'},
+    ],
+  },
+  gemini: {
+    name:'Google Gemini', icon:'🔷', free:'完全免费',
+    placeholder:'AIza…',
+    hint:`🔒 Key 保存在本地浏览器，不上传<br>📖 申请地址：<a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com/app/apikey</a><br>💡 免费版每分钟15次请求，完全够用`,
+    model:'gemini-1.5-flash',
+  },
+  deepseek: {
+    name:'DeepSeek', icon:'🐬', free:'价格极低',
+    placeholder:'sk-…',
+    hint:`🔒 Key 保存在本地浏览器，不上传<br>📖 申请地址：<a href="https://platform.deepseek.com/api_keys" target="_blank">platform.deepseek.com/api_keys</a><br>💡 价格是 GPT-4 的约 1/20，中文效果极佳`,
+    model:'deepseek-chat',
+  },
+  openrouter: {
+    name:'OpenRouter', icon:'🔀', free:'多模型入口',
+    placeholder:'sk-or-v1-…',
+    hint:`🔒 Key 保存在本地浏览器，不上传<br>📖 申请地址：<a href="https://openrouter.ai/keys" target="_blank">openrouter.ai/keys</a><br>💡 一个Key可用 GPT / Claude / Gemini / Llama 等所有主流模型`,
+    model:'google/gemini-flash-1.5',
+  },
+  siliconflow: {
+    name:'硅基流动', icon:'🇨🇳', free:'国内访问流畅',
+    placeholder:'sk-…',
+    hint:`🔒 Key 保存在本地浏览器，不上传<br>📖 申请地址：<a href="https://cloud.siliconflow.cn/account/ak" target="_blank">cloud.siliconflow.cn</a><br>💡 国内访问无需翻墙，支持 Qwen / DeepSeek / GLM 等<br>⚠️ 若报403错误，请在硅基流动控制台「安全设置」中开启「允许浏览器直接调用」`,
+    model:'deepseek-ai/DeepSeek-V3.2',
+    models:[
+      {id:'deepseek-ai/DeepSeek-V3.2',label:'DeepSeek-V3.2（推荐）'},
+      {id:'Pro/deepseek-ai/DeepSeek-V3.2',label:'DeepSeek-V3.2 Pro（稳定）'},
+      {id:'deepseek-ai/DeepSeek-V3.1-Terminus',label:'DeepSeek-V3.1-Terminus'},
+      {id:'Pro/deepseek-ai/DeepSeek-V3.1-Terminus',label:'DeepSeek-V3.1-Terminus Pro'},
+      {id:'Qwen/Qwen3.5-35B-A3B',label:'Qwen3.5-35B（快速）'},
+      {id:'Qwen/Qwen3.5-27B',label:'Qwen3.5-27B'},
+      {id:'Pro/zai-org/GLM-4.7',label:'GLM-4.7 Pro'},
+      {id:'Pro/zai-org/GLM-5',label:'GLM-5 Pro'},
+      {id:'Pro/MiniMaxAI/MiniMax-M2.5',label:'MiniMax-M2.5 Pro'},
+    ],
+  },
+};
+
+let selProvider = 'anthropic';
+let API_KEY = '';
+let API_PROVIDER = 'anthropic';
+
+// ════════════════════════════════════════
+//  LANDING PAGE CAREER WALL
+// ════════════════════════════════════════
+const LP_CATS = {all:'全部',corp:'🏢 公司架构',creative:'🎨 创意',media:'📱 自媒体',service:'🤝 服务',tech:'💻 技术',business:'📈 商业',special:'⚡特殊',daily:'🛵 日常',niche:'🔬 小众',office:'🏢 职场',gov:'🏛️ 体制内',legal:'⚖️ 公检法',research:'🔭 科研院校',public:'🌳 公共场所',mfg:'🏭 制造业'};
+const CAT_COLOR = {corp:'#2060a0',creative:'#e8a030',media:'#c040b0',service:'#c03828',tech:'#3060c0',business:'#3a9060',special:'#8040c0',daily:'#c07820',niche:'#208080',office:'#506880',gov:'#806040',legal:'#703020',research:'#205080',public:'#287040',mfg:'#504020'};
+let lpCat = 'all';
+
+function buildLandingPage(){
+  // Update counts
+  const total = CAREERS.length;
+  document.getElementById('careerCount').textContent = total + '+';
+  document.getElementById('statTotal').textContent = total + '+';
+
+  // Category tabs
+  const catsEl = document.getElementById('lpCats');
+  catsEl.innerHTML = '';
+  Object.entries(LP_CATS).forEach(([k,v])=>{
+    const b = document.createElement('button');
+    b.className = 'lp-cat' + (k===lpCat?' on':'');
+    b.textContent = v;
+    b.onclick = ()=>{ lpCat=k; buildLandingPage(); };
+    catsEl.appendChild(b);
+  });
+
+  // Career wall
+  const wall = document.getElementById('lpWall');
+  wall.innerHTML = '';
+  const filtered = CAREERS.filter(c => lpCat==='all' || c.cat===lpCat);
+  filtered.forEach(c=>{
+    const col = CAT_COLOR[c.cat]||'#888';
+    const diffClass = c.diff.includes('极高压')||c.diff.includes('高压') ? 'lp-diff-high' : c.diff.includes('中等') ? 'lp-diff-mid' : 'lp-diff-low';
+    const d = document.createElement('div');
+    d.className = 'lp-card';
+    d.style.setProperty('--card-color', col+'15');
+    d.innerHTML = `
+      <div class="lp-ce">${c.e}</div>
+      <div class="lp-cn">${c.n}</div>
+      <div class="lp-cs">${c.s}</div>
+      ${c.company?`<div class="lp-company">🏢 ${c.company}${c.dept?' · '+c.dept:''}</div>`:''}
+      <div class="lp-cd">${c.desc}</div>
+      <div class="lp-ctags">
+        <span class="lp-ctag" style="color:${col}">${LP_CATS[c.cat]||c.cat}</span>
+        <span class="lp-ctag ${diffClass}">${c.diff}</span>
+        <span class="lp-ctag">💰 ${c.sal}</span>
+      </div>`;
+    // Clicking a card pre-selects it and focuses the key input
+    d.onclick = ()=>{
+      document.getElementById('keyInput').focus();
+      d.style.borderColor = col;
+      setTimeout(()=>d.style.borderColor='', 1200);
+    };
+    wall.appendChild(d);
+  });
+}
+buildLandingPage();
+
+// Build provider grid
+function buildProviderGrid(){
+  const grid = document.getElementById('pvGrid');
+  grid.innerHTML = '';
+  Object.entries(PROVIDERS).forEach(([k,p])=>{
+    const d = document.createElement('div');
+    d.className = 'pv' + (k===selProvider?' on':'');
+    d.innerHTML = `<div class="pv-icon">${p.icon}</div><div class="pv-name">${p.name}</div><div class="pv-free">${p.free}</div>`;
+    d.onclick = ()=>{ selProvider=k; buildProviderGrid(); updateKeyUI(); };
+    grid.appendChild(d);
+  });
+}
+function updateKeyUI(){
+  const p = PROVIDERS[selProvider];
+  document.getElementById('keyLabel').textContent = p.name.toUpperCase() + ' API KEY';
+  document.getElementById('keyInput').placeholder = p.placeholder;
+  document.getElementById('keyHint').innerHTML = p.hint;
+  // Pre-fill if already saved for this provider
+  const saved = (()=>{ try{ return localStorage.getItem('career_sim_key_'+selProvider)||''; }catch(e){ return ''; } })();
+  document.getElementById('keyInput').value = saved;
+  // Model selector
+  const wrap = document.getElementById('modelSelectorWrap');
+  const sel = document.getElementById('modelSelect');
+  if(p.models && p.models.length > 1){
+    wrap.style.display='block';
+    // Restore saved model if any
+    let savedModel = ''; try{ savedModel=localStorage.getItem('career_sim_model_'+selProvider)||''; }catch(e){}
+    if(savedModel) p.model = savedModel;
+    sel.innerHTML = p.models.map(m=>`<option value="${m.id}" ${m.id===p.model?'selected':''}>${m.label}</option>`).join('');
+    sel.onchange = ()=>{ p.model = sel.value; try{ localStorage.setItem('career_sim_model_'+selProvider, sel.value); }catch(e){} };
+  } else {
+    wrap.style.display='none';
+  }
+}
+buildProviderGrid();
+updateKeyUI();
+
+function getKey(){ try{ return localStorage.getItem('career_sim_key_'+API_PROVIDER)||''; }catch(e){ return ''; } }
+function saveKey(){
+  const k = document.getElementById('keyInput').value.trim();
+  if(!k){ alert('请输入 API Key'); return; }
+  try{ localStorage.setItem('career_sim_key_'+selProvider, k); localStorage.setItem('career_sim_provider', selProvider); }catch(e){}
+  API_KEY = k;
+  API_PROVIDER = selProvider;
+  // Persist the selected model - read from the select element directly
+  const selModel = document.getElementById('modelSelect');
+  const wrap = document.getElementById('modelSelectorWrap');
+  if(selModel && wrap && wrap.style.display !== 'none' && selModel.value) {
+    PROVIDERS[selProvider].model = selModel.value;
+    try{ localStorage.setItem('career_sim_model_'+selProvider, selModel.value); }catch(e){}
+  }
+  document.getElementById('setup').classList.remove('active');
+  document.getElementById('home').classList.add('active');
+  updateKeyBar();
+}
+function changeKey(){
+  // Pre-select current provider and key
+  selProvider = API_PROVIDER;
+  buildProviderGrid();
+  updateKeyUI();
+  document.getElementById('home').classList.remove('active');
+  document.getElementById('game').classList.remove('active');
+  document.getElementById('setup').classList.add('active');
+}
+function updateKeyBar(){
+  const p = PROVIDERS[API_PROVIDER];
+  const bar = document.getElementById('keyBar');
+  if(bar) bar.innerHTML = `${p.icon} <span style="flex:1">${p.name}</span> <span style="font-size:10px">修改</span>`;
+  const homeBar = document.getElementById('homeKeyBarLabel');
+  if(homeBar) homeBar.textContent = `${p.icon} ${p.name}`;
+}
+
+// ── Universal API call ──
+async function callAI(messages, systemPrompt, maxTokens=5000){
+  const p = PROVIDERS[API_PROVIDER];
+  // Always read model fresh in case it was updated after page load
+  const activeModel = (()=>{ try{ return localStorage.getItem('career_sim_model_'+API_PROVIDER)||p.model; }catch(e){ return p.model; } })();
+  const key = API_KEY;
+
+  // ── Anthropic ──
+  if(API_PROVIDER === 'anthropic'){
+    const body = {model:activeModel, max_tokens:maxTokens, messages};
+    if(systemPrompt) body.system = systemPrompt;
+    const r = await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify(body)
+    });
+    const d = await r.json();
+    if(d.error) throw new Error(d.error.message||`Anthropic error ${r.status}`);
+    return d.content?.map(b=>b.text||'').join('')||'';
+  }
+
+  // ── OpenAI-compatible (OpenAI / DeepSeek / SiliconFlow / OpenRouter) ──
+  const endpoints = {
+    openai:'https://api.openai.com/v1/chat/completions',
+    deepseek:'https://api.deepseek.com/v1/chat/completions',
+    openrouter:'https://openrouter.ai/api/v1/chat/completions',
+    siliconflow:'https://api.siliconflow.cn/v1/chat/completions',
+  };
+  if(endpoints[API_PROVIDER]){
+    const msgs = systemPrompt ? [{role:'system',content:systemPrompt},...messages] : messages;
+    const extraHeaders = API_PROVIDER==='siliconflow' ? {'X-Requested-With':'XMLHttpRequest'} : {};
+    const r = await fetch(endpoints[API_PROVIDER],{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+key, ...extraHeaders},
+      body:JSON.stringify({model:activeModel, max_tokens:maxTokens, messages:msgs})
+    });
+    if(!r.ok){
+      const errText = await r.text().catch(()=>'');
+      throw new Error(`HTTP ${r.status}${errText?': '+errText.slice(0,120):''}`);
+    }
+    const d = await r.json();
+    if(d.error) throw new Error(d.error.message||`API error ${r.status}`);
+    return d.choices?.[0]?.message?.content||'';
+  }
+
+  // ── Google Gemini ──
+  if(API_PROVIDER === 'gemini'){
+    const geminiMsgs = messages.map(m=>({role:m.role==='assistant'?'model':'user',parts:[{text:m.content}]}));
+    if(systemPrompt) geminiMsgs.unshift({role:'user',parts:[{text:'[System]: '+systemPrompt}]});
+    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${activeModel}:generateContent?key=${key}`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({contents:geminiMsgs, generationConfig:{maxOutputTokens:maxTokens}})
+    });
+    const d = await r.json();
+    if(d.error) throw new Error(d.error.message||`Gemini error ${r.status}`);
+    return d.candidates?.[0]?.content?.parts?.[0]?.text||'';
+  }
+
+  throw new Error('未知的提供商: '+API_PROVIDER);
+}
+
+// Init: restore saved config
+(function(){
+  try{ API_PROVIDER = localStorage.getItem('career_sim_provider')||'anthropic'; }catch(e){ API_PROVIDER='anthropic'; }
+  try{ API_KEY = localStorage.getItem('career_sim_key_'+API_PROVIDER)||''; }catch(e){ API_KEY=''; }
+  // Try restoring an in-progress game session first
+  if(typeof restoreGState==='function' && restoreGState()){
+    document.getElementById('setup').classList.remove('active');
+    document.getElementById('home').classList.remove('active');
+    document.getElementById('game').classList.add('active');
+    updateStats(); buildDots(); updDots(); updateKeyBar(); if(typeof updateAchievementCount==='function') updateAchievementCount();
+    if(!G.events||G.events.length===0){
+      genDay();
+    } else {
+      renderTL();
+      // Check if all events were done - if so show "next day" button again
+      const allDone = G.events.length>0 && Object.values(G.evtSt).filter(s=>s.done).length >= G.events.length;
+      if(allDone && G.curDay <= G.totalDays){
+        setTimeout(()=>{
+          const tl=document.getElementById('tl');
+          if(tl && !document.getElementById('dayReview')){
+            const actDiv=document.createElement('div');
+            actDiv.className='cr-actions';actDiv.style.marginTop='14px';
+            const isLast=G.curDay>=G.totalDays;
+            actDiv.innerHTML=isLast
+              ? '<button class="nxt" onclick="triggerCareerReview()">查看最终职业评价 →</button>'
+              : `<button class="nxt" onclick="nextDay()">继续第 ${G.curDay+1} 天 →</button><button class="ret" onclick="endCareer()">提前结束职业</button>`;
+            tl.appendChild(actDiv);
+          }
+        }, 100);
+      }
+    }
+  } else if(API_KEY){
+    document.getElementById('setup').classList.remove('active');
+    document.getElementById('home').classList.add('active');
+  }
+  document.getElementById('keyInput').addEventListener('keydown', e=>{ if(e.key==='Enter') saveKey(); });
+  // Delay keyBar update until DOM ready
+  setTimeout(updateKeyBar, 0);
+})();
+
+// ════════════════════════════════════════
+//  CATEGORIES
+// ════════════════════════════════════════
+const CATS={all:'全部',creative:'🎨 创意',media:'📱 自媒体',service:'🤝 服务',tech:'💻 技术',business:'📈 商业',special:'⚡特殊',daily:'🛵 日常',niche:'🔬 小众',office:'🏢 职场',gov:'🏛️ 体制内',legal:'⚖️ 公检法',research:'🔭 科研院校',public:'🌳 公共场所',mfg:'🏭 制造业'};
+const CATNAMES={all:'全部职业',creative:'创意类',media:'自媒体',service:'服务类',tech:'技术类',business:'商业类',special:'特殊类',daily:'日常工作',niche:'小众职业',office:'职场办公',gov:'体制内',legal:'公检法监管',research:'科研院校',public:'公共场所',mfg:'制造业'};
+
+let selCat='all', srchQ='', selC=null, selDays=3;
+
+// Build pills
+const pillsEl=document.getElementById('cpills');
+Object.entries(CATS).forEach(([k,v])=>{
+  const b=document.createElement('button');
+  b.className='cp'+(k==='all'?' on':'');b.textContent=v;b.dataset.cat=k;
+  b.onclick=()=>{document.querySelectorAll('.cp').forEach(x=>x.classList.remove('on'));b.classList.add('on');selCat=k;renderList();};
+  pillsEl.appendChild(b);
+});
+document.getElementById('srch').oninput=function(){srchQ=this.value.toLowerCase();renderList();};
+
+function renderList(){
+  const el=document.getElementById('clist');el.innerHTML='';
+  CAREERS.filter(c=>(selCat==='all'||c.cat===selCat)&&(!srchQ||c.n.includes(srchQ)||c.s.includes(srchQ))).forEach(c=>{
+    const d=document.createElement('div');
+    d.className='ci'+(selC?.id===c.id?' on':'');
+    d.innerHTML=`<span class="ci-emo">${c.e}</span><div><div class="ci-nm">${c.n}</div><div class="ci-cat">${CATNAMES[c.cat]||c.cat} · ${c.diff}</div></div>`;
+    d.onclick=()=>{document.querySelectorAll('.ci').forEach(x=>x.classList.remove('on'));d.classList.add('on');selC=c;showJD(c);};
+    el.appendChild(d);
+  });
+}
+renderList();
+
+// ════════════════════════════════════════
+//  JD PANEL
+// ════════════════════════════════════════
+function showJD(c){
+  const hr=document.getElementById('hr');
+  const dc={creative:'#e8a030',media:'#c040a0',service:'#c03828',tech:'#3060c0',business:'#3a9060',special:'#8040c0',daily:'#c07820',niche:'#208080',office:'#506880',gov:'#806040',legal:'#703020',research:'#205080',public:'#287040',mfg:'#504020'};
+  const diffColor=c.diff==='极高压'?'#e06050':c.diff==='高压'?'#e08030':'#70b070';
+  hr.innerHTML=`<div class="jd">
+    <div class="jd-hd">
+      <div class="jd-ebox">${c.e}</div>
+      <div class="jd-ht">
+        <div class="jd-title">${c.n}</div>
+        <div class="jd-sub">${c.s}</div>
+        <div class="jd-tags">
+          <span class="jtag jt-cat" style="background:${dc[c.cat]||'#888'}22;color:${dc[c.cat]||'#888'}">${CATNAMES[c.cat]||c.cat}</span>
+          <span class="jtag" style="background:${diffColor}22;color:${diffColor}">${c.diff}难度</span>
+          <span class="jtag jt-s">💰 ${c.sal}</span>
+        </div>
+      </div>
+    </div>
+    <div class="jdiv"></div>
+    <div class="jd-desc">${c.desc}</div>
+    <div class="sec-t">体验这个职业你能学到</div>
+    <div class="sk-grid">${c.learns.map((l,i)=>`<div class="sk"><div class="sk-ico">${['🧠','⚡','🎯'][i%3]}</div><div class="sk-tx">${l}</div></div>`).join('')}</div>
+    <div class="sec-t">你会亲身经历的真实场景</div>
+    <div class="exp-list">${c.experiences.map(e=>`<div class="ei"><span class="ei-ico">✦</span><div class="ei-tx">${e}</div></div>`).join('')}</div>
+    ${c.dp?`<div class="sec-t">典型工作日预览</div>
+    <div class="dp">${c.dp.map(d=>`<div class="dp-row"><span class="dp-t">${d.t}</span><div class="dp-b dp-${d.type==='crisis'?'crisis':d.type==='dec'?'dec':d.type==='slack'?'slack':'task'}">${d.type==='crisis'?'🚨':d.type==='dec'?'⚡':d.type==='slack'?'😴':'📋'} ${d.l}</div></div>`).join('')}</div>`:''}
+    ${c.st?`<div class="sec-t">四维状态如何变化</div>
+    <div class="sp-grid">${c.st.map(s=>`<div class="sp-i"><span class="sp-ico">${s.i}</span><div><div class="sp-nm">${s.n}</div><div class="sp-h">${s.h}</div></div></div>`).join('')}</div>`:''}
+    <div class="launch-box">
+      <div class="lb-t">选择体验时长</div>
+      <div class="dur-g">
+        <div class="dur-o on" data-d="3" onclick="selDur(this)"><span class="dur-days">3</span><div class="dur-lbl">天·快速体验</div></div>
+        <div class="dur-o" data-d="5" onclick="selDur(this)"><span class="dur-days">5</span><div class="dur-lbl">天·工作周</div></div>
+        <div class="dur-o" data-d="7" onclick="selDur(this)"><span class="dur-days">7</span><div class="dur-lbl">天·深度沉浸</div></div>
+        <div class="dur-o" data-d="14" onclick="selDur(this)"><span class="dur-days">14</span><div class="dur-lbl">天·全职体验</div></div>
+      </div>
+      <button class="go-btn" onclick="launchGame()">开始 ${c.n} 生涯 →</button>
+    </div>
+  </div>`;
+}
+function selDur(el){document.querySelectorAll('.dur-o').forEach(x=>x.classList.remove('on'));el.classList.add('on');selDays=+el.dataset.d;}
+
+// ════════════════════════════════════════
+//  GAME STATE
+// ════════════════════════════════════════
+let G={career:null,totalDays:3,curDay:0,events:[],evtSt:{},stats:{rep:50,stress:20,rel:50,perf:50},log:[],history:[],generating:false,achievements:[],lastGrade:null};
+
+// ── Auto-save/restore game state (prevents data loss on accidental refresh) ──
+const GAME_VERSION='6.4';
+function saveGState(){
+  if(!G.career) return;
+  try{
+    // Only save essential game state, not full career object (too large)
+    const snapshot={v:GAME_VERSION,G:{...G,generating:false,career:{id:G.career.id}},screen:'game'};
+    sessionStorage.setItem('career_sim_gstate', JSON.stringify(snapshot));
+  }catch(e){
+    // sessionStorage full or blocked - silently fail
+    try{sessionStorage.removeItem('career_sim_gstate');}catch(e2){}
+  }
+}
+function restoreGState(){
+  try{
+    const raw=sessionStorage.getItem('career_sim_gstate');
+    if(!raw) return false;
+    const snap=JSON.parse(raw);
+    if(snap.v !== GAME_VERSION) { sessionStorage.removeItem('career_sim_gstate'); return false; }
+    if(!snap.G?.career) return false;
+    // Re-link career object from CAREERS array (can't serialize functions)
+    const career=CAREERS.find(c=>c.id===snap.G.career.id);
+    if(!career) return false;
+    G={...snap.G,career,generating:false,achievements:snap.G.achievements||[],_mentorCount:snap.G._mentorCount||0};
+    if(!G.curDay||G.curDay<1) return false;  // invalid state
+    return true;
+  }catch(e){return false;}
+}
+function clearGState(){ try{sessionStorage.removeItem('career_sim_gstate');}catch(e){} }
+
+function launchGame(){
+  if(!selC)return;
+  clearGState();
+  G={career:selC,totalDays:selDays,curDay:1,events:[],evtSt:{},stats:{rep:50,stress:20,rel:50,perf:50},log:[],history:[],generating:false,achievements:[],lastGrade:null,_mentorCount:0};
+  document.getElementById('home').classList.remove('active');
+  document.getElementById('game').classList.add('active');
+  document.getElementById('sbE').textContent=G.career.e;
+  document.getElementById('sbN').textContent=G.career.n;
+  document.getElementById('sbR').textContent=G.career.s;
+  updateStats();buildDots();updateAchievementCount();genDay();
+  // Set mentor context
+  mentorCtx=`当前职业：${G.career.n}（${G.career.s}）。${G.career.desc}`;
+}
+function quitHome(){document.getElementById('game').classList.remove('active');document.getElementById('home').classList.add('active');}
+
+function buildDots(){
+  const el=document.getElementById('ddots');el.innerHTML='';
+  for(let i=1;i<=G.totalDays;i++){const d=document.createElement('div');d.id=`dd${i}`;d.className='dd'+(i<G.curDay?' done':i===G.curDay?' cur':' fut');d.textContent=i<G.curDay?'✓':i;el.appendChild(d);}
+}
+function updDots(){for(let i=1;i<=G.totalDays;i++){const d=document.getElementById(`dd${i}`);if(!d)continue;d.className='dd'+(i<G.curDay?' done':i===G.curDay?' cur':' fut');d.textContent=i<G.curDay?'✓':i;}}
+function updateStats(){
+  const s=G.stats;
+  [['Rep','rep'],['Str','stress'],['Rel','rel'],['Per','perf']].forEach(([k,sk])=>{
+    const v=Math.round(s[sk]);
+    const ve=document.getElementById('v'+k);const be=document.getElementById('b'+k);
+    if(ve)ve.textContent=v;if(be)be.style.width=Math.min(100,Math.max(0,v))+'%';
+  });
+}
+function addLog(txt,cls='u'){
+  G.log.unshift({d:G.curDay,t:txt,c:cls});if(G.log.length>20)G.log.pop();
+  const el=document.getElementById('logEl');
+  el.innerHTML=G.log.slice(0,12).map(l=>`<div class="le"><div class="le-d">DAY ${l.d}</div><div class="l${l.c}">${l.t}</div></div>`).join('');
+}
+
+// ════════════════════════════════════════
+//  JSON REPAIR UTILITY
+// ════════════════════════════════════════
+function repairJSON(txt){
+  // Step -1: curly/fancy quotes → straight quotes (don't delete - they may be inside string values)
+  txt=txt.replace(/\u201c|\u201d/g,'"').replace(/\u2018|\u2019/g,"'");
+  txt=txt.replace(/\uff02/g,'"').replace(/\uff07/g,"'");
+
+  // Step -0.5: fix unescaped double-quotes inside JSON string values
+  // Walk char-by-char; inside a string, any " that isn't the closing delimiter gets escaped
+  (function(){
+    let o='',i=0,inStr=false,esc=false;
+    while(i<txt.length){
+      const c=txt[i];
+      if(esc){o+=c;esc=false;i++;continue;}
+      if(c==='\\'){o+=c;esc=true;i++;continue;}
+      if(c==='"'){
+        if(!inStr){inStr=true;o+=c;i++;continue;}
+        // peek ahead past whitespace to decide if this closes the string
+        let j=i+1;
+        while(j<txt.length&&(txt[j]===' '||txt[j]==='\t'||txt[j]==='\n'||txt[j]==='\r'))j++;
+        const nx=txt[j];
+        const closes=nx===','||nx===':'||nx==='}'||nx===']'||nx==='"'||j>=txt.length;
+        if(closes){inStr=false;o+=c;i++;continue;}
+        o+='\\"';i++;continue;  // unescaped inner quote → escape it
+      }
+      o+=c;i++;
+    }
+    txt=o;
+  })();
+
+  // Step 0: single-quoted keys/values → double-quoted  e.g. {'k':'v'} → {"k":"v"}
+  (function(){
+    let o='',i=0,inD=false,inS=false,esc=false;
+    while(i<txt.length){
+      const c=txt[i];
+      if(esc){o+=c;esc=false;i++;continue;}
+      if(c==='\\'){o+=c;if(inD||inS)esc=true;i++;continue;}
+      if(c==='"'&&!inS){inD=!inD;o+=c;i++;continue;}
+      if(c==="'"&&!inD){o+='"';inS=!inS;i++;continue;}
+      if(inS&&c==='"'){o+='\\"';i++;continue;}
+      o+=c;i++;
+    }
+    txt=o;
+  })();
+
+  // Step 1: escape bare control chars inside strings
+  let out='',inStr=false,esc=false;
+  for(let i=0;i<txt.length;i++){
+    const c=txt[i];
+    if(esc){out+=c;esc=false;continue;}
+    if(c==='\\'){out+=c;if(inStr)esc=true;continue;}
+    if(c==='"'){inStr=!inStr;out+=c;continue;}
+    if(inStr){
+      if(c==='\n'){out+='\\n';continue;}
+      if(c==='\r'){out+='\\r';continue;}
+      if(c==='\t'){out+='\\t';continue;}
+      if(c.charCodeAt(0)<32)continue;
+    }
+    out+=c;
+  }
+  txt=out;
+
+  // Step 2: strip leading + from numbers  e.g. "stress": +5 → "stress": 5
+  txt=txt.replace(/:\s*\+(\d)/g,': $1');
+
+  // Step 3: remove trailing commas
+  txt=txt.replace(/,\s*([\]}])/g,'$1');
+
+  // Step 4: try parse
+  try{JSON.parse(txt);return txt;}catch(e){}
+
+  // Step 5: close truncated JSON
+  const opens=[];inStr=false;esc=false;
+  for(let i=0;i<txt.length;i++){
+    const c=txt[i];
+    if(esc){esc=false;continue;}
+    if(c==='\\'){if(inStr)esc=true;continue;}
+    if(c==='"'){inStr=!inStr;continue;}
+    if(inStr)continue;
+    if(c==='{'||c==='[')opens.push(c);
+    else if(c==='}'||c===']')opens.pop();
+  }
+  if(inStr)txt+='"';
+  for(let i=opens.length-1;i>=0;i--)txt+=opens[i]==='{'?'}':']';
+  txt=txt.replace(/,\s*([\]}])/g,'$1');
+  return txt;
+}
+
+function renderTL(){
+  const tl=document.getElementById('tl');
+  if(!tl||!G.events?.length)return;
+  tl.innerHTML='';
+
+  const totalEvts=G.events.length;
+  // 找到第一个未完成的事件索引
+  let curIdx=G.events.findIndex((_,i)=>!G.evtSt[i].done);
+  if(curIdx===-1) curIdx=totalEvts; // 全部完成
+
+  // 渲染已完成 + 当前事件
+  for(let i=0;i<Math.min(curIdx+1,totalEvts);i++){
+    tl.appendChild(buildEvtEl(G.events[i],i));
+  }
+
+  // 后续未揭示的事件：显示模糊占位
+  const remaining=totalEvts-curIdx-1;
+  if(curIdx<totalEvts && remaining>0){
+    const ph=document.createElement('div');
+    ph.className='evt-upcoming-wrap';
+    ph.id='upcomingPH';
+    ph.innerHTML=`
+      <div class="upcoming-hint">
+        <span class="upcoming-icon">⏳</span>
+        <span class="upcoming-txt">今天还有 <strong>${remaining}</strong> 件事等着你…</span>
+        <span class="upcoming-sub">处理完当前事项后继续</span>
+      </div>
+      <div class="upcoming-blur-list">
+        ${G.events.slice(curIdx+1).map(ev=>`
+          <div class="blur-evt">
+            <span class="blur-time">${ev.time}</span>
+            <div class="blur-card">
+              <span class="blur-dot"></span>
+              <span class="blur-title">██████████</span>
+              <span class="blur-tag">??????</span>
+            </div>
+          </div>`).join('')}
+      </div>`;
+    tl.appendChild(ph);
+  }
+
+  // 自动展开当前待处理事件
+  if(curIdx<totalEvts && !G.evtSt[curIdx].done){
+    G.evtSt[curIdx].expanded=true;
+    const card=document.getElementById(`EC${curIdx}`);
+    const body=document.getElementById(`EB${curIdx}`);
+    if(card&&body){
+      body.innerHTML=G.events[curIdx]?bodyHTML(G.events[curIdx],curIdx,G.evtSt[curIdx]):'';
+      body.classList.add('open');
+      card.classList.add('oc');
+      // 新事件入场动画
+      const evWrap=document.getElementById(`EV${curIdx}`);
+      if(evWrap){evWrap.style.animation='none';evWrap.offsetHeight;evWrap.style.animation='evtAppear .4s ease';}
+    }
+  }
+  // 注意：全部完成时不在这里触发评价，由 advanceToNext 负责
+}
+
+// 事件入场动画
+const styleAnim=document.createElement('style');
+styleAnim.textContent=`
+@keyframes evtAppear{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+.evt-upcoming-wrap{margin-top:4px;}
+.upcoming-hint{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  padding:14px 0 10px;color:var(--t3);text-align:center;
+}
+.upcoming-icon{font-size:20px;opacity:.5;}
+.upcoming-txt{font-size:12px;color:var(--t2);}
+.upcoming-sub{font-size:10px;color:var(--t3);}
+.upcoming-blur-list{display:flex;flex-direction:column;gap:6px;padding:0 0 8px;}
+.blur-evt{display:flex;align-items:center;gap:10px;padding:2px 0;opacity:.35;filter:blur(1.5px);pointer-events:none;}
+.blur-time{font-family:'JetBrains Mono';font-size:10px;color:var(--t3);width:38px;flex-shrink:0;}
+.blur-card{flex:1;background:var(--s1);border:1px solid var(--bd);border-radius:var(--r);padding:8px 12px;display:flex;align-items:center;gap:8px;}
+.blur-dot{width:8px;height:8px;border-radius:50%;background:var(--bd2);flex-shrink:0;}
+.blur-title{font-size:12px;color:var(--t3);letter-spacing:2px;flex:1;}
+.blur-tag{font-family:'JetBrains Mono';font-size:9px;color:var(--t3);background:var(--s2);padding:1px 6px;border-radius:8px;}
+
+/* AI评价面板 */
+.ai-review{
+  margin:12px 0;padding:18px 20px;
+  background:var(--s2);border:1.5px solid var(--bd2);border-radius:10px;
+  animation:fd .4s ease;
+}
+.air-header{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.air-avatar{width:36px;height:36px;border-radius:50%;background:rgba(32,128,128,.15);border:1.5px solid var(--cy);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.air-meta{flex:1;}
+.air-who{font-size:12px;font-weight:700;color:var(--cy);}
+.air-when{font-size:10px;color:var(--t3);margin-top:1px;}
+.air-grade{
+  font-family:'JetBrains Mono';font-size:22px;font-weight:700;
+  width:44px;height:44px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.grade-S{background:rgba(232,160,48,.15);color:var(--ac);border:1.5px solid rgba(232,160,48,.4);}
+.grade-A{background:rgba(58,144,96,.12);color:var(--gr);border:1.5px solid rgba(58,144,96,.35);}
+.grade-B{background:rgba(48,96,192,.12);color:#8ab0f0;border:1.5px solid rgba(48,96,192,.3);}
+.grade-C{background:rgba(192,56,40,.1);color:#e08060;border:1.5px solid rgba(192,56,40,.3);}
+.air-body{font-size:13px;line-height:1.85;color:var(--t2);white-space:pre-wrap;}
+.air-highlights{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;}
+.air-hl{font-size:11px;padding:3px 10px;border-radius:12px;border:1px solid;}
+.air-hl-pos{background:rgba(58,144,96,.08);color:var(--gr);border-color:rgba(58,144,96,.3);}
+.air-hl-neg{background:rgba(192,56,40,.08);color:#e07060;border-color:rgba(192,56,40,.3);}
+.air-hl-neu{background:rgba(106,100,88,.12);color:var(--t2);border-color:var(--bd2);}
+.air-loading{display:flex;align-items:center;gap:10px;color:var(--t3);font-size:12px;padding:4px 0;}
+.air-stats{display:flex;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--bd);}
+.air-stat{flex:1;text-align:center;background:var(--s1);border-radius:var(--r);padding:7px 4px;}
+.air-stat-n{font-family:'JetBrains Mono';font-size:15px;font-weight:700;}
+.air-stat-l{font-size:10px;color:var(--t3);margin-top:2px;}
+
+/* 周期总评特别样式 */
+.career-review{
+  margin:16px 0;padding:24px;
+  background:linear-gradient(135deg,var(--s2) 0%,rgba(232,160,48,.04) 100%);
+  border:1.5px solid rgba(232,160,48,.25);border-radius:12px;
+  animation:fd .5s ease;
+}
+.cr-title{font-size:16px;font-weight:900;letter-spacing:-.3px;margin-bottom:4px;}
+.cr-sub{font-size:11px;color:var(--t3);margin-bottom:16px;}
+.cr-grade-wrap{display:flex;align-items:center;gap:16px;margin-bottom:16px;}
+.cr-grade-big{
+  font-family:'JetBrains Mono';font-size:42px;font-weight:700;
+  width:72px;height:72px;border-radius:12px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+}
+.cr-grade-info{flex:1;}
+.cr-grade-label{font-size:14px;font-weight:700;margin-bottom:4px;}
+.cr-grade-desc{font-size:12px;color:var(--t2);line-height:1.6;}
+.cr-body{font-size:13px;line-height:1.9;color:var(--t2);margin-bottom:16px;white-space:pre-wrap;}
+.cr-dims{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px;}
+.cr-dim{background:var(--s1);border:1px solid var(--bd2);border-radius:var(--r);padding:10px 12px;}
+.cr-dim-name{font-size:11px;font-weight:700;margin-bottom:4px;}
+.cr-dim-score{font-family:'JetBrains Mono';font-size:18px;font-weight:700;color:var(--ac);}
+.cr-dim-comment{font-size:11px;color:var(--t3);margin-top:3px;line-height:1.5;}
+.cr-actions{display:flex;gap:8px;margin-top:4px;}
+`;
+document.head.appendChild(styleAnim);
+
+function buildEvtEl(ev,i){
+  const st=G.evtSt[i];
+  const typeMap={task:{dot:'d-task',card:'',tag:'et-task',label:'日常任务'},crisis:{dot:'d-crisis',card:'crisis-c',tag:'et-crisis',label:'突发危机'},decision:{dot:'d-dec',card:'dec-c',tag:'et-dec',label:'重要决策'},slack:{dot:'d-slack',card:'slack-c',tag:'et-slack',label:'😴 摸鱼时间'},negative:{dot:'d-neg',card:'neg-c',tag:'et-neg',label:'⚡ 负面事件'}};
+  const tm=typeMap[ev.type]||typeMap.task;
+  const wrap=document.createElement('div');wrap.className='evt';wrap.id=`EV${i}`;
+  // 当前待处理事件加高亮边框
+  const isCurrent=!st.done && G.events.findIndex((_,j)=>!G.evtSt[j].done)===i;
+  wrap.innerHTML=`
+    <div class="evt-t">${ev.time||''}</div>
+    <div class="evt-dot ${st.done?'d-done':tm.dot}"></div>
+    <div class="ecard ${st.done?'done-c':tm.card}${st.expanded?' oc':''}${isCurrent?' current-evt':''}" id="EC${i}">
+      <div class="etop" onclick="togEvt(${i})">
+        <span class="eico">${st.done?'✅':ev.icon||'📌'}</span>
+        <div class="einf">
+          <div class="ettl">${st.done?`<s style="opacity:.5">${ev.title}</s>`:ev.title}${isCurrent?'<span class="cur-badge">当前</span>':''}</div>
+          <div class="etags">
+            <span class="etag ${st.done?'et-done':tm.tag}">${st.done?'✓ 完成':tm.label}</span>
+            ${ev.duration?`<span class="etag et-dur">⏱ ${ev.duration}</span>`:''}
+          </div>
+        </div>
+        <span class="earr">${st.done?'':st.expanded?'▲':'▼'}</span>
+      </div>
+      <div class="ebody${st.expanded?' open':''}" id="EB${i}">${st.expanded?bodyHTML(ev,i,st):''}</div>
+    </div>`;
+  return wrap;
+}
+
+// 补充当前事件样式
+const styleCur=document.createElement('style');
+styleCur.textContent=`
+.current-evt{border-color:var(--ac)!important;box-shadow:0 0 0 1px rgba(232,160,48,.15);}
+.cur-badge{
+  display:inline-block;margin-left:7px;
+  padding:1px 6px;border-radius:8px;
+  background:rgba(232,160,48,.15);color:var(--ac);
+  font-family:'JetBrains Mono';font-size:8px;font-weight:700;letter-spacing:.5px;
+  vertical-align:middle;
+}
+`;
+document.head.appendChild(styleCur);
+
+function bodyHTML(ev,i,st){
+  let h='';
+  if(ev.layman_explain){
+    h+=`<div class="explain-box"><div class="explain-lbl">🔍 外行人解释</div><div class="explain-tx">${ev.layman_explain}</div></div>`;
+  }
+  h+=`<div class="ctx-box">${ev.context||''}</div>`;
+  if(ev.tip)h+=`<div class="hbox h-tip">💡 <strong>行业小知识：</strong>${ev.tip}</div>`;
+  if(ev.consequences&&!st.done){
+    const cq=ev.consequences;
+    h+=`<div class="conseq">
+      <div class="conseq-hd">做还是不做？后果一览</div>
+      ${cq.do?`<div class="cq-row"><span class="cq-ico">✅</span><div><span class="cq-label">完成后</span><span class="cq-tx">${cq.do}</span></div></div>`:''}
+      ${cq.skip?`<div class="cq-row"><span class="cq-ico">⏭️</span><div><span class="cq-label">跳过后</span><span class="cq-tx">${cq.skip}</span></div></div>`:''}
+    </div>`;
+  }
+  if(st.done&&st.feedback){
+    const fc=st.fbScore>3?'fb-g':st.fbScore<-3?'fb-b':'fb-o';
+    const gradeInfo={excellent:['⭐ 出色完成','gb-ex'],good:['✓ 正常完成','gb-gd'],poor:['📋 敷衍了事','gb-po'],skip:['⏭ 跳过','gb-sk']};
+    const gi=st.grade&&gradeInfo[st.grade]?`<span class="grade-badge ${gradeInfo[st.grade][1]}">${gradeInfo[st.grade][0]}</span><br>`:'';
+    h+=`<div class="fb ${fc}">${gi}${st.feedback}${st.effects?`<div class="fb-eff">${fmtEff(st.effects)}</div>`:''}</div>`;
+  } else if(!st.done){
+    if(ev.type==='task'||ev.type==='slack'||ev.type==='negative'){
+      const neg=ev.type==='negative';
+      const isSlack=ev.type==='slack';
+      const gradeLabels = isSlack
+        ? [['excellent','😎 真的摸了','放空大脑，什么都没想'],['good','😌 随便刷刷','刷了会儿手机'],['poor','😓 摸了个寂寞','坐着发呆，焦虑没减少'],['skip','💼 假装在忙','继续盯着屏幕装样子']]
+        : neg
+        ? [['excellent','💪 正面硬刚','认真应对，结果说不准'],['good','😐 捏着鼻子做','做完了，心情复杂'],['poor','😑 随便糊弄','草草了事，先过了再说'],['skip','🚪 当没看见','没理它，看看会不会消失']]
+        : [['excellent','⭐ 认真搞了','花了真功夫，结果不一定完美'],['good','✓ 完成了','就这样，交出去了'],['poor','📋 混了过去','做了点，够交差就行'],['skip','⏭ 先放着','暂时不碰，后果后面再说']];
+      h+=`<div class="grade-btns">
+        <div class="grade-hint">选择完成程度：</div>
+        ${gradeLabels.map(([g,label,desc])=>`<button class="grade-btn grade-${g}" onclick="doGrade(${i},'${g}',event)"><span class="gb-label">${label}</span><span class="gb-desc">${desc}</span></button>`).join('')}
+      </div>`;
+    } else if(ev.options){
+      h+=`<div class="opts">${ev.options.map((o,j)=>`<button class="opt" onclick="doOpt(${i},${j},event)"><span class="opt-lbl">选项 ${o.label}</span>${o.text}</button>`).join('')}</div>`;
+    }
+    h+=`<div class="ask-mentor" onclick="openMentorWithQ('请用简单的话解释一下：${ev.title}是什么意思？在${G.career.n}的工作中为什么重要？')">🤖 不懂？问问职业导师</div>`;
+  }
+  return h;
+}
+
+function fmtEff(eff){
+  const m={rep:'声望',stress:'压力',rel:'人际',perf:'绩效'};
+  return Object.entries(eff).map(([k,v])=>{if(!v)return'';const neg=k==='stress';const good=neg?v<0:v>0;const c=good?'#70c090':'#e07060';return`<span style="color:${c}">${m[k]} ${v>0?'+':''}${v}</span>`;}).filter(Boolean).join('  ');
+}
+
+function togEvt(i){
+  const st=G.evtSt[i];
+  // 只允许展开已完成事件或当前事件
+  const curIdx=G.events.findIndex((_,j)=>!G.evtSt[j].done);
+  if(!st.done && i!==curIdx) return;
+  st.expanded=!st.expanded;
+  const body=document.getElementById(`EB${i}`);const card=document.getElementById(`EC${i}`);
+  if(st.expanded){body.innerHTML=bodyHTML(G.events[i],i,st);body.classList.add('open');card.classList.add('oc');}
+  else{body.classList.remove('open');card.classList.remove('oc');setTimeout(()=>{body.innerHTML='';},400);}
+  const arr=card.querySelector('.earr');if(arr)arr.textContent=st.done?'':st.expanded?'▲':'▼';
+}
+
+// Grade definitions: [perf, stress, rel, rep, fbScore, logEmoji, logType]
+const GRADE_EFF = {
+  task:{
+    excellent:{perf:5,stress:2,rel:2,rep:3,score:8,e:'⭐',lt:'p',fb:'做得不错。领导说了声好，然后顺手把下个任务也甩过来了。'},
+    good:     {perf:3,stress:0,rel:1,rep:1,score:5,e:'✓',lt:'p',fb:'完成了，没人夸也没人骂，就这样过去了。'},
+    poor:     {perf:-1,stress:2,rel:-1,rep:-1,score:2,e:'📋',lt:'w',fb:'差不多能用。心里知道有个地方没做好，但应该没人发现。'},
+    skip:     {perf:-3,stress:1,rel:0,rep:-2,score:-1,e:'⏭',lt:'n',fb:'先放着。这种事有时候等等就自己消失了，有时候不会。'},
+  },
+  slack:{
+    excellent:{perf:0,stress:-6,rel:1,rep:0,score:6,e:'😎',lt:'p',fb:'真的放松了一下。脑子清醒了，不知道是心理作用还是真有用。'},
+    good:     {perf:0,stress:-3,rel:0,rep:0,score:4,e:'😌',lt:'p',fb:'刷了会儿手机。就这样。'},
+    poor:     {perf:-1,stress:2,rel:0,rep:0,score:1,e:'😓',lt:'w',fb:'既没休息好，也没做什么事，时间就这么没了。'},
+    skip:     {perf:1,stress:3,rel:0,rep:0,score:2,e:'💼',lt:'n',fb:'继续工作了。进度快了一点，但下午开始脑子有点转不动。'},
+  },
+  negative:{
+    excellent:{perf:2,stress:2,rel:2,rep:3,score:7,e:'💪',lt:'p',fb:'应对得还不错。对方没再说什么——不过这种事一般不会就这么结束。'},
+    good:     {perf:-1,stress:4,rel:-1,rep:0,score:3,e:'😐',lt:'w',fb:'做完了。心里不太舒服，但没说出来。'},
+    poor:     {perf:-2,stress:5,rel:-2,rep:-2,score:1,e:'😤',lt:'n',fb:'混过去了。对方没追，但气氛有点奇怪。'},
+    skip:     {perf:-1,stress:1,rel:-3,rep:-3,score:-2,e:'🚪',lt:'n',fb:'没理它。可能是对的选择，可能不是，暂时看不出来。'},
+  },
+};
+
+function doGrade(i, grade, e){
+  e.stopPropagation();
+  if(!G.events||!G.evtSt||!G.events[i]||!G.evtSt[i]) return;
+  const st=G.evtSt[i]; const ev=G.events[i];
+  const type=ev.type==='negative'?'negative':ev.type==='slack'?'slack':'task';
+  const g=GRADE_EFF[type][grade];
+  st.done=true; st.grade=grade; st.fbScore=g.score;
+  st.effects={perf:g.perf,stress:g.stress,rel:g.rel,rep:g.rep};
+  // Use AI grade_feedback first, then consequence text, then hardcoded fallback
+  const aiFb = ev.grade_feedback?.[grade] || '';
+  const conseqFb = grade==='skip' ? (ev.consequences?.skip||'') : (ev.consequences?.do||'');
+  st.feedback = aiFb || conseqFb || g.fb;
+  // Tag grade onto feedback for ripple effect context
+  st.gradeLabel = {excellent:'出色',good:'完成',poor:'敷衍',skip:'跳过'}[grade];
+  applyEff(st.effects);
+  addLog(`${g.e} ${st.gradeLabel}：${ev.title}`, g.lt);
+  // If excellent/poor, flag for intra-day ripple
+  if(grade==='excellent'||grade==='poor'||grade==='skip'){
+    G.lastGrade={idx:i,grade,title:ev.title,type};
+  }
+  refreshEvt(i); saveGState();
+  setTimeout(()=>advanceToNext(i),300);
+}
+
+function doOpt(i,j,e){
+  e.stopPropagation();const st=G.evtSt[i];const opt=G.events[i]?.options?.[j];if(!opt)return;
+  st.done=true;st.choice=j;st.feedback=opt.feedback;st.effects=opt.effects;
+  const eff=opt.effects||{};
+  st.fbScore=(eff.rep||0)-(eff.stress||0)+(eff.rel||0)+(eff.perf||0);
+  applyEff(eff);addLog(`决策[${G.events[i].title}]→${opt.label}`,st.fbScore>3?'p':st.fbScore<-3?'n':'u');
+  refreshEvt(i);
+  setTimeout(()=>advanceToNext(i),300);
+}
+
+function applyEff(eff){if(!eff)return;const s=G.stats;Object.entries(eff).forEach(([k,v])=>{if(s[k]!==undefined)s[k]=Math.min(100,Math.max(0,s[k]+v));});updateStats();saveGState();if(typeof trackAchievementState==='function'){trackAchievementState();checkAchievements();}}
+
+function saveSession(){
+  if(!G.career) return;
+  try{
+    const snap={
+      career:G.career, totalDays:G.totalDays, curDay:G.curDay,
+      events:G.events, evtSt:G.evtSt, stats:G.stats,
+      log:G.log.slice(-50), history:G.history,
+      lastGrade:G.lastGrade||null
+    };
+    sessionStorage.setItem('career_sim_session', JSON.stringify(snap));
+  }catch(e){}
+}
+
+function restoreSession(){
+  try{
+    const raw = sessionStorage.getItem('career_sim_session');
+    if(!raw) return false;
+    const snap = JSON.parse(raw);
+    if(!snap.career || !snap.curDay) return false;
+    G = {...G, ...snap, generating:false};
+    // Restore UI
+    document.getElementById('home').classList.remove('active');
+    document.getElementById('game').classList.add('active');
+    document.getElementById('sbE').textContent = G.career.e;
+    document.getElementById('sbN').textContent = G.career.n;
+    document.getElementById('sbR').textContent = G.career.s;
+    mentorCtx = `当前职业：${G.career.n}（${G.career.s}）。${G.career.desc}`;
+    updateStats(); buildDots(); renderTL();
+    // If current day events are empty, regenerate
+    if(!G.events || G.events.length===0) genDay();
+    return true;
+  }catch(e){ return false; }
+}
+
+// 完成一个事件后推进到下一个
+function advanceToNext(doneIdx){
+  const nextIdx=doneIdx+1;
+  const tl=document.getElementById('tl');
+
+  if(nextIdx>=G.events.length){
+    // 全部完成，先滚到底再触发AI日评
+    if(tl) tl.scrollTop=tl.scrollHeight;
+    saveGState();
+    setTimeout(triggerDayReview,500);
+    return;
+  }
+
+  // 重新渲染时间轴（已完成 + 新当前事件 + 模糊后续）
+  renderTL();
+
+  // 滚动到新的当前事件
+  setTimeout(()=>{
+    const nextEl=document.getElementById(`EV${nextIdx}`);
+    if(nextEl) nextEl.scrollIntoView({behavior:'smooth',block:'nearest'});
+  },150);
+}
+
+function refreshEvt(i){
+  const st=G.evtSt[i];const ev=G.events[i];
+  const dot=document.querySelector(`#EV${i} .evt-dot`);const card=document.getElementById(`EC${i}`);
+  if(dot)dot.className='evt-dot d-done';
+  if(card){
+    card.className='ecard done-c oc';
+    const ico=card.querySelector('.eico');if(ico)ico.textContent='✅';
+    const ttl=card.querySelector('.ettl');if(ttl)ttl.innerHTML=`<s style="opacity:.5">${ev.title}</s>`;
+    const tags=card.querySelector('.etags');
+    if(tags){const lm={task:'日常任务',crisis:'突发危机',decision:'重要决策',slack:'摸鱼时间',negative:'负面事件'};const tm2={task:'et-task',crisis:'et-crisis',decision:'et-dec',slack:'et-slack',negative:'et-neg'};tags.innerHTML=`<span class="etag ${tm2[ev.type]||'et-task'}">${lm[ev.type]||'任务'}</span>${ev.duration?`<span class="etag et-dur">⏱ ${ev.duration}</span>`:''}<span class="etag et-done">✓ 完成</span>`;}
+    const arr=card.querySelector('.earr');if(arr)arr.textContent='';
+    const body=document.getElementById(`EB${i}`);
+    if(body){body.innerHTML=bodyHTML(ev,i,st);body.classList.add('open');}
+  }
+}
+
+// ════════════════════════════════════════
+//  AI GENERATION
+// ════════════════════════════════════════
+async function genDay(){
+  if(G.generating)return; G.generating=true;
+  const tl=document.getElementById('tl');
+  if(!tl){G.generating=false;return;}
+  const _loadMsgs=['正在推演今天的工作流…','AI正在体验这份工作…','生成职场故事中…','今天会发生什么呢…'];
+  tl.innerHTML=`<div class="gload"><div class="big">${G.career.e}</div><p>${_loadMsgs[G.curDay%_loadMsgs.length]}</p><div class="ldots"><div class="ld"></div><div class="ld"></div><div class="ld"></div></div></div>`;
+  document.getElementById('dayBadge').textContent=`DAY ${G.curDay}`;
+  const _gMap={excellent:'出色完成，势头很好',poor:'敷衍了事，留下隐患',skip:'直接跳过，遗留问题',good:'完成了'};
+  const gradeCtx=G.lastGrade?('当天前一事件「'+G.lastGrade.title+'」'+(_gMap[G.lastGrade.grade]||'完成了')+'，后续事件应体现连锁反应。'):'';
+  const hist=G.history.length>0?('历史：'+G.history.map(h=>'第'+h.day+'天：'+h.summary).join('；')+'。当前状态：声望'+Math.round(G.stats.rep)+'、压力'+Math.round(G.stats.stress)+'、人际'+Math.round(G.stats.rel)+'、绩效'+Math.round(G.stats.perf)+'。'+gradeCtx):'第一天，刚刚开始。';
+  const isLast=G.curDay===G.totalDays;
+  const dayDesc=G.curDay===1?'第一天，刚入职状态':isLast?('最后一天（第'+G.totalDays+'天），有收尾感'):('第'+G.curDay+'天/共'+G.totalDays+'天');
+
+  const _evtTypes=['task','task','crisis','slack','negative'];
+  const _shuffled=_evtTypes.slice().sort(()=>Math.random()-0.5);
+  const prompt=`职业模拟器内容引擎。生成${G.career.n}（${G.career.s}${G.career.company?'·'+G.career.company:''}）的真实工作日。
+今天：${dayDesc} | ${hist}
+
+输出5事件(09:00-19:00)，类型：${_shuffled.join('/')}。
+
+规则（关键）：
+· 灰色地带：非黑即白是大忌。任务出色完成可能带来新麻烦，跳过可能没人发现
+· 细节真实：真实人名/工具/数字/行话，别写"完成报告"写"王总要的Q3毛利表还差两张图"
+· explain：聊天语气给外行解释，≤18字
+
+每个task/slack/negative必含grade_feedback{excellent,good,poor,skip}（各≤12字，有因果，不说教）
+crisis含options[3]{label,text≤10字,feedback≤15字,rep/stress/rel/perf}，选项各有利弊无明显最优
+
+字段：time,type,icon,title≤8字,duration,explain,context≤20字,tip≤12字
+JSON格式：{"dayTitle":"","dayMeta":"","events":[]}`;
+
+  try{
+    let txt=await callAI([{role:'user',content:prompt}],'只返回合法JSON，无任何额外文字。',1000);
+    txt=txt.replace(/<think>[\s\S]*?<\/think>/gi,'').trim();
+    txt=txt.replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
+    const s=txt.indexOf('{'),e=txt.lastIndexOf('}');
+    if(s<0||e<0)throw new Error('No JSON found');
+    txt=txt.slice(s,e+1);
+    txt=repairJSON(txt);
+    const day=JSON.parse(txt);
+    G.events=(day.events||[]).map(ev=>({
+      time:ev.time||'09:00',
+      type:ev.type||'task',
+      icon:(()=>{
+        const ic=ev.icon||'';
+        // Reject :slack: style codes, plain text, or empty - use type-based default
+        const typeIcons={task:'📋',crisis:'🚨',decision:'🤔',slack:'😴',negative:'😤'};
+        if(!ic||ic.startsWith(':')||ic.length>8||!/\p{Emoji}/u.test(ic))
+          return typeIcons[ev.type||'task']||'📋';
+        return ic;
+      })(),
+      title:(ev.title&&/[\u4e00-\u9fff]/.test(ev.title)?ev.title:null)||'工作任务',
+      duration:ev.duration||'30分钟',
+      layman_explain:ev.explain||ev.layman_explain||'',
+      context:ev.context||'',
+      tip:ev.tip||'',
+      grade_feedback:ev.grade_feedback||null,
+      consequences:{
+        do:ev.do_result||ev.consequences?.do||'顺利推进工作',
+        skip:ev.skip_result||ev.consequences?.skip||'任务积压，影响进度',
+      },
+      options:ev.options?.map(o=>({
+        label:o.label||'A',
+        text:o.text||'',
+        feedback:o.feedback||'',
+        effects:{rep:o.rep||o.effects?.rep||0,stress:o.stress||o.effects?.stress||0,rel:o.rel||o.effects?.rel||0,perf:o.perf||o.effects?.perf||0}
+      }))
+    }));
+    G.evtSt={};
+    G.events.forEach((_,i)=>G.evtSt[i]={expanded:false,done:false,choice:null,feedback:null,fbScore:0,effects:null,grade:null});
+    const hasCN=s=>/[\u4e00-\u9fff]/.test(s);
+    document.getElementById('dayTtl').textContent=(hasCN(day.dayTitle||'')?day.dayTitle:null)||`第${G.curDay}天`;
+    document.getElementById('dayMet').textContent=hasCN(day.dayMeta||'')?day.dayMeta:'';
+    saveGState();
+    renderTL();
+    if(typeof updateQuickChips==='function') updateQuickChips();
+  }catch(err){
+    console.error('genDay error:',err);
+    const errMsg=(err?.message||String(err)||'未知错误');
+    const isKeyErr=errMsg.includes?.('Key')||errMsg.includes?.('401');
+    const is403=errMsg.includes?.('403')||errMsg.includes?.('Forbidden');
+    const isSF=API_PROVIDER==='siliconflow';
+    let tipHtml='';
+    if(is403&&isSF) tipHtml=`<div style="font-size:11px;color:var(--ac);margin-top:8px;line-height:1.8;text-align:left;background:rgba(232,160,48,.08);padding:8px 10px;border-radius:4px;border:1px solid rgba(232,160,48,.2)">💡 <b>硅基流动403解决：</b><br>cloud.siliconflow.cn → 账户设置 → 安全设置 → 开启「允许浏览器直接调用API」</div>`;
+    else if(is403) tipHtml=`<div style="font-size:11px;color:var(--t3);margin-top:6px">API Key权限不足或已过期</div>`;
+    tl.innerHTML=`<div class="gload">
+      <div class="big">⚠️</div>
+      <p style="color:var(--rd)">${is403?'请求被拒绝(403)':isKeyErr?'API Key有问题':'生成失败，请重试'}</p>
+      <div style="font-family:'JetBrains Mono';font-size:10px;color:var(--t3);margin:6px 0;text-align:center;max-width:300px;">${errMsg}</div>
+      ${tipHtml}
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <button onclick="genDay()" style="padding:8px 18px;background:var(--ac);color:#0f0e0c;border:none;border-radius:4px;cursor:pointer;font-family:'Noto Serif SC';font-size:13px;font-weight:700;">重试</button>
+        ${isKeyErr?`<button onclick="changeKey()" style="padding:8px 18px;background:transparent;border:1px solid var(--bd2);color:var(--t2);border-radius:4px;cursor:pointer;font-family:'Noto Serif SC';font-size:13px;">修改Key</button>`:''}
+        <button onclick="clearGState();quitHome()" style="padding:8px 14px;background:transparent;border:1px solid var(--rd);color:var(--rd);border-radius:4px;cursor:pointer;font-family:'Noto Serif SC';font-size:11px;">重置存档</button>
+      </div>
+    </div>`;
+  }
+  finally { G.generating=false; }
+}
+
+
+// ════════════════════════════════════════
+//  AI 日评价
+// ════════════════════════════════════════
+async function triggerDayReview(){
+  const tl=document.getElementById('tl');
+  const isLast=G.curDay>=G.totalDays;
+
+  // 构造今日决策摘要
+  const decisionLog=G.events.map((ev,i)=>{
+    const st=G.evtSt[i];
+    if(ev.type==='crisis'||ev.type==='decision'){
+      const chosen=st.choice!=null&&ev.options?.[st.choice]?`选了${ev.options[st.choice].label}：${ev.options[st.choice].text}`:'跳过了';
+      return`【${ev.type==='crisis'?'危机':'决策'}】${ev.title} → ${chosen}`;
+    }
+    if(ev.type==='task') return`【任务】${ev.title} → ${st.done&&st.fbScore>0?'完成':'跳过'}`;
+    if(ev.type==='slack') return`【摸鱼】${ev.title} → ${st.done?'享受了':'没有摸鱼'}`;
+    if(ev.type==='negative') return`【负面】${ev.title} → ${st.done?'应对了':'逃避了'}`;
+    return null;
+  }).filter(Boolean).join('\n');
+
+  const gradeMap={excellent:'出色完成',good:'正常完成',poor:'敷衍了事',skip:'选择跳过'};
+  const summary=G.events.map((ev,i)=>{
+    const st=G.evtSt[i];
+    if(!st.done) return null;
+    const gradeStr=st.grade?`(${gradeMap[st.grade]||st.grade})`:'';
+    if(ev.type==='slack') return `摸鱼${gradeStr}`;
+    if(ev.type==='task') return `"${ev.title}"${gradeStr}`;
+    if(ev.type==='negative') return `应对了"${ev.title}"${gradeStr}`;
+    if(st.choice!=null&&ev.options) return `"${ev.title}"选了${ev.options[st.choice].label}`;
+    return null;
+  }).filter(Boolean).join('；');
+  const gradeCount={excellent:0,good:0,poor:0,skip:0};
+  G.events.forEach((_,i)=>{const g=G.evtSt[i].grade;if(g)gradeCount[g]=(gradeCount[g]||0)+1;});
+  const gradeNameMap={excellent:'出色',good:'完成',poor:'敷衍',skip:'跳过'};
+  const gradeSummary=Object.entries(gradeCount).filter(([,v])=>v>0).map(([k,v])=>gradeNameMap[k]+'×'+v).join('、');
+  G.history.push({day:G.curDay,summary:summary+'。'+(gradeSummary?'表现：'+gradeSummary+'。':'')});
+  if(typeof checkAchievements==='function') checkAchievements();
+  saveGState(); // Save before AI review call
+
+  // 显示AI评价加载占位
+  const reviewEl=document.createElement('div');
+  reviewEl.className='ai-review';
+  reviewEl.id='dayReview';
+  reviewEl.innerHTML=`
+    <div class="air-header">
+      <div class="air-avatar">👔</div>
+      <div class="air-meta">
+        <div class="air-who">主管·今日工作点评</div>
+        <div class="air-when">DAY ${G.curDay} 结束</div>
+      </div>
+    </div>
+    <div class="air-loading"><div class="ldots"><div class="ld"></div><div class="ld"></div><div class="ld"></div></div><span>主管正在写今日点评…</span></div>`;
+  tl.appendChild(reviewEl);
+  tl.scrollTop=tl.scrollHeight;
+
+  const prompt=`你是一个职场模拟游戏里的"主管"角色，正在对下属今天的工作表现做点评。
+
+职业：${G.career.n}（${G.career.s}）
+今天是第${G.curDay}天，共${G.totalDays}天
+当前状态：声望${Math.round(G.stats.rep)} 压力${Math.round(G.stats.stress)} 人际${Math.round(G.stats.rel)} 绩效${Math.round(G.stats.perf)}
+
+今日事件与决策：
+${decisionLog}
+
+请给出今日工作点评。要求：
+1. 语气像真实的职场主管，有温度但也有直接性，不要太客气也不要太严厉
+2. 对具体的决策做出针对性评价，说出做得好的和做得差的各自原因
+3. 给出今日综合等级：S（出色）/A（良好）/B（普通）/C（需改进）
+4. 指出1-2个今天最关键的时刻
+5. 给1句职业建议
+
+只返回合法JSON：
+{"grade":"A","grade_label":"表现良好","comment":"点评正文，150字以内，口语化","highlights":[{"type":"pos","text":"做得好的地方"},{"type":"neg","text":"可以改进的地方"}],"key_moment":"今天最关键的一个时刻描述","advice":"一句职业建议"}`;
+
+  try{
+    let txt=await callAI([{role:'user',content:prompt}],null,1200);
+    txt=txt.replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
+    const s=txt.indexOf('{');if(s<0)throw new Error('no json');
+    const rv=JSON.parse(repairJSON(txt.slice(s)));
+
+    const gradeClass=`grade-${rv.grade||'B'}`;
+    const gradeColors={S:'var(--ac)',A:'var(--gr)',B:'#8ab0f0',C:'#e08060'};
+    const gc=gradeColors[rv.grade||'B'];
+
+    reviewEl.innerHTML=`
+      <div class="air-header">
+        <div class="air-avatar">👔</div>
+        <div class="air-meta">
+          <div class="air-who">主管·今日工作点评</div>
+          <div class="air-when">DAY ${G.curDay} / ${G.totalDays}</div>
+        </div>
+        <div class="air-grade ${gradeClass}">${rv.grade||'B'}</div>
+      </div>
+      <div class="air-body">${rv.comment||''}</div>
+      ${rv.highlights?.length?`<div class="air-highlights">${rv.highlights.map(h=>`<span class="air-hl air-hl-${h.type||'neu'}">${h.type==='pos'?'✓':h.type==='neg'?'✗':'·'} ${h.text}</span>`).join('')}</div>`:''}
+      ${rv.key_moment?`<div style="margin-top:10px;padding:9px 12px;background:rgba(232,160,48,.06);border:1px solid rgba(232,160,48,.2);border-radius:6px;font-size:12px;color:var(--t2);">⚡ <strong>关键时刻：</strong>${rv.key_moment}</div>`:''}
+      ${rv.advice?`<div style="margin-top:8px;padding:9px 12px;background:rgba(32,128,128,.06);border:1px solid rgba(32,128,128,.2);border-radius:6px;font-size:12px;color:#90c0c0;">💬 <strong>建议：</strong>${rv.advice}</div>`:''}
+      <div class="air-stats">
+        <div class="air-stat"><div class="air-stat-n" style="color:var(--ac)">${Math.round(G.stats.rep)}</div><div class="air-stat-l">声望</div></div>
+        <div class="air-stat"><div class="air-stat-n" style="color:var(--rd)">${Math.round(G.stats.stress)}</div><div class="air-stat-l">压力</div></div>
+        <div class="air-stat"><div class="air-stat-n" style="color:var(--bl)">${Math.round(G.stats.rel)}</div><div class="air-stat-l">人际</div></div>
+        <div class="air-stat"><div class="air-stat-n" style="color:var(--gr)">${Math.round(G.stats.perf)}</div><div class="air-stat-l">绩效</div></div>
+      </div>`;
+  }catch(err){
+    // fallback 静态评价
+    const score=Object.values(G.evtSt).reduce((a,s)=>a+s.fbScore,0);
+    const grade=score>8?'A':score>2?'B':'C';
+    reviewEl.innerHTML=`
+      <div class="air-header">
+        <div class="air-avatar">👔</div>
+        <div class="air-meta"><div class="air-who">今日总结</div><div class="air-when">DAY ${G.curDay}</div></div>
+        <div class="air-grade grade-${grade}">${grade}</div>
+      </div>
+      <div class="air-body">今天的工作已完成。</div>`;
+  }
+
+  // 操作按钮
+  const actDiv=document.createElement('div');
+  actDiv.className='cr-actions';
+  actDiv.style.marginTop='14px';
+  if(!isLast){
+    actDiv.innerHTML=`<button class="nxt" onclick="nextDay()">继续第 ${G.curDay+1} 天 →</button><button class="ret" onclick="endCareer()">提前结束职业</button>`;
+  } else {
+    actDiv.innerHTML=`<button class="nxt" onclick="triggerCareerReview()">查看最终职业评价 →</button>`;
+  }
+  tl.appendChild(actDiv);
+  tl.scrollTop=tl.scrollHeight;
+}
+
+function nextDay(){G._crisisCount=0;G.curDay++;updDots();genDay();document.getElementById('tl').scrollTop=0;}
+
+// ════════════════════════════════════════
+//  AI 职业周期总评
+// ════════════════════════════════════════
+async function triggerCareerReview(){
+  const tl=document.getElementById('tl');
+  tl.innerHTML=`<div class="gload"><div class="big">${G.career.e}</div><p>AI 正在生成你的职业总评…</p><div class="ldots"><div class="ld"></div><div class="ld"></div><div class="ld"></div></div></div>`;
+
+  const histLog=G.history.map(h=>`第${h.day}天：${h.summary}`).join('\n');
+  const finalStats=`声望${Math.round(G.stats.rep)} 压力${Math.round(G.stats.stress)} 人际${Math.round(G.stats.rel)} 绩效${Math.round(G.stats.perf)}`;
+  const totalDecisions=G.history.length;
+
+  const prompt=`你是一个职业模拟游戏的评价系统，正在给玩家写完整的职业体验总结。
+
+职业：${G.career.n}（${G.career.s}）
+体验天数：${G.totalDays}天
+最终状态：${finalStats}
+
+每日摘要：
+${histLog}
+
+请给出完整的职业体验总评。要求：
+1. 语气像一份真实的职业评估报告，有深度有温度
+2. 总体等级：S/A/B/C，对应出色/良好/普通/需磨练
+3. 对四个维度分别给出20字以内的简短点评
+4. 写100-150字的综合总结，说明这个人适不适合这个职业，有什么特质，有什么要改进
+5. 给出最难忘的一个时刻或决策点评
+6. 给一句话建议：如果真的去做这个职业，最重要的一件事是什么
+
+只返回合法JSON：
+{"overall_grade":"A","overall_label":"表现良好，有成为优秀${G.career.n}的潜质","summary":"综合总结正文","dim_comments":{"rep":"声望维度简评","stress":"压力维度简评","rel":"人际维度简评","perf":"绩效维度简评"},"memorable_moment":"最难忘时刻","final_advice":"一句话建议"}`;
+
+  try{
+    let txt=await callAI([{role:'user',content:prompt}],null,1500);
+    txt=txt.replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
+    const s=txt.indexOf('{');if(s<0)throw new Error('no json');
+    const rv=JSON.parse(repairJSON(txt.slice(s)));
+
+    const grade=rv.overall_grade||'B';
+    const gradeColors={S:'#e8a030',A:'#3a9060',B:'#8ab0f0',C:'#e07060'};
+    const gradeLabels={S:'传奇表现',A:'表现优秀',B:'初步掌握',C:'任重道远'};
+    const gc=gradeColors[grade];
+
+    tl.innerHTML=`
+      <div class="career-review">
+        <div class="cr-title">${G.career.e} ${G.career.n} · 职业体验总评</div>
+        <div class="cr-sub">体验了 ${G.totalDays} 天 · ${G.career.s}</div>
+        <div class="cr-grade-wrap">
+          <div class="cr-grade-big grade-${grade}" style="border:2px solid ${gc}40;">${grade}</div>
+          <div class="cr-grade-info">
+            <div class="cr-grade-label" style="color:${gc}">${gradeLabels[grade]}</div>
+            <div class="cr-grade-desc">${rv.overall_label||''}</div>
+          </div>
+        </div>
+        <div class="cr-body">${rv.summary||''}</div>
+        <div style="font-family:'JetBrains Mono';font-size:9px;letter-spacing:2px;color:var(--t3);margin-bottom:8px;">四维详评</div>
+        <div class="cr-dims">
+          <div class="cr-dim"><div class="cr-dim-name" style="color:var(--ac)">声望 ${Math.round(G.stats.rep)}</div><div class="cr-dim-score">${Math.round(G.stats.rep)}</div><div class="cr-dim-comment">${rv.dim_comments?.rep||''}</div></div>
+          <div class="cr-dim"><div class="cr-dim-name" style="color:var(--rd)">压力 ${Math.round(G.stats.stress)}</div><div class="cr-dim-score" style="color:var(--rd)">${Math.round(G.stats.stress)}</div><div class="cr-dim-comment">${rv.dim_comments?.stress||''}</div></div>
+          <div class="cr-dim"><div class="cr-dim-name" style="color:var(--bl)">人际 ${Math.round(G.stats.rel)}</div><div class="cr-dim-score" style="color:var(--bl)">${Math.round(G.stats.rel)}</div><div class="cr-dim-comment">${rv.dim_comments?.rel||''}</div></div>
+          <div class="cr-dim"><div class="cr-dim-name" style="color:var(--gr)">绩效 ${Math.round(G.stats.perf)}</div><div class="cr-dim-score" style="color:var(--gr)">${Math.round(G.stats.perf)}</div><div class="cr-dim-comment">${rv.dim_comments?.perf||''}</div></div>
+        </div>
+        ${rv.memorable_moment?`<div style="padding:12px;background:rgba(232,160,48,.06);border:1px solid rgba(232,160,48,.2);border-radius:8px;margin-bottom:12px;"><div style="font-family:'JetBrains Mono';font-size:9px;letter-spacing:1px;color:var(--ac);margin-bottom:5px;">✦ 最难忘的时刻</div><div style="font-size:13px;color:var(--t2);line-height:1.7;">${rv.memorable_moment}</div></div>`:''}
+        ${rv.final_advice?`<div style="padding:12px;background:rgba(32,128,128,.06);border:1px solid rgba(32,128,128,.2);border-radius:8px;margin-bottom:16px;"><div style="font-family:'JetBrains Mono';font-size:9px;letter-spacing:1px;color:var(--cy);margin-bottom:5px;">💬 如果真的去做这个职业</div><div style="font-size:13px;color:#90c0c0;line-height:1.7;">${rv.final_advice}</div></div>`:''}
+        <button class="rs" onclick="quitHome()">体验其他职业 →</button>
+      </div>`;
+  }catch(err){
+    // fallback
+    endCareer();
+  }
+}
+
+// 保留兜底（showDayEnd 和 endCareer 不互相调用）
+function showDayEnd(){ triggerDayReview(); }
+function endCareer(){
+  // 直接跳到职业总评，不经过 triggerDayReview
+  triggerCareerReview();
+}
+
+// ════════════════════════════════════════
+//  AI MENTOR
+// ════════════════════════════════════════
+let mentorCtx='';
+let mentorHistory=[];
+let mentorLoading=false;
+
+function openMentor(){document.getElementById('mentor-overlay').classList.add('open');}
+function openMentorWithQ(q){openMentor();document.getElementById('mpInput').value=q;sendMentor();}
+function closeMentor(){document.getElementById('mentor-overlay').classList.remove('open');}
+function closeMentorOuter(e){if(e.target===document.getElementById('mentor-overlay'))closeMentor();}
+
+function updateQuickChips(){
+  const chips=document.getElementById('quickChips');
+  const career=G.career;if(!career)return;
+  const curIdx=G.events.findIndex((_,i)=>!G.evtSt[i].done);
+  const curEvt=G.events[curIdx];
+  const qs=[
+    curEvt?`"${curEvt.title}"是什么意思？`:`${career.n}最难的地方是什么？`,
+    `${career.n}每天最累的是什么？`,
+    `做${career.n}需要什么背景？`,
+    `${career.n}的薪资一般是多少？`,
+    '现在这个事件，做好了有什么影响？',
+  ];
+  chips.innerHTML=qs.map(q=>`<div class="qchip" onclick="openMentorWithQ('${q.replace(/'/g,'')}')">${q}</div>`).join('');
+}
+
+async function sendMentor(){
+  G._mentorCount=(G._mentorCount||0)+1;
+  if(mentorLoading)return;
+  const input=document.getElementById('mpInput');const txt=input.value.trim();if(!txt)return;
+  input.value='';
+  addMentorMsg('user',txt);
+  mentorHistory.push({role:'user',content:txt});
+  mentorLoading=true;
+  document.getElementById('mpSend').disabled=true;
+  const chat=document.getElementById('mpChat');
+  const typingId='typing_'+Date.now();
+  const td=document.createElement('div');td.className='mc-msg ai';td.id=typingId;
+  td.innerHTML=`<div class="mc-av">🤖</div><div class="mc-bubble"><div class="mc-typing"><div class="mc-dot"></div><div class="mc-dot"></div><div class="mc-dot"></div></div></div>`;
+  chat.appendChild(td);chat.scrollTop=chat.scrollHeight;
+  const sys=`你是一个职业体验模拟器里的"职业导师"。
+当前职业：${mentorCtx||'未知'}
+今天的事件：${G.events.map(e=>e.title).join('、')}
+用口语化大白话回答，100-200字，不要用太多术语。`;
+  try{
+    const reply=await callAI(mentorHistory.slice(-10),sys,600);
+    document.getElementById(typingId)?.remove();
+    addMentorMsg('ai',reply);
+    mentorHistory.push({role:'assistant',content:reply});
+    if(mentorHistory.length>20)mentorHistory=mentorHistory.slice(-20);
+  }catch(e){
+    document.getElementById(typingId)?.remove();
+    addMentorMsg('ai','出错了：'+(e?.message||String(e)));
+  }
+  mentorLoading=false;document.getElementById('mpSend').disabled=false;
+  if(typeof checkAchievements==='function') checkAchievements();
+}
+
+function addMentorMsg(role,text){
+  const chat=document.getElementById('mpChat');
+  const d=document.createElement('div');d.className=`mc-msg ${role}`;
+  d.innerHTML=`<div class="mc-av">${role==='user'?'你':'🤖'}</div><div class="mc-bubble">${text.replace(/\n/g,'<br>')}</div>`;
+  chat.appendChild(d);chat.scrollTop=chat.scrollHeight;
+}
+
+
+// ════════════════════════════════════════
+//  成就系统
+// ════════════════════════════════════════
+
+const ACHIEVEMENTS = [
+  // ── 正面成就 ──
+  {id:'first_blood',    ico:'⚡',name:'初来乍到',     desc:'完成第一个工作任务',                  tag:'pos', rarity:'common',
+   check:()=>Object.values(G.evtSt).some(s=>s.done&&s.grade)},
+  {id:'perfectionist',  ico:'⭐',name:'卷王附体',     desc:'单天连续3次出色完成',                  tag:'pos', rarity:'rare',
+   check:()=>{const gs=Object.values(G.evtSt).filter(s=>s.grade==='excellent');return gs.length>=3;}},
+  {id:'survivor',       ico:'🏆',name:'活下来了',     desc:'完成整个职业体验',                    tag:'pos', rarity:'epic',
+   check:()=>G.curDay>=G.totalDays&&G.history.length>=G.totalDays},
+  {id:'smooth_talker',  ico:'🤝',name:'人缘王',       desc:'人际关系达到80+',                     tag:'pos', rarity:'rare',
+   check:()=>G.stats.rel>=80},
+  {id:'reputation_max', ico:'🌟',name:'名声大噪',     desc:'声望值达到85+',                       tag:'pos', rarity:'rare',
+   check:()=>G.stats.rep>=85},
+  {id:'zen_master',     ico:'🧘',name:'佛系打工人',   desc:'压力值始终低于30',                    tag:'pos', rarity:'rare',
+   check:()=>G.stats.stress<30&&G.curDay>=2},
+  {id:'consistent',     ico:'✅',name:'稳定发挥',     desc:'连续5次正常完成',                     tag:'pos', rarity:'common',
+   check:()=>{const grades=Object.values(G.evtSt).map(s=>s.grade).filter(Boolean);let cnt=0,max=0;grades.forEach(g=>{if(g==='good'){cnt++;max=Math.max(max,cnt);}else cnt=0;});return max>=5;}},
+  {id:'overtime',       ico:'🌙',name:'自愿加班',     desc:'单天完成所有5个事件且全部出色',        tag:'pos', rarity:'epic',
+   check:()=>{const done=Object.values(G.evtSt);return done.length>=5&&done.every(s=>s.grade==='excellent');}},
+
+  // ── 负面成就 ──
+  {id:'burnout',        ico:'🔥',name:'点燃自己',     desc:'压力值突破90',                        tag:'neg', rarity:'common',
+   check:()=>G.stats.stress>=90},
+  {id:'ghosted',        ico:'👻',name:'隐身模式',     desc:'连续跳过3个任务',                     tag:'neg', rarity:'common',
+   check:()=>{const grades=Object.values(G.evtSt).map(s=>s.grade).filter(Boolean);let cnt=0,max=0;grades.forEach(g=>{if(g==='skip'){cnt++;max=Math.max(max,cnt);}else cnt=0;});return max>=3;}},
+  {id:'bad_rep',        ico:'💀',name:'人见人躲',     desc:'声望跌破20',                          tag:'neg', rarity:'common',
+   check:()=>G.stats.rep<=20},
+  {id:'slacker',        ico:'😴',name:'职场透明人',   desc:'一天内跳过4个以上事件',               tag:'neg', rarity:'common',
+   check:()=>Object.values(G.evtSt).filter(s=>s.grade==='skip').length>=4},
+  {id:'disaster',       ico:'💥',name:'行走的事故',   desc:'绩效和声望同时低于25',                tag:'neg', rarity:'rare',
+   check:()=>G.stats.perf<=25&&G.stats.rep<=25},
+  {id:'social_death',   ico:'🪦',name:'社会性死亡',   desc:'人际关系跌至10以下',                  tag:'neg', rarity:'rare',
+   check:()=>G.stats.rel<=10},
+
+  // ── 让人无语的成就 ──
+  {id:'mixed_signals',  ico:'🎲',name:'选项恐惧症',   desc:'危机事件每次都选C',                   tag:'wtf', rarity:'common',
+   check:()=>{const crisis=G.events?.filter(e=>e.type==='crisis')||[];return crisis.length>=2&&crisis.every((_,i)=>G.evtSt[G.events.indexOf(_)]?.choice===2);}},
+  {id:'mediocre',       ico:'📊',name:'及格万岁',     desc:'所有事件都选择"正常完成"',             tag:'wtf', rarity:'rare',
+   check:()=>{const gs=Object.values(G.evtSt).filter(s=>s.grade);return gs.length>=4&&gs.every(s=>s.grade==='good');}},
+  {id:'chaos_agent',    ico:'🌪️',name:'混乱中立',    desc:'在同一天既出色完成又跳过各至少2次',    tag:'wtf', rarity:'rare',
+   check:()=>{const st=Object.values(G.evtSt);return st.filter(s=>s.grade==='excellent').length>=2&&st.filter(s=>s.grade==='skip').length>=2;}},
+  {id:'zero_slack',     ico:'⚙️',name:'机器人本机',  desc:'连续跳过所有摸鱼事件',                 tag:'wtf', rarity:'common',
+   check:()=>{const slacks=G.events?.filter(e=>e.type==='slack')||[];return slacks.length>=1&&slacks.every(e=>{const i=G.events.indexOf(e);return G.evtSt[i]?.grade==='skip';});}},
+  {id:'only_slack',     ico:'🛋️',name:'摸鱼哲学家',  desc:'只有摸鱼事件出色完成其余全跳过',       tag:'wtf', rarity:'rare',
+   check:()=>{const st=Object.values(G.evtSt);const slackEx=G.events?.some((e,i)=>e.type==='slack'&&G.evtSt[i]?.grade==='excellent');const othersSkip=G.events?.every((e,i)=>e.type==='slack'||G.evtSt[i]?.grade==='skip');return slackEx&&othersSkip&&st.length>=4;}},
+
+  // ── 让人小惊喜的成就 ──
+  {id:'comeback',       ico:'🔄',name:'王者归来',     desc:'压力90+之后成功降到60以下',            tag:'pos', rarity:'rare',
+   check:()=>G._hadHighStress&&G.stats.stress<60},
+  {id:'underdog',       ico:'🐣',name:'逆风翻盘',     desc:'声望从30以下回升到60+',               tag:'pos', rarity:'epic',
+   check:()=>G._hadLowRep&&G.stats.rep>=60},
+  {id:'mentor_addict',  ico:'🤖',name:'AI依赖症',    desc:'问了职业导师5次以上',                  tag:'wtf', rarity:'common',
+   check:()=>(G._mentorCount||0)>=5},
+  {id:'day1_hero',      ico:'🌅',name:'开门红',       desc:'第一天所有任务出色完成',               tag:'pos', rarity:'rare',
+   check:()=>G.curDay===1&&Object.values(G.evtSt).filter(s=>s.grade).every(s=>s.grade==='excellent')&&Object.values(G.evtSt).length>=4},
+
+  // ── 抽象/莫名其妙成就 ──
+  {id:'existential',    ico:'🌀',name:'哲学时刻',     desc:'同时出现高压力+高声望（矛盾体）',      tag:'wtf', rarity:'rare',
+   check:()=>G.stats.stress>=75&&G.stats.rep>=75},
+  {id:'flat_line',      ico:'📈',name:'不增不减',     desc:'连续两天所有数值变化幅度不超过5',      tag:'wtf', rarity:'epic',
+   check:()=>(G._statStable||0)>=2},
+  {id:'crisis_magnet',  ico:'🧲',name:'危机体质',     desc:'遭遇3次以上危机事件',                 tag:'neg', rarity:'common',
+   check:()=>(G._crisisCount||0)>=3},
+  {id:'skip_crisis',    ico:'🏃',name:'逃跑大师',     desc:'跳过危机事件',                        tag:'wtf', rarity:'common',
+   check:()=>G.events?.some((e,i)=>e.type==='crisis'&&G.evtSt[i]?.grade==='skip')},
+  {id:'poor_then_epic', ico:'🎭',name:'先抑后扬',     desc:'同天先敷衍后出色（顺序相邻）',         tag:'wtf', rarity:'rare',
+   check:()=>{const evs=G.events||[];for(let i=0;i<evs.length-1;i++){if(G.evtSt[i]?.grade==='poor'&&G.evtSt[i+1]?.grade==='excellent')return true;}return false;}},
+  {id:'speedrun',       ico:'⚡',name:'极限摸鱼',     desc:'一天内跳过任务同时出色完成了摸鱼',     tag:'wtf', rarity:'common',
+   check:()=>G.events?.some((e,i)=>e.type==='slack'&&G.evtSt[i]?.grade==='excellent')&&G.events?.some((e,i)=>e.type==='task'&&G.evtSt[i]?.grade==='skip')},
+];
+
+// Track extra state needed for some achievements
+function trackAchievementState(){
+  if(G.stats.stress>=90) G._hadHighStress=true;
+  if(G.stats.rep<=30) G._hadLowRep=true;
+  // Track stat stability
+  if(!G._prevStats) G._prevStats={...G.stats};
+  else{
+    const maxDelta=Math.max(...Object.keys(G.stats).map(k=>Math.abs(G.stats[k]-(G._prevStats[k]||50))));
+    if(maxDelta<=5) G._statStable=(G._statStable||0)+1;
+    else G._statStable=0;
+    G._prevStats={...G.stats};
+  }
+  G._crisisCount=(G.events||[]).filter(e=>e.type==='crisis').length+(G._crisisCount||0);
+}
+
+function checkAchievements(){
+  let newUnlocks=[];
+  ACHIEVEMENTS.forEach(a=>{
+    if(G.achievements.includes(a.id)) return;
+    try{ if(a.check()){ G.achievements.push(a.id); newUnlocks.push(a); } }
+    catch(e){}
+  });
+  if(newUnlocks.length){
+    updateAchievementCount();
+    newUnlocks.forEach(a=>showAchievementToast(a));
+    saveGState();
+  }
+}
+
+function showAchievementToast(ach){
+  const toast=document.getElementById('ach-toast');
+  if(!toast) return;
+  const el=document.createElement('div');
+  el.className='ach-toast-item'+(ach.rarity==='rare'?' rare':ach.rarity==='epic'?' epic':'');
+  el.innerHTML=`<span style="font-size:22px">${ach.ico}</span><div><div style="font-size:11px;font-weight:700;color:var(--t)">成就解锁：${ach.name}</div><div style="font-size:10px;color:var(--t3);margin-top:2px">${ach.desc}</div></div>`;
+  toast.appendChild(el);
+  setTimeout(()=>{ el.style.animation='toastOut .3s ease forwards'; setTimeout(()=>el.remove(),300); },3500);
+}
+
+function updateAchievementCount(){
+  const el=document.getElementById('achCount');
+  if(el) el.textContent=G.achievements.length+'/'+ACHIEVEMENTS.length;
+}
+
+function openAchievements(){
+  const overlay=document.getElementById('ach-overlay');
+  const list=document.getElementById('achList');
+  if(!overlay||!list) return;
+  // Render all achievements
+  const groups=[
+    {label:'🌟 正面成就', tag:'pos'},
+    {label:'💀 负面成就', tag:'neg'},
+    {label:'🌀 抽象成就', tag:'wtf'},
+  ];
+  list.innerHTML='';
+  groups.forEach(g=>{
+    const groupAchs=ACHIEVEMENTS.filter(a=>a.tag===g.tag);
+    const hd=document.createElement('div');
+    hd.style='font-family:\'JetBrains Mono\';font-size:9px;letter-spacing:2px;color:var(--t3);padding:4px 2px;margin-top:4px;';
+    hd.textContent=g.label+' ('+groupAchs.filter(a=>G.achievements.includes(a.id)).length+'/'+groupAchs.length+')';
+    list.appendChild(hd);
+    groupAchs.forEach(a=>{
+      const unlocked=G.achievements.includes(a.id);
+      const d=document.createElement('div');
+      d.className='ach-card '+(unlocked?'unlocked '+a.rarity:'locked');
+      d.innerHTML=`<div class="ach-ico">${unlocked?a.ico:'❓'}</div><div class="ach-body"><div class="ach-name">${unlocked?a.name:'???'}</div><div class="ach-desc">${unlocked?a.desc:(a.tag==='pos'?'完成某件了不起的事':'做了某件……事')}</div>${unlocked?`<div class="ach-tag ${a.tag}">${a.rarity==='epic'?'★ 史诗':a.rarity==='rare'?'◆ 稀有':'● 普通'}</div>`:''}`;
+      list.appendChild(d);
+    });
+  });
+  overlay.style.display='flex';
+}
+
+function closeAchievements(){
+  const overlay=document.getElementById('ach-overlay');
+  if(overlay) overlay.style.display='none';
+}
+
+// Achievement hooks are inlined directly into applyEff, nextDay, sendMentor
+
+</script>
+
+<!-- ══ ACHIEVEMENT OVERLAY ══ -->
+<div id="ach-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;align-items:center;justify-content:center;">
+  <div style="background:var(--s1);border:1px solid var(--bd2);border-radius:10px;width:480px;max-width:95vw;max-height:80vh;display:flex;flex-direction:column;overflow:hidden;">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid var(--bd);">
+      <div style="font-size:14px;font-weight:900;letter-spacing:-.3px;">🏅 成就列表</div>
+      <button onclick="closeAchievements()" style="background:none;border:none;color:var(--t3);cursor:pointer;font-size:18px;line-height:1;">×</button>
+    </div>
+    <div id="achList" style="overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;"></div>
+  </div>
+</div>
+
+<!-- ══ ACHIEVEMENT TOAST ══ -->
+<div id="ach-toast" style="position:fixed;bottom:24px;right:24px;z-index:300;display:flex;flex-direction:column;gap:8px;pointer-events:none;"></div>
+</body>
+</html>
