@@ -504,15 +504,6 @@
       align-items: flex-start;
       gap: 0.55rem;
     }
-    .q-card .q-num {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.64rem;
-      color: var(--muted);
-      font-weight: 600;
-      flex-shrink: 0;
-      margin-top: 0.15rem;
-      letter-spacing: 0.02em;
-    }
     .q-card .q-text {
       font-size: 0.9rem;
       font-weight: 500;
@@ -1156,16 +1147,6 @@
       background: var(--accent-soft);
       border-color: rgba(245,166,35,0.25);
       color: var(--ink);
-    }
-    .linked-q-ref .lqr-num {
-      color: var(--accent);
-      font-family: 'JetBrains Mono', monospace;
-      font-weight: 700;
-      margin-right: 0.4rem;
-      padding: 0.05rem 0.32rem;
-      background: var(--accent-soft);
-      border-radius: 4px;
-      font-size: 0.72rem;
     }
 
     /* === Animations === */
@@ -2632,7 +2613,7 @@
         var lc = getCasesForQuestion(q);
         var sel = state.selectedQId === q.id ? ' selected' : '';
         h += '<div class="q-card' + sel + '" data-qid="' + esc(q.id) + '">';
-        h += '  <div class="q-header"><span class="q-num">Q' + q.num + '</span><span class="q-text">' + esc(q.text) + '</span></div>';
+        h += '  <div class="q-header"><span class="q-text">' + esc(q.text) + '</span></div>';
         h += '  <div class="q-meta"><span>' + esc(q.exam) + '</span><span class="case-count">' + lc.length + ' 个关联案例</span></div>';
         h += '  <div class="q-tags">';
         h += '    <span class="tag tag-year"' + (q.date ? '>' + q.year + '年<span class="td-full">\uD83D\uDCC5 ' + esc(q.date) + '</span>' : '>' + q.year + '年') + '</span>';
@@ -2756,7 +2737,7 @@
       }
       document.getElementById('drawerScroll').innerHTML = h;
       document.getElementById('drawerTitle').innerHTML =
-        '<span class="dt-region">' + esc(curRegion().name) + '</span>\u771F\u9898\u8BE6\u60C5 \u00b7 Q' + q.num;
+        '<span class="dt-region">' + esc(curRegion().name) + '</span>\u771F\u9898\u8BE6\u60C5';
 
       // Bind independent panel toggles
       var panelHeaders = document.querySelectorAll('.ans-panel-header');
@@ -2806,7 +2787,7 @@
       if (linkedQs.length > 0) {
         h += '<div class="cases-section-title">关联真题（' + linkedQs.length + '）</div>';
         linkedQs.forEach(function(q) {
-          h += '<div class="linked-q-ref" data-goto-qid="' + esc(q.id) + '"><span class="lqr-num">Q' + q.num + '</span>' + esc(q.text.substring(0, 60)) + (q.text.length > 60 ? '...' : '') + '</div>';
+          h += '<div class="linked-q-ref" data-goto-qid="' + esc(q.id) + '">' + esc(q.text.substring(0, 60)) + (q.text.length > 60 ? '...' : '') + '</div>';
         });
       }
       document.getElementById('drawerScroll').innerHTML = h;
