@@ -1,0 +1,3038 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>新疆面试真题与案例库</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+    /* ===== Shared tokens (non-color) ===== */
+    :root {
+      /* Spacing scale */
+      --sp-1: 0.25rem;
+      --sp-2: 0.5rem;
+      --sp-3: 0.75rem;
+      --sp-4: 1rem;
+      --sp-5: 1.5rem;
+      --sp-6: 2rem;
+      --sp-7: 3rem;
+
+      /* Radii */
+      --radius: 12px;
+      --radius-sm: 8px;
+      --radius-lg: 16px;
+      --radius-xl: 20px;
+      --radius-full: 999px;
+
+      /* Transitions */
+      --t: 0.22s cubic-bezier(.4,.2,.2,1);
+      --t-slow: 0.35s cubic-bezier(.2,.7,.2,1);
+      --t-spring: 0.3s cubic-bezier(.34,1.56,.64,1);
+
+      /* Theme name for JS detection */
+      --theme-name: 'dark';
+    }
+
+    /* ===== Dark theme (default) ===== */
+    [data-theme="dark"] {
+      --bg: #0a0d13;
+      --bg2: #10141e;
+      --bg3: #161b28;
+      --bg4: #1b2230;
+      --surface: #1e2638;
+      --surface2: #242d42;
+      --surface3: #2b3549;
+      --ink: #f2efe9;
+      --ink2: #c4c0b9;
+      --muted: #6e7791;
+      --muted2: #4a5268;
+      --rule: #232b3b;
+      --rule2: #1c2331;
+      --rule3: #2d384e;
+      --accent: #f5a623;
+      --accent-d: #d98e0a;
+      --accent-soft: rgba(245,166,35,0.08);
+      --accent-glow: rgba(245,166,35,0.15);
+      --accent2: #2ed4a8;
+      --accent2-d: #19b88e;
+      --accent2-soft: rgba(46,212,168,0.06);
+      --accent3: #f06868;
+      --tag-bg: rgba(245,166,35,0.1);
+      --tag-text: #f5a623;
+      --source-gov: #2ed4a8;
+      --source-media: #5ea8fa;
+      --source-other: #a78bfa;
+      --shadow-xs: 0 1px 3px rgba(0,0,0,0.3);
+      --shadow-sm: 0 2px 8px rgba(0,0,0,0.25);
+      --shadow: 0 4px 20px rgba(0,0,0,0.35);
+      --shadow-lg: 0 12px 44px rgba(0,0,0,0.5);
+      --shadow-glow: 0 0 32px rgba(245,166,35,0.1);
+      --shadow-card-hover: 0 6px 24px rgba(0,0,0,0.3);
+      --ambient-1: rgba(245,166,35,0.04);
+      --ambient-2: rgba(46,212,168,0.03);
+      --header-bg: linear-gradient(180deg, rgba(16,20,30,0.9) 0%, rgba(10,13,19,0.4) 100%);
+      --toolbar-bg: linear-gradient(180deg, var(--bg2) 0%, var(--bg) 100%);
+      --drawer-header-bg: linear-gradient(180deg, var(--bg3) 0%, var(--bg2) 100%);
+      --backdrop: rgba(5,7,10,0.65);
+      --answer-bg: var(--bg3);
+      --answer-border: var(--rule);
+      --answer-section-bg: rgba(245,166,35,0.03);
+    }
+
+    /* ===== Light theme (白天) ===== */
+    [data-theme="light"] {
+      --bg: #f8f9fb;
+      --bg2: #ffffff;
+      --bg3: #f1f3f6;
+      --bg4: #e5e9ef;
+      --surface: #ffffff;
+      --surface2: #f7f8fa;
+      --surface3: #eef0f4;
+      --ink: #1f2937;
+      --ink2: #4b5563;
+      --muted: #6b7280;
+      --muted2: #9ca3af;
+      --rule: #e5e7eb;
+      --rule2: #f0f1f4;
+      --rule3: #d1d5db;
+      --accent: #d97706;
+      --accent-d: #b45309;
+      --accent-soft: rgba(217,119,6,0.1);
+      --accent-glow: rgba(217,119,6,0.18);
+      --accent2: #059669;
+      --accent2-d: #047857;
+      --accent2-soft: rgba(5,150,105,0.08);
+      --accent3: #dc2626;
+      --tag-bg: rgba(217,119,6,0.1);
+      --tag-text: #b45309;
+      --source-gov: #059669;
+      --source-media: #2563eb;
+      --source-other: #7c3aed;
+      --shadow-xs: 0 1px 2px rgba(0,0,0,0.05);
+      --shadow-sm: 0 2px 8px rgba(0,0,0,0.06);
+      --shadow: 0 4px 20px rgba(0,0,0,0.07);
+      --shadow-lg: 0 12px 44px rgba(0,0,0,0.1);
+      --shadow-glow: 0 0 32px rgba(217,119,6,0.08);
+      --shadow-card-hover: 0 6px 24px rgba(0,0,0,0.08);
+      --ambient-1: rgba(217,119,6,0.03);
+      --ambient-2: rgba(5,150,105,0.02);
+      --header-bg: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(248,249,251,0.6) 100%);
+      --toolbar-bg: linear-gradient(180deg, var(--bg2) 0%, var(--bg) 100%);
+      --drawer-header-bg: linear-gradient(180deg, var(--bg3) 0%, var(--bg2) 100%);
+      --backdrop: rgba(17,24,39,0.35);
+      --answer-bg: var(--surface);
+      --answer-border: var(--rule);
+      --answer-section-bg: rgba(217,119,6,0.03);
+    }
+
+    /* ===== Eye-care theme (护眼) ===== */
+    [data-theme="eye"] {
+      --bg: #f0f4e8;
+      --bg2: #f6f8ee;
+      --bg3: #e8eddc;
+      --bg4: #dde4cd;
+      --surface: #f7f9f0;
+      --surface2: #eef2e3;
+      --surface3: #e3ead3;
+      --ink: #3a4a2f;
+      --ink2: #4f5f42;
+      --muted: #6e7d5c;
+      --muted2: #93a17e;
+      --rule: #d4dcc2;
+      --rule2: #e5ebd5;
+      --rule3: #c5d0ae;
+      --accent: #6b8e23;
+      --accent-d: #556b2f;
+      --accent-soft: rgba(107,142,35,0.12);
+      --accent-glow: rgba(107,142,35,0.2);
+      --accent2: #2e8b57;
+      --accent2-d: #246b45;
+      --accent2-soft: rgba(46,139,87,0.1);
+      --accent3: #c0504d;
+      --tag-bg: rgba(107,142,35,0.1);
+      --tag-text: #556b2f;
+      --source-gov: #2e8b57;
+      --source-media: #3b6fa5;
+      --source-other: #6b5a8c;
+      --shadow-xs: 0 1px 2px rgba(58,74,47,0.06);
+      --shadow-sm: 0 2px 8px rgba(58,74,47,0.06);
+      --shadow: 0 4px 20px rgba(58,74,47,0.08);
+      --shadow-lg: 0 12px 44px rgba(58,74,47,0.12);
+      --shadow-glow: 0 0 32px rgba(107,142,35,0.08);
+      --shadow-card-hover: 0 6px 24px rgba(58,74,47,0.1);
+      --ambient-1: rgba(107,142,35,0.025);
+      --ambient-2: rgba(46,139,87,0.02);
+      --header-bg: linear-gradient(180deg, rgba(246,248,238,0.98) 0%, rgba(240,244,232,0.6) 100%);
+      --toolbar-bg: linear-gradient(180deg, var(--bg2) 0%, var(--bg) 100%);
+      --drawer-header-bg: linear-gradient(180deg, var(--bg3) 0%, var(--bg2) 100%);
+      --backdrop: rgba(58,74,47,0.3);
+      --answer-bg: var(--surface);
+      --answer-border: var(--rule);
+      --answer-section-bg: rgba(107,142,35,0.04);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 15px; scroll-behavior: smooth; }
+    body {
+      font-family: 'Noto Sans SC', -apple-system, sans-serif;
+      color: var(--ink);
+      background: var(--bg);
+      line-height: 1.7;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: optimizeLegibility;
+      transition: background 0.4s ease, color 0.4s ease;
+    }
+    .app-header, .toolbar, .drawer, .drawer-header, .q-card, .case-card,
+    .region-btn, .filter-btn, .search-box input, .view-toggle {
+      transition: background 0.4s ease, border-color 0.4s ease, color 0.4s ease;
+    }
+
+    /* Ambient background — subtle layered glow */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -30%; left: -15%;
+      width: 70vw; height: 70vw;
+      background: radial-gradient(circle, var(--ambient-1) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: -25%; right: -12%;
+      width: 55vw; height: 55vw;
+      background: radial-gradient(circle, var(--ambient-2) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* === App Shell === */
+    .app { position: relative; z-index: 1; height: 100vh; display: flex; flex-direction: column; }
+
+    /* === Header === */
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.9rem 1.5rem;
+      border-bottom: 1px solid var(--rule);
+      flex-shrink: 0;
+      background: var(--header-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    .app-header .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+    .app-header .brand-icon {
+      width: 38px; height: 38px;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-d) 100%);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: 1.15rem; color: #0a0d13;
+      box-shadow: 0 4px 16px rgba(245,166,35,0.3), inset 0 1px 0 rgba(255,255,255,0.15);
+      flex-shrink: 0;
+    }
+    .app-header h1 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--ink);
+      letter-spacing: -0.02em;
+      line-height: 1.3;
+    }
+    .app-header h1 span { color: var(--accent); }
+    .app-header .header-right {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    .app-header .stats {
+      display: flex; gap: 0; font-size: 0.7rem; color: var(--muted);
+      align-items: center;
+    }
+    .app-header .stats span {
+      padding: 0 1rem;
+      border-right: 1px solid var(--rule);
+      white-space: nowrap;
+    }
+    .app-header .stats span:last-child { border-right: none; padding-right: 0; }
+    .app-header .stats span:first-child { padding-left: 0; }
+    .app-header .stats strong {
+      color: var(--ink);
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.88rem;
+      margin-left: 0.3rem;
+    }
+
+    /* === Toolbar === */
+    .toolbar {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      padding: 0;
+      border-bottom: 1px solid var(--rule);
+      flex-shrink: 0;
+      background: var(--toolbar-bg);
+    }
+
+    /* Toolbar section wrapper */
+    .toolbar-section {
+      padding: 0.6rem 1.5rem;
+      border-bottom: 1px solid var(--rule2);
+    }
+    .toolbar-section:last-child { border-bottom: none; }
+
+    /* Region Selector row */
+    .region-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+    .region-label {
+      font-size: 0.6rem;
+      font-weight: 700;
+      color: var(--muted2);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      flex-shrink: 0;
+      width: 2.2rem;
+    }
+    .region-buttons {
+      display: flex;
+      gap: 0.25rem;
+      flex-wrap: wrap;
+    }
+    .region-btn {
+      padding: 0.38rem 0.9rem;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: var(--radius-full);
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--t);
+      font-family: inherit;
+      white-space: nowrap;
+      position: relative;
+    }
+    .region-btn:hover {
+      color: var(--ink2);
+      background: var(--surface);
+    }
+    .region-btn.active {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-d) 100%);
+      border-color: var(--accent);
+      color: #0a0d13;
+      font-weight: 700;
+      box-shadow: 0 2px 12px rgba(245,166,35,0.25), inset 0 1px 0 rgba(255,255,255,0.15);
+    }
+
+    /* Filter row: search + year + type combined compact layout */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+    }
+
+    /* Search box - compact with icon */
+    .search-box {
+      flex: 0 0 200px;
+      position: relative;
+    }
+    .search-box input {
+      width: 100%;
+      padding: 0.42rem 0.8rem 0.42rem 2.1rem;
+      background: var(--bg3);
+      border: 1px solid var(--rule);
+      border-radius: var(--radius-full);
+      color: var(--ink);
+      font-size: 0.78rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color var(--t), box-shadow var(--t), background var(--t);
+    }
+    .search-box input::placeholder { color: var(--muted2); }
+    .search-box input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+      background: var(--surface);
+    }
+    .search-box .search-icon {
+      position: absolute;
+      left: 0.7rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--muted2);
+      font-size: 0.75rem;
+      pointer-events: none;
+    }
+
+    /* Filter group container */
+    .filter-group {
+      display: flex;
+      gap: 0.15rem;
+      align-items: center;
+      flex-wrap: wrap;
+      background: var(--bg3);
+      border: 1px solid var(--rule);
+      border-radius: var(--radius-full);
+      padding: 0.15rem;
+    }
+    .filter-btn {
+      padding: 0.3rem 0.7rem;
+      background: transparent;
+      border: none;
+      border-radius: var(--radius-full);
+      color: var(--muted);
+      font-size: 0.72rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--t);
+      font-family: inherit;
+      white-space: nowrap;
+    }
+    .filter-btn:hover { color: var(--ink2); }
+    .filter-btn.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 600;
+      box-shadow: inset 0 0 0 1px rgba(245,166,35,0.15);
+    }
+
+    /* View toggle - segmented control style */
+    .view-toggle {
+      display: flex;
+      gap: 0.1rem;
+      background: var(--bg3);
+      border-radius: var(--radius-full);
+      padding: 0.15rem;
+      border: 1px solid var(--rule);
+      margin-left: auto;
+    }
+    .view-btn {
+      padding: 0.32rem 0.85rem;
+      background: none;
+      border: none;
+      border-radius: var(--radius-full);
+      color: var(--muted);
+      font-size: 0.73rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--t);
+      font-family: inherit;
+    }
+    .view-btn:hover { color: var(--ink2); }
+    .view-btn.active {
+      background: var(--surface2);
+      color: var(--accent);
+      box-shadow: var(--shadow-xs);
+    }
+
+    /* === Main Content === */
+    .main-content {
+      flex: 1;
+      overflow-y: auto;
+    }
+    .main-content::-webkit-scrollbar { width: 6px; }
+    .main-content::-webkit-scrollbar-track { background: transparent; }
+    .main-content::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 4px; }
+    .main-content::-webkit-scrollbar-thumb:hover { background: var(--muted2); }
+    .main-inner {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 0.8rem 1.5rem 3rem;
+    }
+    .panel-label {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      padding: 0.4rem 0 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .panel-label .pl-region { color: var(--accent); font-weight: 700; }
+    .panel-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, var(--rule), transparent);
+    }
+    .panel-label .pl-count {
+      color: var(--muted);
+      font-weight: 500;
+      text-transform: none;
+      letter-spacing: 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+    }
+
+    /* === Question / Case Card === */
+    .q-card {
+      background: var(--bg2);
+      border: 1px solid var(--rule);
+      border-left: 3px solid transparent;
+      border-radius: var(--radius);
+      padding: 1rem 1.2rem;
+      margin-bottom: 0.55rem;
+      cursor: pointer;
+      transition: all var(--t);
+      position: relative;
+      overflow: hidden;
+    }
+    .q-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent-glow), transparent);
+      opacity: 0;
+      transition: opacity var(--t);
+    }
+    .q-card:hover {
+      border-color: var(--rule3);
+      border-left-color: var(--accent);
+      background: var(--bg3);
+      transform: translateX(3px);
+      box-shadow: var(--shadow-sm);
+    }
+    .q-card:hover::before { opacity: 1; }
+    .q-card.selected {
+      border-color: rgba(245,166,35,0.3);
+      border-left-color: var(--accent);
+      background: var(--accent-soft);
+      box-shadow: 0 0 0 1px rgba(245,166,35,0.08), var(--shadow-sm);
+    }
+    .q-card .q-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.55rem;
+    }
+    .q-card .q-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.66rem;
+      color: var(--accent);
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 0.12rem;
+      padding: 0.12rem 0.4rem;
+      background: var(--accent-soft);
+      border-radius: 5px;
+      letter-spacing: 0.02em;
+    }
+    .q-card .q-text {
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--ink);
+      line-height: 1.6;
+      flex: 1;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .q-card .q-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      margin-top: 0.65rem;
+    }
+    .q-card .q-meta {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      margin-top: 0.5rem;
+      font-size: 0.7rem;
+      color: var(--muted);
+      flex-wrap: wrap;
+    }
+    .q-card .q-meta .case-count {
+      color: var(--accent2);
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    .q-card .q-meta .case-count::before {
+      content: '';
+      width: 5px; height: 5px;
+      border-radius: 50%;
+      background: var(--accent2);
+      box-shadow: 0 0 6px var(--accent2);
+    }
+
+    /* === Tags === */
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.16rem 0.52rem;
+      border-radius: 5px;
+      font-size: 0.66rem;
+      font-weight: 500;
+      white-space: nowrap;
+      line-height: 1.5;
+    }
+    .tag-year {
+      background: rgba(46,212,168,0.08);
+      color: var(--accent2);
+      border: 1px solid rgba(46,212,168,0.18);
+    }
+    .tag-exam {
+      background: rgba(244,114,182,0.06);
+      color: #f472b6;
+      border: 1px solid rgba(244,114,182,0.15);
+    }
+    .tag-type {
+      background: rgba(94,168,250,0.06);
+      color: #5ea8fa;
+      border: 1px solid rgba(94,168,250,0.15);
+    }
+    .tag-source {
+      background: rgba(167,139,250,0.06);
+      color: #a78bfa;
+      border: 1px solid rgba(167,139,250,0.15);
+    }
+    .tag-match {
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1px solid rgba(245,166,35,0.15);
+    }
+
+    /* === Empty State === */
+    .empty-state {
+      text-align: center;
+      padding: 4.5rem 1.5rem;
+      color: var(--muted);
+    }
+    .empty-state .es-icon {
+      font-size: 2.2rem;
+      margin-bottom: 1rem;
+      opacity: 0.35;
+    }
+    .empty-state p { font-size: 0.88rem; color: var(--ink2); }
+    .empty-state .es-hint { font-size: 0.76rem; margin-top: 0.4rem; opacity: 0.7; }
+
+    /* === List End Indicator === */
+    .list-end {
+      text-align: center;
+      font-size: 0.68rem;
+      color: var(--muted2);
+      padding: 1.5rem 0 0.5rem;
+      letter-spacing: 0.1em;
+      position: relative;
+    }
+    .list-end::before,
+    .list-end::after {
+      content: '';
+      position: absolute;
+      top: 1.5rem;
+      width: 60px;
+      height: 1px;
+      background: var(--rule);
+    }
+    .list-end::before { left: 50%; transform: translateX(-80px); }
+    .list-end::after { right: 50%; transform: translateX(80px); }
+
+    /* === Theme Toggle === */
+    .theme-toggle {
+      display: flex;
+      gap: 0.2rem;
+      background: var(--bg3);
+      border-radius: var(--radius-full);
+      padding: 0.2rem;
+      border: 1px solid var(--rule);
+    }
+    .theme-btn {
+      width: 32px; height: 32px;
+      background: none;
+      border: none;
+      border-radius: var(--radius-full);
+      color: var(--muted);
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all var(--t);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: inherit;
+    }
+    .theme-btn:hover { color: var(--ink2); }
+    .theme-btn.active {
+      background: var(--surface2);
+      color: var(--accent);
+      box-shadow: var(--shadow-xs);
+    }
+
+    /* === Font Size Control === */
+    .font-control {
+      display: flex;
+      align-items: center;
+      gap: 0.1rem;
+      background: var(--bg3);
+      border-radius: var(--radius-full);
+      padding: 0.15rem;
+      border: 1px solid var(--rule);
+    }
+    .font-btn {
+      width: 30px; height: 30px;
+      background: none;
+      border: none;
+      border-radius: var(--radius-full);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all var(--t);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: inherit;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .font-btn:hover { color: var(--ink2); background: var(--surface2); }
+    .font-btn:active { transform: scale(0.92); }
+    .font-btn.minus { font-size: 0.85rem; }
+    .font-btn.plus { font-size: 1rem; }
+    .font-btn.reset { font-size: 0.65rem; color: var(--muted2); width: auto; padding: 0 0.5rem; font-weight: 600; }
+    .font-btn.reset:hover { color: var(--ink2); }
+    .font-divider {
+      width: 1px; height: 16px;
+      background: var(--rule3);
+      flex-shrink: 0;
+    }
+
+    /* === Answer Template (3 independent collapsible panels) === */
+    .ans-panel {
+      background: var(--answer-bg);
+      border: 1px solid var(--answer-border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 0.8rem;
+    }
+    .ans-panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.65rem 1rem;
+      background: var(--answer-section-bg);
+      border-bottom: 1px solid var(--rule2);
+      cursor: pointer;
+      transition: background var(--t);
+    }
+    .ans-panel-header:hover { background: var(--accent-soft); }
+    .ans-panel.collapsed .ans-panel-header { border-bottom: none; }
+    .ans-panel.collapsed .ans-panel-body { display: none; }
+    .ans-panel-header .aph-title {
+      font-size: 0.74rem;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.06em;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .ans-panel-header .aph-num {
+      width: 18px; height: 18px;
+      background: var(--accent-soft);
+      border: 1px solid rgba(245,166,35,0.2);
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.62rem;
+      font-weight: 800;
+      color: var(--accent);
+      font-family: 'JetBrains Mono', monospace;
+      flex-shrink: 0;
+    }
+    .ans-panel-header .aph-toggle {
+      font-size: 0.7rem;
+      color: var(--muted);
+      transition: transform var(--t);
+    }
+    .ans-panel.collapsed .aph-toggle { transform: rotate(-90deg); }
+    .ans-panel-body {
+      padding: 0;
+    }
+
+    /* Panel A: Formal Answer */
+    .ans-formal-text {
+      padding: 0.9rem 1rem;
+      font-size: 0.82rem;
+      color: var(--ink);
+      line-height: 1.9;
+      text-align: justify;
+    }
+
+    /* Panel B: Framework steps */
+    .answer-step {
+      padding: 0.7rem 1rem;
+      border-bottom: 1px solid var(--rule2);
+      position: relative;
+    }
+    .answer-step:last-child { border-bottom: none; }
+    .answer-step .as-head {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.35rem;
+    }
+    .answer-step .as-num {
+      width: 22px; height: 22px;
+      background: var(--accent-soft);
+      border: 1px solid rgba(245,166,35,0.15);
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--accent);
+      font-family: 'JetBrains Mono', monospace;
+      flex-shrink: 0;
+    }
+    .answer-step .as-title {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--ink);
+    }
+    .answer-step .as-hint {
+      display: inline-block;
+      padding: 0.15rem 0.5rem;
+      background: var(--accent2-soft);
+      border: 1px dashed rgba(46,212,168,0.2);
+      border-radius: 5px;
+      font-size: 0.68rem;
+      color: var(--accent2);
+      margin-left: 1.65rem;
+    }
+    .answer-step .as-details {
+      list-style: none;
+      margin: 0.4rem 0 0 1.65rem;
+      padding: 0;
+    }
+    .answer-step .as-details li {
+      position: relative;
+      padding: 0.15rem 0 0.15rem 1rem;
+      font-size: 0.74rem;
+      color: var(--ink2);
+      line-height: 1.6;
+    }
+    .answer-step .as-details li::before {
+      content: '';
+      position: absolute;
+      left: 0.2rem;
+      top: 0.6rem;
+      width: 4px; height: 4px;
+      border-radius: 50%;
+      background: var(--accent);
+      opacity: 0.5;
+    }
+    .answer-step.has-case .as-num {
+      background: var(--accent2-soft);
+      border-color: rgba(46,212,168,0.2);
+      color: var(--accent2);
+    }
+    .answer-step .as-case-ref {
+      margin-top: 0.45rem;
+      margin-left: 1.65rem;
+      padding: 0.5rem 0.7rem;
+      background: var(--accent2-soft);
+      border-left: 2px solid var(--accent2);
+      border-radius: 0 5px 5px 0;
+      font-size: 0.75rem;
+      color: var(--ink2);
+      display: none;
+    }
+    .answer-step .as-case-ref.show { display: block; }
+    .answer-step .as-case-ref .acr-label {
+      font-size: 0.66rem;
+      font-weight: 700;
+      color: var(--accent2);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.2rem;
+      display: block;
+    }
+
+    /* Panel C: Case Sources + Linked Cases */
+    .ans-sources { padding: 0; }
+    .ans-source-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.6rem;
+      padding: 0.5rem 1rem;
+      border-bottom: 1px solid var(--rule2);
+    }
+    .ans-source-item:last-child { border-bottom: none; }
+    .ans-source-item .asi-title {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--ink);
+      flex-shrink: 0;
+    }
+    .ans-source-item .asi-link {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.7rem;
+      color: var(--accent2);
+      text-decoration: none;
+      transition: color var(--t);
+    }
+    .ans-source-item .asi-link:hover { color: var(--accent); }
+    /* Linked cases inside Panel C */
+    .ans-cases-divider {
+      padding: 0.5rem 1rem 0.3rem;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: var(--rule2);
+    }
+    .ans-cases-list {
+      padding: 0.6rem 0.8rem;
+    }
+    .ans-cases-list .case-card {
+      margin-bottom: 0.6rem;
+    }
+    .ans-cases-list .case-card:last-child { margin-bottom: 0; }
+
+    /* === Date Tag with hover tooltip (year only, hover for full date) === */
+    .tag-date {
+      background: rgba(168,162,158,0.08);
+      color: var(--muted);
+      border: 1px solid var(--rule3);
+      position: relative;
+      cursor: help;
+    }
+    .tag-year { position: relative; cursor: help; }
+    /* Tooltip styles - apply to any tag containing .td-full */
+    .tag .td-full,
+    .tag-year .td-full {
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 50%;
+      transform: translateX(-50%) translateY(4px);
+      background: var(--surface3);
+      color: var(--ink);
+      border: 1px solid var(--rule3);
+      border-radius: var(--radius-sm);
+      padding: 0.25rem 0.6rem;
+      font-size: 0.68rem;
+      font-weight: 500;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--t), transform var(--t);
+      z-index: 100;
+      box-shadow: var(--shadow-sm);
+    }
+    .tag .td-full::after,
+    .tag-year .td-full::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 4px solid transparent;
+      border-top-color: var(--surface3);
+    }
+    .tag:hover .td-full,
+    .tag-year:hover .td-full,
+    .tag-date:hover .td-full {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* === Detail Drawer === */
+    .drawer-backdrop {
+      position: fixed;
+      inset: 0;
+      background: var(--backdrop);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--t-slow);
+      z-index: 40;
+    }
+    .drawer-backdrop.open { opacity: 1; pointer-events: auto; }
+
+    .drawer {
+      position: fixed;
+      top: 0; right: 0;
+      width: 520px;
+      max-width: 100vw;
+      height: 100vh;
+      background: var(--bg2);
+      border-left: 1px solid var(--rule);
+      box-shadow: -16px 0 60px rgba(0,0,0,0.55);
+      transform: translateX(105%);
+      transition: transform var(--t-slow);
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+    }
+    .drawer.open { transform: translateX(0); }
+    .drawer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.3rem;
+      border-bottom: 1px solid var(--rule);
+      flex-shrink: 0;
+      background: var(--drawer-header-bg);
+    }
+    .drawer-title {
+      font-size: 0.86rem;
+      font-weight: 600;
+      color: var(--ink);
+    }
+    .drawer-title .dt-region { color: var(--accent); margin-right: 0.4rem; }
+    .drawer-close {
+      width: 34px; height: 34px;
+      background: var(--surface);
+      border: 1px solid var(--rule);
+      border-radius: var(--radius-sm);
+      color: var(--muted);
+      font-size: 1.3rem;
+      cursor: pointer;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--t);
+      font-family: inherit;
+    }
+    .drawer-close:hover { color: var(--ink); border-color: var(--accent); background: var(--surface2); }
+    .drawer-scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.3rem;
+    }
+    .drawer-scroll::-webkit-scrollbar { width: 5px; }
+    .drawer-scroll::-webkit-scrollbar-track { background: transparent; }
+    .drawer-scroll::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 4px; }
+    .drawer-scroll::-webkit-scrollbar-thumb:hover { background: var(--muted2); }
+
+    /* === Detail Content === */
+    .detail-question {
+      font-size: 1.08rem;
+      font-weight: 600;
+      color: var(--ink);
+      line-height: 1.65;
+      margin-bottom: 0.7rem;
+      letter-spacing: -0.01em;
+    }
+    .detail-exam {
+      font-size: 0.76rem;
+      color: var(--muted);
+      margin-bottom: 0.9rem;
+    }
+    .detail-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.3rem;
+      border-bottom: 1px solid var(--rule2);
+    }
+
+    .cases-section-title {
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .cases-section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, var(--rule), transparent);
+    }
+
+    /* === Case Card === */
+    .case-card {
+      background: var(--bg3);
+      border: 1px solid var(--rule);
+      border-radius: var(--radius);
+      padding: 1.1rem 1.2rem;
+      margin-bottom: 0.75rem;
+      transition: border-color var(--t);
+      position: relative;
+    }
+    .case-card::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: linear-gradient(180deg, var(--accent2) 0%, transparent 100%);
+      border-radius: 3px 0 0 3px;
+      opacity: 0.5;
+    }
+    .case-card:hover {
+      border-color: rgba(46,212,168,0.2);
+    }
+    .case-card:hover::before { opacity: 1; }
+    .case-card .case-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.6rem;
+      margin-bottom: 0.75rem;
+    }
+    .case-card .case-card-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--ink);
+      flex: 1;
+    }
+    .case-year-inline {
+      flex-shrink: 0;
+    }
+    .case-card .case-body {
+      font-size: 0.88rem;
+      font-weight: 400;
+      color: var(--ink2);
+      line-height: 1.8;
+      margin-bottom: 0.85rem;
+    }
+    .case-card .case-data-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 0.7rem;
+    }
+    .case-data-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.28rem;
+      padding: 0.2rem 0.58rem;
+      background: var(--accent-soft);
+      border: 1px solid rgba(245,166,35,0.08);
+      border-radius: 6px;
+      font-size: 0.72rem;
+    }
+    .case-data-chip .cdv {
+      font-weight: 700;
+      color: var(--accent);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .case-data-chip .cdl { color: var(--muted); }
+    .case-card .case-quote {
+      padding: 0.7rem 0.9rem;
+      background: var(--accent2-soft);
+      border-left: 2px solid var(--accent2);
+      border-radius: 0 6px 6px 0;
+      font-size: 0.82rem;
+      color: var(--ink2);
+      line-height: 1.7;
+      margin-bottom: 0.7rem;
+      font-style: italic;
+    }
+    .case-card .case-quote .cq-author {
+      display: block;
+      color: var(--muted);
+      font-size: 0.7rem;
+      margin-top: 0.4rem;
+      font-style: normal;
+    }
+    .case-card .case-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.7rem;
+      color: var(--muted);
+      padding-top: 0.65rem;
+      border-top: 1px solid var(--rule2);
+      flex-wrap: wrap;
+    }
+    .case-card .case-title {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--ink);
+      flex-shrink: 0;
+    }
+    .case-card .case-source-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.32rem;
+      flex-wrap: wrap;
+    }
+    .case-card .case-source-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      box-shadow: 0 0 6px currentColor;
+    }
+    .case-card .case-source-link {
+      color: var(--accent2);
+      text-decoration: none;
+      transition: color var(--t);
+      font-weight: 500;
+    }
+    .case-card .case-source-link:hover {
+      color: var(--accent);
+      text-decoration: underline;
+    }
+    .dot-gov { background: var(--source-gov); color: var(--source-gov); }
+    .dot-media { background: var(--source-media); color: var(--source-media); }
+    .dot-other { background: var(--source-other); color: var(--source-other); }
+
+    /* Linked Q badge in case view */
+    .linked-q-ref {
+      display: block;
+      padding: 0.65rem 0.9rem;
+      background: var(--bg3);
+      border: 1px solid var(--rule);
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      color: var(--ink2);
+      cursor: pointer;
+      transition: all var(--t);
+      margin-bottom: 0.45rem;
+      line-height: 1.55;
+    }
+    .linked-q-ref:hover {
+      background: var(--accent-soft);
+      border-color: rgba(245,166,35,0.25);
+      color: var(--ink);
+      transform: translateX(3px);
+    }
+    .linked-q-ref .lqr-num {
+      color: var(--accent);
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      margin-right: 0.4rem;
+      padding: 0.05rem 0.32rem;
+      background: var(--accent-soft);
+      border-radius: 4px;
+      font-size: 0.72rem;
+    }
+
+    /* === Animations === */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(14px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes drawerFadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .drawer-scroll > * {
+      animation: drawerFadeIn 0.32s ease both;
+    }
+    .drawer-scroll > *:nth-child(2) { animation-delay: 0.05s; }
+    .drawer-scroll > *:nth-child(3) { animation-delay: 0.1s; }
+    .drawer-scroll > *:nth-child(4) { animation-delay: 0.15s; }
+    .drawer-scroll > *:nth-child(5) { animation-delay: 0.2s; }
+    .drawer-scroll > *:nth-child(6) { animation-delay: 0.25s; }
+    .drawer-scroll > *:nth-child(7) { animation-delay: 0.3s; }
+    .drawer-scroll > *:nth-child(8) { animation-delay: 0.35s; }
+    .drawer-scroll > *:nth-child(9) { animation-delay: 0.4s; }
+    .drawer-scroll > *:nth-child(10) { animation-delay: 0.45s; }
+
+    .q-card {
+      animation: fadeIn 0.22s ease both;
+    }
+
+    /* === Responsive === */
+    @media (max-width: 768px) {
+      html { font-size: 14px; }
+      .app-header { padding: 0.75rem 1rem; }
+      .app-header h1 { font-size: 1rem; }
+      .app-header .header-right { gap: 0.6rem; }
+      .app-header .stats { gap: 0; font-size: 0.66rem; }
+      .app-header .stats span { padding: 0 0.6rem; }
+      .app-header .stats strong { font-size: 0.8rem; }
+      .app-header .brand-icon { width: 32px; height: 32px; font-size: 1rem; }
+      .theme-btn { width: 28px; height: 28px; font-size: 0.8rem; }
+      .font-btn { width: 26px; height: 26px; }
+      .font-btn.minus { font-size: 0.75rem; }
+      .font-btn.plus { font-size: 0.9rem; }
+      .font-btn.reset { font-size: 0.58rem; padding: 0 0.35rem; }
+      .toolbar { padding: 0; gap: 0; }
+      .toolbar-section { padding: 0.5rem 1rem; }
+      .main-inner { padding: 0.6rem 1rem 2rem; }
+      .drawer { width: 100%; }
+      .drawer-scroll { padding: 1rem; }
+      .q-card { padding: 0.85rem 1rem; }
+      .case-card { padding: 0.95rem 1rem; }
+      .detail-question { font-size: 0.98rem; }
+      .filter-bar { gap: 0.4rem; }
+      .search-box { flex: 1 1 100%; }
+      .filter-group { flex: 1 1 auto; }
+      .region-btn { padding: 0.38rem 0.8rem; font-size: 0.74rem; }
+      .answer-step { padding: 0.7rem 0.85rem; }
+      .answer-step .as-content { padding-left: 0; font-size: 0.78rem; }
+      .answer-step .as-hint { margin-left: 0; }
+      .answer-step .as-details { margin-left: 0; }
+      .answer-step .as-case-ref { margin-left: 0; }
+    }
+
+    @media (max-width: 480px) {
+      .app-header .stats span:nth-child(3) { display: none; }
+      .panel-label { font-size: 0.6rem; }
+    }
+
+    /* Reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-icon">新</div>
+        <h1><span>新疆</span>面试真题与案例库</h1>
+      </div>
+      <div class="header-right">
+        <div class="stats">
+          <span>真题 <strong id="stat-q">0</strong></span>
+          <span>案例 <strong id="stat-c">0</strong></span>
+          <span>覆盖 <strong id="stat-y">0</strong> 年</span>
+        </div>
+        <div class="font-control" id="fontControl">
+          <button class="font-btn minus" id="fontMinus" title="缩小字体">A-</button>
+          <span class="font-divider"></span>
+          <button class="font-btn reset" id="fontReset" title="恢复默认">标准</button>
+          <span class="font-divider"></span>
+          <button class="font-btn plus" id="fontPlus" title="放大字体">A+</button>
+        </div>
+        <div class="theme-toggle" id="themeToggle">
+          <button class="theme-btn" data-theme="light" title="白天模式">&#x2600;</button>
+          <button class="theme-btn" data-theme="eye" title="护眼模式">&#x1F33F;</button>
+          <button class="theme-btn active" data-theme="dark" title="暗黑模式">&#x1F319;</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="toolbar">
+      <!-- Region Selector -->
+      <div class="toolbar-section">
+        <div class="region-bar">
+          <span class="region-label">地区</span>
+          <div class="region-buttons" id="regionButtons"></div>
+        </div>
+      </div>
+
+      <!-- Search + Filters + View toggle -->
+      <div class="toolbar-section">
+        <div class="filter-bar">
+          <div class="search-box">
+            <span class="search-icon">&#x1F50D;</span>
+            <input type="text" id="searchInput" placeholder="搜索关键词、题型、来源...">
+          </div>
+          <div class="filter-group" id="yearFilters"></div>
+          <div class="filter-group" id="typeFilters"></div>
+          <div class="view-toggle">
+            <button class="view-btn active" data-view="questions">真题</button>
+            <button class="view-btn" data-view="cases">案例</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <main class="main-content">
+      <div class="main-inner">
+        <div class="panel-label" id="panelLabel">真题列表</div>
+        <div id="mainScroll"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Detail Drawer -->
+  <div class="drawer-backdrop" id="drawerBackdrop"></div>
+  <aside class="drawer" id="detailDrawer" aria-hidden="true">
+    <div class="drawer-header">
+      <span class="drawer-title" id="drawerTitle">详情</span>
+      <button class="drawer-close" id="drawerClose" aria-label="关闭">&times;</button>
+    </div>
+    <div class="drawer-scroll" id="drawerScroll"></div>
+  </aside>
+
+  <script>
+  (function() {
+    // ===================== THEME SYSTEM =====================
+    var THEME_KEY = 'interview-theme';
+    function applyTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      document.querySelectorAll('.theme-btn').forEach(function(b) {
+        b.classList.toggle('active', b.getAttribute('data-theme') === theme);
+      });
+    }
+    function initTheme() {
+      var saved = localStorage.getItem(THEME_KEY) || 'dark';
+      applyTheme(saved);
+    }
+    document.getElementById('themeToggle').addEventListener('click', function(e) {
+      var b = e.target.closest('.theme-btn');
+      if (!b) return;
+      var theme = b.getAttribute('data-theme');
+      applyTheme(theme);
+      localStorage.setItem(THEME_KEY, theme);
+    });
+    initTheme();
+
+    // ===================== FONT SIZE SYSTEM =====================
+    var FONT_KEY = 'interview-fontsize';
+    var FONT_MIN = 13;
+    var FONT_MAX = 20;
+    var FONT_DEFAULT = 15;
+    function applyFontSize(size) {
+      size = Math.max(FONT_MIN, Math.min(FONT_MAX, size));
+      document.documentElement.style.fontSize = size + 'px';
+      var resetBtn = document.getElementById('fontReset');
+      if (resetBtn) resetBtn.textContent = (size === FONT_DEFAULT) ? '标准' : size + 'px';
+    }
+    function initFontSize() {
+      var saved = parseInt(localStorage.getItem(FONT_KEY)) || FONT_DEFAULT;
+      applyFontSize(saved);
+    }
+    document.getElementById('fontPlus').addEventListener('click', function() {
+      var cur = parseInt(localStorage.getItem(FONT_KEY)) || FONT_DEFAULT;
+      var next = Math.min(FONT_MAX, cur + 1);
+      applyFontSize(next);
+      localStorage.setItem(FONT_KEY, next);
+    });
+    document.getElementById('fontMinus').addEventListener('click', function() {
+      var cur = parseInt(localStorage.getItem(FONT_KEY)) || FONT_DEFAULT;
+      var next = Math.max(FONT_MIN, cur - 1);
+      applyFontSize(next);
+      localStorage.setItem(FONT_KEY, next);
+    });
+    document.getElementById('fontReset').addEventListener('click', function() {
+      applyFontSize(FONT_DEFAULT);
+      localStorage.setItem(FONT_KEY, FONT_DEFAULT);
+    });
+    initFontSize();
+
+    // ===================== ANSWER SYSTEM =====================
+    // Framework templates (structural skeleton with detailed hints and bullet points)
+    var answerFrameworks = {
+      '综合分析': [
+        { title: '破题表态', hint: '一句话概括本质 + 表明态度', 
+          details: [
+            '用"各位考官"开场，简明扼要概括题目核心议题',
+            '表明基本立场：积极支持/辩证看待/高度关注',
+            '引出下文分析方向，如"我认为应从以下几个维度来理解"'
+          ] },
+        { title: '分析阐述', hint: '从意义、现状、原因多角度展开',
+          details: [
+            '谈意义：这件事对国家治理、民生福祉、社会公平的积极意义',
+            '谈现状：当前工作中取得的成绩与存在的不足',
+            '谈原因：从制度层面、执行层面、思想层面深挖根源',
+            '运用辩证思维，既不一味否定也不盲目乐观'
+          ] },
+        { title: '案例论证', hint: '结合关联案例的具体做法与数据论证', caseSlot: true,
+          details: [
+            '引入本地案例："以新疆/石河子的实践为例..."',
+            '概述案例做法：谁做了什么，采取了哪些具体措施',
+            '引用关键数据：用数据说话增强说服力',
+            '点评案例价值：该做法的启示和可推广性'
+          ] },
+        { title: '对策建议', hint: '提出针对性、可操作的对策',
+          details: [
+            '制度层面：完善法规政策，建立长效机制',
+            '执行层面：强化监督检查，确保落地见效',
+            '宣传层面：加强宣传引导，营造良好氛围',
+            '技术层面：借助信息化手段，提升工作效率',
+            '每条对策力求具体可操作，避免空泛口号'
+          ] },
+        { title: '总结升华', hint: '回扣主题 + 结合岗位表态',
+          details: [
+            '回扣题目主题，强调核心观点',
+            '联系自身岗位：作为未来的公职人员，我将以...',
+            '展望未来，表达信心和决心',
+            '以"回答完毕"收尾'
+          ] }
+      ],
+      '计划组织': [
+        { title: '明确目标', hint: '领会上级意图 + 明确活动目标',
+          details: [
+            '认真学习上级文件精神，准确领会领导意图',
+            '明确活动的核心目标、预期效果和衡量标准',
+            '确定活动主题、参与对象和覆盖范围',
+            '初步制定时间节点和里程碑计划'
+          ] },
+        { title: '前期准备', hint: '人/财/物/时/地 五要素准备',
+          details: [
+            '组建工作小组，明确分工职责',
+            '制定详细实施方案，包括流程、分工、应急预案',
+            '落实经费预算，申请必要资源',
+            '确定时间地点，做好场地布置和设备调试',
+            '开展前期宣传动员，确保参与率',
+            '准备相关材料：通知、手册、调查问卷等'
+          ] },
+        { title: '组织实施', hint: '分阶段实施 + 可套用案例做法', caseSlot: true,
+          details: [
+            '启动阶段：召开动员部署会，统一思想认识',
+            '推进阶段：按方案有序推进，参考本地案例的成功做法',
+            '引用案例数据说明可量化的实施标准',
+            '加强过程督导，及时解决推进中的问题',
+            '做好沟通协调，确保各部门配合顺畅',
+            '注重安全保障，制定应急预案'
+          ] },
+        { title: '总结评估', hint: '反馈收集 + 长效机制',
+          details: [
+            '收集参与者的反馈意见和满意度评价',
+            '整理活动成果，量化工作成效',
+            '形成书面总结报告，上报领导审阅',
+            '召开复盘会议，总结经验教训',
+            '将有效做法制度化、常态化，形成长效机制'
+          ] },
+        { title: '反思提升', hint: '复盘反思 + 个人成长',
+          details: [
+            '反思活动中的不足和改进空间',
+            '提炼可复制的经验做法',
+            '思考如何优化流程、提升效率',
+            '以"回答完毕"收尾，表达持续学习提升的决心'
+          ] }
+      ],
+      '应急应变': [
+        { title: '稳定情绪', hint: '临危不乱 + 控制局面',
+          details: [
+            '第一时间赶赴现场，表明身份和态度',
+            '安抚当事人情绪，避免事态升级',
+            '启动应急预案，调动必要资源',
+            '确保现场安全，必要时疏散人群',
+            '保持冷静果断，展现责任担当'
+          ] },
+        { title: '了解情况', hint: '快速摸清现场情况',
+          details: [
+            '迅速了解事件经过：发生了什么、何时何地',
+            '摸清涉及人员：伤亡情况、影响范围',
+            '查明原因：初步判断事件性质',
+            '做好详细记录，必要时拍照取证',
+            '及时向上级汇报，请求支援'
+          ] },
+        { title: '分类处置', hint: '分轻重缓急 + 可套用案例做法', caseSlot: true,
+          details: [
+            '按照轻重缓急原则排序处理',
+            '紧急问题：立即解决，保障人员安全',
+            '重要问题：协调多部门联合处置',
+            '一般问题：有序安排，逐步解决',
+            '参考本地案例中的有效做法和经验',
+            '全程保持信息透明，及时通报进展'
+          ] },
+        { title: '跟踪落实', hint: '后续跟进 + 善后安抚',
+          details: [
+            '持续跟进处置结果，确保问题彻底解决',
+            '对受影响群众做好安抚和补偿工作',
+            '安排专人负责后续跟踪，防止反弹',
+            '做好舆情引导，回应社会关切',
+            '形成处置报告，完整记录归档'
+          ] },
+        { title: '总结反思', hint: '复盘总结 + 完善机制',
+          details: [
+            '事后认真复盘，总结经验教训',
+            '向领导汇报处理全过程和结果',
+            '建议完善相关预案和制度',
+            '加强日常演练，提升应急处置能力',
+            '以"回答完毕"收尾，体现举一反三的思考'
+          ] }
+      ],
+      '人际关系': [
+        { title: '表明态度', hint: '换位思考 + 积极心态',
+          details: [
+            '以积极心态面对人际关系问题',
+            '换位思考：理解对方的立场和感受',
+            '反思自身：是否存在沟通不到位的问题',
+            '明确原则：以工作为重，以诚相待',
+            '不被情绪左右，保持理性客观'
+          ] },
+        { title: '分析原因', hint: '多角度反思原因',
+          details: [
+            '从自身找原因：工作方式、沟通技巧、态度问题',
+            '从对方找原因：性格差异、工作压力、信息不对称',
+            '从环境找原因：制度不完善、分工不明确',
+            '从历史找原因：是否有过往遗留问题',
+            '找准症结，对症下药'
+          ] },
+        { title: '沟通化解', hint: '主动沟通 + 可套用案例做法', caseSlot: true,
+          details: [
+            '选择合适的时机和场合进行沟通',
+            '先倾听对方想法，表达理解和尊重',
+            '坦诚表达自己的观点，避免指责',
+            '寻找共同点，求同存异',
+            '参考本地案例中的协作经验或机制',
+            '以实际行动改善关系，增进互信'
+          ] },
+        { title: '改进提升', hint: '制度化改进 + 持续提升',
+          details: [
+            '建立定期沟通机制，避免信息不对称',
+            '提升业务能力，用实力赢得认可',
+            '积极参与团队活动，融入集体',
+            '主动帮助同事，营造互信氛围',
+            '完善工作流程，减少摩擦机会'
+          ] },
+        { title: '总结升华', hint: '升华到团队建设高度',
+          details: [
+            '强调团结协作的重要性',
+            '表达以包容、真诚态度对待同事的决心',
+            '联系单位整体发展，展现大局观',
+            '以"回答完毕"收尾，体现成熟稳重'
+          ] }
+      ]
+    };
+
+    // Generate a formal answer based on question + linked cases
+    function generateFormalAnswer(q, linkedCases) {
+      var cat = q.typeCategory || q.type;
+      var caseText = '';
+      var caseData = '';
+      if (linkedCases.length > 0) {
+        var c = linkedCases[0];
+        caseText = c.summary;
+        if (c.data && c.data.length > 0) {
+          caseData = c.data.map(function(d) { return d.value + d.label; }).join('，');
+        }
+      }
+
+      if (cat === '综合分析') {
+        return generateAnalysisAnswer(q, linkedCases, caseText, caseData);
+      } else if (cat === '计划组织') {
+        return generatePlanAnswer(q, linkedCases, caseText, caseData);
+      } else if (cat === '应急应变') {
+        return generateEmergencyAnswer(q, linkedCases, caseText, caseData);
+      } else if (cat === '人际关系') {
+        return generateRelationAnswer(q, linkedCases, caseText, caseData);
+      }
+      return '';
+    }
+
+    function generateAnalysisAnswer(q, linkedCases, caseText, caseData) {
+      var qTopic = q.text.length > 30 ? q.text.substring(0, 30) + '...' : q.text;
+      var answer = '各位考官，关于' + qTopic + '这一问题，我的看法如下。\n\n';
+      answer += '首先，这一问题的实质在于如何在新时代背景下推动工作高质量发展。从宏观层面看，这关系到国家治理体系和治理能力现代化的推进；从微观层面看，也直接影响基层群众的获得感和满意度。我们既要看到这项工作的重要性，也要清醒认识到当前存在的不足。\n\n';
+      if (caseText) {
+        answer += '以本地实践为例，' + caseText;
+        if (caseData) { answer += '（关键数据：' + caseData + '）'; }
+        answer += '。这一做法充分说明，只要坚持问题导向、以人为本，就能取得实实在在的成效。\n\n';
+      }
+      answer += '为此，我建议：一是完善制度机制，从源头上规范工作流程；二是强化执行落实，确保各项措施落地见效；三是建立长效评估体系，持续跟踪改进。\n\n';
+      answer += '总之，做好这项工作不是一日之功，需要多方合力、久久为功。作为未来的公职人员，我将以实际行动践行初心使命，在岗位上贡献自己的力量。回答完毕。';
+      return answer;
+    }
+
+    function generatePlanAnswer(q, linkedCases, caseText, caseData) {
+      var answer = '各位考官，领导将此项工作交给我负责，我深感责任重大。我将从以下几个方面着手开展。\n\n';
+      answer += '第一，明确目标，做好前期准备。我会认真学习领会上级精神，明确活动的核心目标和预期效果。同时成立工作小组，制定详细方案，统筹安排时间、地点、人员、物资和预算，做好宣传动员。\n\n';
+      answer += '第二，精心组织，分阶段实施。在启动阶段，召开动员部署会统一思想；在推进阶段，按照方案有序推进各项工作';
+      if (caseText) {
+        answer += '，参考本地' + (linkedCases[0].title || '') + '的成功经验——' + caseText.substring(0, 80);
+        if (caseData) { answer += '（' + caseData + '）'; }
+      }
+      answer += '；在总结阶段，及时梳理成果，形成闭环。\n\n';
+      answer += '第三，注重细节，确保安全有序。活动过程中加强协调联动，做好应急预案，确保各环节衔接顺畅。\n\n';
+      answer += '第四，总结评估，建立长效机制。活动结束后及时收集反馈，形成总结报告上报领导，并将有效做法制度化、常态化。\n\n';
+      answer += '通过此次活动，我也会认真复盘，不断提升自身的组织协调能力。回答完毕。';
+      return answer;
+    }
+
+    function generateEmergencyAnswer(q, linkedCases, caseText, caseData) {
+      var answer = '各位考官，面对题目中的突发情况，我将按照以下步骤妥善处置。\n\n';
+      answer += '第一，保持冷静，迅速反应。我会第一时间赶赴现场，同时启动应急预案，安抚当事人情绪，控制事态进一步发展，确保现场安全。\n\n';
+      answer += '第二，全面了解，摸清情况。到达现场后，我会迅速了解事件经过、涉及人员、原因及影响范围，做好详细记录，必要时请求相关部门协助。\n\n';
+      answer += '第三，分类处置，精准施策。根据问题性质分轻重缓急处理';
+      if (caseText) {
+        answer += '，参考本地' + (linkedCases[0].title || '') + '中' + caseText.substring(0, 60) + '的做法';
+      }
+      answer += '。对紧急问题立即解决，对复杂问题协调多部门联合处理。\n\n';
+      answer += '第四，跟踪落实，做好善后。处置完毕后持续跟进，确保问题彻底解决，对受影响群众做好安抚和补偿工作。\n\n';
+      answer += '第五，总结反思，完善机制。事后认真复盘，向领导汇报处理全过程，建议完善相关预案制度，防止类似事件再次发生。回答完毕。';
+      return answer;
+    }
+
+    function generateRelationAnswer(q, linkedCases, caseText, caseData) {
+      var answer = '各位考官，面对题目中的情况，我将从以下几个方面妥善处理。\n\n';
+      answer += '首先，我会换位思考，理解对方的心情和立场。同时反思自身在工作中是否存在沟通不到位、方式方法有待改进等问题，以积极心态面对，不让情绪影响工作。\n\n';
+      answer += '其次，主动沟通，化解误会。我会选择合适的时机和场合，与对方坦诚交流，认真倾听对方的想法和诉求';
+      if (caseText) {
+        answer += '。在具体工作中，参考本地' + (linkedCases[0].title || '') + '的协作经验，' + caseText.substring(0, 60);
+      }
+      answer += '，以实际行动改善关系、增进互信。\n\n';
+      answer += '再次，在今后工作中，我会注意：一是加强日常沟通，建立定期交流机制；二是提升业务能力，用实力赢得认可；三是积极参与团队活动，营造和谐氛围。\n\n';
+      answer += '总之，良好的人际关系是做好工作的基础。我将以包容、真诚的态度对待每一位同事，共同营造团结协作的工作氛围。回答完毕。';
+      return answer;
+    }
+
+    function getAnswerFramework(typeCategory) {
+      return answerFrameworks[typeCategory] || null;
+    }
+
+    function renderAnswerTemplate(q, linkedCases) {
+      var framework = getAnswerFramework(q.typeCategory);
+      if (!framework) return '';
+      var formalAnswer = generateFormalAnswer(q, linkedCases);
+
+      var h = '';
+
+      // === Panel A: 参考答案 (expandable, open by default) ===
+      h += '<div class="ans-panel" data-panel="answer">';
+      h += '  <div class="ans-panel-header">';
+      h += '    <span class="aph-title"><span class="aph-num">A</span>\u53C2\u8003\u7B54\u6848 \u00b7 ' + esc(q.typeCategory) + '</span>';
+      h += '    <span class="aph-toggle">\u25BC</span>';
+      h += '  </div>';
+      h += '  <div class="ans-panel-body">';
+      h += '    <div class="ans-formal-text">' + esc(formalAnswer).replace(/\n/g, '<br>') + '</div>';
+      h += '  </div>';
+      h += '</div>';
+
+      // === Panel B: 答题框架 (expandable, collapsed by default) ===
+      h += '<div class="ans-panel collapsed" data-panel="framework">';
+      h += '  <div class="ans-panel-header">';
+      h += '    <span class="aph-title"><span class="aph-num">B</span>\u7B54\u9898\u6846\u67B6</span>';
+      h += '    <span class="aph-toggle">\u25BC</span>';
+      h += '  </div>';
+      h += '  <div class="ans-panel-body">';
+      framework.forEach(function(step, i) {
+        var hasCase = step.caseSlot && linkedCases.length > 0;
+        h += '<div class="answer-step' + (hasCase ? ' has-case' : '') + '">';
+        h += '  <div class="as-head"><span class="as-num">' + (i + 1) + '</span><span class="as-title">' + esc(step.title) + '</span></div>';
+        if (step.hint) {
+          h += '  <div class="as-hint">\u2611 ' + esc(step.hint) + '</div>';
+        }
+        if (step.details && step.details.length > 0) {
+          h += '  <ul class="as-details">';
+          step.details.forEach(function(d) {
+            h += '    <li>' + esc(d) + '</li>';
+          });
+          h += '  </ul>';
+        }
+        if (hasCase) {
+          linkedCases.forEach(function(c) {
+            h += '  <div class="as-case-ref show">';
+            h += '    <span class="acr-label">\uD83D\uDD17 \u5957\u7528\u6848\u4F8B\uFF1A' + esc(c.title) + '</span>';
+            h += '    ' + esc(c.summary.substring(0, 120)) + (c.summary.length > 120 ? '...' : '');
+            if (c.data && c.data.length > 0) {
+              h += '    <div style="margin-top:0.35rem;">';
+              c.data.slice(0, 3).forEach(function(d) {
+                h += '<span class="case-data-chip" style="margin-right:0.3rem;"><span class="cdv">' + esc(d.value) + '</span><span class="cdl">' + esc(d.label) + '</span></span>';
+              });
+              h += '    </div>';
+            }
+            h += '  </div>';
+          });
+        }
+        h += '</div>';
+      });
+      h += '  </div>';
+      h += '</div>';
+
+      // === Panel C: 案例来源 + 关联本地案例 (expandable, collapsed by default) ===
+      h += '<div class="ans-panel collapsed" data-panel="cases">';
+      h += '  <div class="ans-panel-header">';
+      h += '    <span class="aph-title"><span class="aph-num">C</span>\u6848\u4F8B\u6765\u6E90\u4E0E\u5173\u8054\u6848\u4F8B</span>';
+      h += '    <span class="aph-toggle">\u25BC</span>';
+      h += '  </div>';
+      h += '  <div class="ans-panel-body">';
+      if (linkedCases.length > 0) {
+        // Case sources
+        linkedCases.forEach(function(c) {
+          h += '<div class="ans-source-item">';
+          h += '  <span class="asi-title">' + esc(c.title) + '</span>';
+          var sourceText = sourceLabel(c.sourceType) + ' \u00b7 ' + esc(c.source);
+          if (c.sourceUrl) {
+            h += '  <a class="asi-link" href="' + esc(c.sourceUrl) + '" target="_blank" rel="noopener"><span class="case-source-dot ' + sourceDotClass(c.sourceType) + '"></span>' + sourceText + ' \u2197</a>';
+          } else {
+            h += '  <span class="asi-link"><span class="case-source-dot ' + sourceDotClass(c.sourceType) + '"></span>' + sourceText + '</span>';
+          }
+          h += '</div>';
+        });
+        // Divider
+        h += '<div class="ans-cases-divider">\u5173\u8054\u672C\u5730\u6848\u4F8B\uFF08' + linkedCases.length + '\uFF09</div>';
+        // Linked case cards
+        h += '<div class="ans-cases-list">';
+        linkedCases.forEach(function(c) { h += renderCaseCard(c); });
+        h += '</div>';
+      } else {
+        h += '<div class="empty-state" style="padding:2.5rem 1rem;"><div class="es-icon">\uD83D\uDCC2</div><p>\u6682\u65E0\u5173\u8054\u6848\u4F8B</p><p class="es-hint">\u8BE5\u771F\u9898\u7684\u672C\u5730\u6848\u4F8B\u6B63\u5728\u6574\u7406\u4E2D</p></div>';
+      }
+      h += '  </div>';
+      h += '</div>';
+
+      return h;
+    }
+
+    // ===================== DATA (grouped by region) =====================
+    var regions = {
+      shz: {
+        name: '石河子',
+        fullName: '石河子（第八师）',
+        questions: [
+          {
+            id: 'shz_1', num: 1,
+            text: "依法治校是实施依法治教的重要组成部分，是学校管理提高质量，实现制度化、规范化、法律化的必由之路。对于学校制度建设和依法治校的关系，你怎么看？",
+            year: 2022, date: "2022-05-22",
+            exam: "石河子工程职业技术学院事业单位面试（管理岗）",
+            type: "综合分析", typeCategory: "综合分析", source: "考生回忆",
+            caseIds: ["shz_c8"]
+          },
+          {
+            id: 'shz_2', num: 2,
+            text: "你认为学校行政人员，需要具备的能力有哪些？",
+            year: 2022, date: "2022-05-22",
+            exam: "石河子工程职业技术学院事业单位面试（管理岗）",
+            type: "综合分析", typeCategory: "综合分析", source: "考生回忆",
+            caseIds: ["shz_c8"]
+          },
+          {
+            id: 'shz_3', num: 3,
+            text: "请谈谈你对分工和合作的看法。",
+            year: 2022, date: "2022-05-22",
+            exam: "石河子工程职业技术学院事业单位面试（管理岗）",
+            type: "综合分析", typeCategory: "综合分析", source: "考生回忆",
+            caseIds: ["shz_c9", "shz_c10"]
+          },
+          {
+            id: 'shz_4', num: 4,
+            text: "领导安排你负责一项老旧小区改造工程的民意调查工作，有的居民非常支持，有的居民强烈反对，尤其是一楼住户认为加装电梯影响采光和房价。你会怎么开展这项工作？",
+            year: 2024, date: "2024-06-25",
+            exam: "石河子市事业单位面试",
+            type: "计划组织", typeCategory: "计划组织", source: "考生回忆",
+            caseIds: ["shz_c1"]
+          },
+          {
+            id: 'shz_5', num: 5,
+            text: "你所在的街道要开展“我为群众办实事”实践活动，领导让你牵头负责，你会如何组织？",
+            year: 2024, date: "2024-06-25",
+            exam: "石河子市事业单位面试",
+            type: "计划组织", typeCategory: "计划组织", source: "考生回忆（模拟）",
+            caseIds: ["shz_c2"]
+          },
+          {
+            id: 'shz_6', num: 6,
+            text: "当前就业形势严峻，部分高校毕业生选择“慢就业”或“灵活就业”。对此现象，你怎么看？",
+            year: 2024, date: "2024-06-25",
+            exam: "石河子市事业单位面试",
+            type: "综合分析", typeCategory: "综合分析", source: "考生回忆（模拟）",
+            caseIds: ["shz_c3", "shz_c4"]
+          },
+          {
+            id: 'shz_7', num: 7,
+            text: "社区网格员在走访中发现一位独居老人反映社保年审不会在手机上操作，同时老人还提到邻居家装修噪音影响休息。作为网格员，你怎么办？",
+            year: 2024, date: "2024-06-25",
+            exam: "石河子市事业单位面试",
+            type: "应急应变", typeCategory: "应急应变", source: "考生回忆（模拟）",
+            caseIds: ["shz_c2", "shz_c7", "shz_c9"]
+          },
+          {
+            id: 'shz_8', num: 8,
+            text: "你刚到单位工作，同事老王对你态度冷淡，其他同事也跟他关系不错，你觉得被孤立了。你该怎么办？",
+            year: 2021, date: "2021-05-09",
+            exam: "新疆兵团公务员面试",
+            type: "人际关系", typeCategory: "人际关系", source: "华图教育",
+            caseIds: ["shz_c10"]
+          },
+          {
+            id: 'shz_9', num: 9,
+            text: "社会发展突飞猛进，给我们的工作、学习都带来改变。对此，你有什么感受？请谈谈你的理解。",
+            year: 2024, date: "2024-11-23",
+            exam: "石河子市事业单位面试（兵团）",
+            type: "综合分析", typeCategory: "综合分析", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'shz_10', num: 10,
+            text: "领导给你安排工作，你用AI完成，被发现后领导不高兴，你会怎么办？",
+            year: 2024, date: "2024-11-23",
+            exam: "石河子市事业单位面试（兵团）",
+            type: "人际关系", typeCategory: "人际关系", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'shz_11', num: 11,
+            text: "对社区老年人的消防安全知识，开展长期的宣传活动，对此你怎么组织？",
+            year: 2024, date: "2024-11-23",
+            exam: "石河子市事业单位面试（兵团）",
+            type: "计划组织", typeCategory: "计划组织", source: "考生回忆",
+            caseIds: ["shz_c9"]
+          },
+          {
+            id: 'shz_12', num: 12,
+            text: '塔克拉玛干沙漠完成"锁边"工作，是新疆治沙工作的巨大成就。对此，你怎么看？',
+            year: 2025, date: "2025-01-05",
+            exam: "新疆事业单位联考面试",
+            type: "综合分析", typeCategory: "综合分析", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'shz_13', num: 13,
+            text: "社区将组织开展一项民生工作，这项工作由你负责，你将怎样组织？",
+            year: 2025, date: "2025-01-05",
+            exam: "新疆事业单位联考面试",
+            type: "计划组织", typeCategory: "计划组织", source: "考生回忆",
+            caseIds: ["shz_c2"]
+          },
+          {
+            id: 'shz_14', num: 14,
+            text: "同事小王不小心把未公开的信息发到了网上，造成了不好的影响。作为负责人，你该怎么办？",
+            year: 2025, date: "2025-01-05",
+            exam: "新疆事业单位联考面试",
+            type: "应急应变", typeCategory: "应急应变", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'shz_15', num: 15,
+            text: '伴随着AI的发展，有一部分工作岗位已经被现有的AI所替代。关于"工作岗位是否会被AI影响"，谈谈你的看法。',
+            year: 2025, date: "2025-05-12",
+            exam: "新疆公务员面试",
+            type: "综合分析", typeCategory: "综合分析", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'shz_16', num: 16,
+            text: "有学生家长举报学生住的宿舍经常停水、水质不清澈、过滤网不及时更换等问题。作为教育局的工作人员，领导安排你去调查你该怎样做？",
+            year: 2025, date: "2025-05-12",
+            exam: "新疆公务员面试",
+            type: "计划组织", typeCategory: "计划组织", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'shz_17', num: 17,
+            text: "单位计划周末组织团建活动。新人同事小王既要工作又要让表演节目，同事老张说平时的工作就很多，现在又要搞这个，不就相当于变相加班吗？作为活动负责人，你该怎么办？",
+            year: 2025, date: "2025-05-12",
+            exam: "新疆公务员面试",
+            type: "人际关系", typeCategory: "人际关系", source: "考生回忆",
+            caseIds: ["shz_c10"]
+          }
+        ],
+        cases: [
+          {
+            id: 'shz_c1', num: 1,
+            title: "既有住宅加装电梯", year: 2024,
+            summary: "石河子市2024年将既有住宅加装电梯纳入民生实事，坚持“业主自愿、政府扶持、社区协商、兼顾各方、依法合规、保障安全”原则。师市住建局牵头，与街道、社区联动，深入政策宣传和民意协调。完成41部电梯加装，涉及15个小区、400余户居民。",
+            data: [
+              { value: "41部", label: "电梯加装" },
+              { value: "15个", label: "小区覆盖" },
+              { value: "400+", label: "户受益" },
+              { value: "80%", label: "财政补贴" }
+            ],
+            quote: "在电梯加装施工中，我们尽最大努力减少对居民生活的干扰，做到文明施工。加强对各施工点位的日常巡查，对基础施工、井道吊装、电梯安装等重要环节加强监督管理。",
+            quoteAuthor: "师市2024年加装电梯项目负责人",
+            source: "石河子零距离", sourceType: "media", sourceDate: "2025-02-06",
+            sourceUrl: "https://www.shznews.com/2025/02/06/9916418.html"
+          },
+          {
+            id: 'shz_c2', num: 2,
+            title: "“我为群众办实事”十大民生行动", year: 2024,
+            summary: "2024年八师石河子市印发《“我为群众办实事”十大民生行动工作方案》，涵盖稳定就业、教育惠民、全民健康、科技文体、社会保障、基础设施、环保安全、乡村振兴、金融维权、促进消费共十大领域，落实56项民生实事。",
+            data: [
+              { value: "10", label: "大行动领域" },
+              { value: "56", label: "项民生实事" },
+              { value: "1.23万", label: "新增就业" },
+              { value: "5.7万", label: "老人免费体检" }
+            ],
+            source: "八师石河子市政府官网", sourceType: "gov", sourceDate: "2024-05-15",
+            sourceUrl: "http://www.shz.gov.cn/govxxgk/003/2024-05-15/b337e9c3-80b9-4a31-99bf-a530f6d7974e.html"
+          },
+          {
+            id: 'shz_c3', num: 3,
+            title: "援企稳岗与职业技能培训", year: 2024,
+            summary: "实施阶段性降低失业、工伤保险费率政策至2025年底，对不裁员、少裁员的民营企业实施失业保险稳岗返还。建好建强兵团·石河子人力资源服务产业园，开展补贴性就业培训2万人。实施11个职工自主创业示范项目，按5%利率给予贷款贴息。",
+            data: [
+              { value: "2万", label: "培训人次" },
+              { value: "11", label: "创业示范项目" },
+              { value: "450+", label: "户带动" },
+              { value: "0.51万", label: "再就业" }
+            ],
+            source: "八师石河子市2024年十大民生行动方案", sourceType: "gov", sourceDate: "2024-05-15",
+            sourceUrl: "http://www.shz.gov.cn/govxxgk/003/2024-05-15/b337e9c3-80b9-4a31-99bf-a530f6d7974e.html"
+          },
+          {
+            id: 'shz_c4', num: 4,
+            title: "青年创业筑梦与妇女就业", year: 2024,
+            summary: "按每个项目10万元扶持标准，示范扶持6个青年创业项目，带动100名以上青年就业。扶持7个妇女创业项目，促进乡村旅游、种植、大数据等妇女优势特色产业提质增效。帮助280名有就业和培训意愿的残疾人掌握1-2项职业技能。",
+            data: [
+              { value: "10万", label: "元/项目" },
+              { value: "6", label: "青年项目" },
+              { value: "280", label: "残疾人培训" },
+              { value: "5%", label: "贴息率" }
+            ],
+            source: "八师石河子市2024年十大民生行动方案", sourceType: "gov", sourceDate: "2024-05-15",
+            sourceUrl: "http://www.shz.gov.cn/govxxgk/003/2024-05-15/b337e9c3-80b9-4a31-99bf-a530f6d7974e.html"
+          },
+          {
+            id: 'shz_c5', num: 5,
+            title: "教育优质均衡与职业教育提升", year: 2024,
+            summary: "推进第20小区幼儿园、第47小区幼儿园等项目建设，加快第16中学综合教学楼、第11小学综合教学楼建设。支持石河子职业技术学院建设智慧校园、国产工业软件产业学院、食品检验检测技术专业教学资源库。",
+            data: [
+              { value: "多个", label: "在建学校" },
+              { value: "智慧校园", label: "重点建设" },
+              { value: "国产软件", label: "产业学院" }
+            ],
+            source: "八师石河子市2024年十大民生行动方案", sourceType: "gov", sourceDate: "2024-05-15",
+            sourceUrl: "http://www.shz.gov.cn/govxxgk/003/2024-05-15/b337e9c3-80b9-4a31-99bf-a530f6d7974e.html"
+          },
+          {
+            id: 'shz_c6', num: 6,
+            title: "医疗扩容提质与公共卫生服务", year: 2024,
+            summary: "加快推动人民医院搬迁，推进石大一附院国家紧急医学救援基地、国家中医类区域医疗中心等项目建设。为2450对计划怀孕夫妇免费提供19项孕优服务。为5.7万名65岁以上老年人实施免费健康体检。为3.2万名适龄妇女开展“两癌”筛查。",
+            data: [
+              { value: "2450", label: "对孕前检查" },
+              { value: "5.7万", label: "老人体检" },
+              { value: "3.2万", label: "两癌筛查" },
+              { value: "2810", label: "对婚检" }
+            ],
+            source: "八师石河子市2024年十大民生行动方案", sourceType: "gov", sourceDate: "2024-05-15",
+            sourceUrl: "http://www.shz.gov.cn/govxxgk/003/2024-05-15/b337e9c3-80b9-4a31-99bf-a530f6d7974e.html"
+          },
+          {
+            id: 'shz_c7', num: 7,
+            title: "“一件事一次办”数字政务", year: 2024,
+            summary: "深化数字政府建设，深入实施“一件事一次办”，持续开展便民服务“微实事”，打造社保网办品牌，实现“只点一次，一次办结”。新建5G基站140个，升级改造49个千兆小区，光纤覆盖24个连队。",
+            data: [
+              { value: "140", label: "个5G基站" },
+              { value: "49", label: "千兆小区" },
+              { value: "24", label: "光纤连队" }
+            ],
+            source: "八师石河子市2024年十大民生行动方案", sourceType: "gov", sourceDate: "2024-05-15",
+            sourceUrl: "http://www.shz.gov.cn/govxxgk/003/2024-05-15/b337e9c3-80b9-4a31-99bf-a530f6d7974e.html"
+          },
+          {
+            id: 'shz_c8', num: 8,
+            title: "困难群众兜底保障", year: 2024,
+            summary: "将符合条件的困难群众100%纳入救助保障范围，月均保障0.56万人，月人均补助水平不低于690元。孤儿分散供养每人每月1150元，集中供养1610元。为6000名困难群众提供居民参保资助，3万名困难群众提供医疗救助。850户残疾人家庭无障碍改造。",
+            data: [
+              { value: "0.56万", label: "月均保障" },
+              { value: "690元", label: "月人均补助" },
+              { value: "3万", label: "医疗救助" },
+              { value: "850", label: "无障碍改造" }
+            ],
+            source: "八师石河子市2024年十大民生行动方案", sourceType: "gov", sourceDate: "2024-05-15",
+            sourceUrl: "http://www.shz.gov.cn/govxxgk/003/2024-05-15/b337e9c3-80b9-4a31-99bf-a530f6d7974e.html"
+          },
+          {
+            id: 'shz_c9', num: 9,
+            title: "新城街道“心想事成”党建品牌", year: 2024,
+            summary: "石河子市新城街道办事处创新党建工作载体，开展“党建+网格精细化服务”，打造“心想事成”党建服务品牌，精准对接民生诉求。通过网格化管理实现“人在网中走、事在格中办”，将群众诉求分类派单、限时办结。",
+            data: [],
+            source: "石河子零距离", sourceType: "media", sourceDate: "2023-11-29",
+            sourceUrl: "https://www.shznews.com/2023/11/29/9913254.html"
+          },
+          {
+            id: 'shz_c10', num: 10,
+            title: "警民恳谈\u201c零距离\u201d机制", year: 2024,
+            summary: "八师石河子市公安局各基层所队常态化召开警民恳谈会，作为政策法规的宣传会、以案释法的教育会、倾听百姓心声的座谈会、解决群众\u201c急难愁盼\u201d的现场办公会。实现警民互动常态化、问题解决闭环化。",
+            data: [],
+            source: "平安石河子", sourceType: "media", sourceDate: "2025",
+            sourceUrl: "http://m.toutiao.com/group/7508640263833764406/"
+          }
+        ]
+      },
+
+      wlmq: {
+        name: '乌鲁木齐',
+        fullName: '乌鲁木齐',
+        questions: [
+          {
+            id: 'wlmq_1', num: 1,
+            text: "结合新疆维吾尔自治区的实际，谈谈中华民族共同体。",
+            year: 2025, date: "",
+            exam: "乌鲁木齐事业单位面试",
+            type: "综合分析", typeCategory: "综合分析", source: "考生回忆",
+            caseIds: ["wlmq_c1", "wlmq_c2"]
+          },
+          {
+            id: 'wlmq_2', num: 2,
+            text: "领导让你处理涉密文件，但你不懂，同事让你用AI弄，你会怎么办？",
+            year: 2025, date: "",
+            exam: "乌鲁木齐事业单位面试",
+            type: "应急应变", typeCategory: "应急应变", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'wlmq_3', num: 3,
+            text: "最近TikTok被封，很多美国网友涌入小红书，作为网信办工作人员，你怎么看？",
+            year: 2025, date: "",
+            exam: "乌鲁木齐事业单位面试",
+            type: "综合分析", typeCategory: "综合分析", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'wlmq_4', num: 4,
+            text: "请你说说数字化发展的必要性。",
+            year: 2025, date: "",
+            exam: "乌鲁木齐事业单位面试",
+            type: "综合分析", typeCategory: "综合分析", source: "考生回忆",
+            caseIds: ["wlmq_c3"]
+          },
+          {
+            id: 'wlmq_5', num: 5,
+            text: "开展一次矛盾纠纷专项行动，你怎么组织？",
+            year: 2025, date: "",
+            exam: "乌鲁木齐事业单位面试",
+            type: "计划组织", typeCategory: "计划组织", source: "考生回忆",
+            caseIds: ["wlmq_c2"]
+          },
+          {
+            id: 'wlmq_6', num: 6,
+            text: "为提升老年人的幸福度，准备组织一个老年人文创比赛，你会怎么办？",
+            year: 2025, date: "",
+            exam: "乌鲁木齐事业单位面试",
+            type: "计划组织", typeCategory: "计划组织", source: "考生回忆",
+            caseIds: ["wlmq_c4"]
+          },
+          {
+            id: 'wlmq_7', num: 7,
+            text: "苟日新又日新，日日新。谈谈你对创新的理解。",
+            year: 2025, date: "",
+            exam: "乌鲁木齐事业单位面试",
+            type: "综合分析", typeCategory: "综合分析", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'wlmq_8', num: 8,
+            text: "2025年乌鲁木齐市将“一刻钟便民生活圈”建设列入年度民生实事清单，计划全年新建、升级80个便民生活圈，覆盖社区居民超40万人。对此，请谈谈你的看法。",
+            year: 2025, date: "",
+            exam: "乌鲁木齐事业单位面试",
+            type: "综合分析", typeCategory: "综合分析", source: "考生回忆（模拟）",
+            caseIds: ["wlmq_c1"]
+          },
+          {
+            id: 'wlmq_9', num: 9,
+            text: "有句谚语说：种一棵树最好的时间是10年前，其次是现在。对此谈一下你的理解。",
+            year: 2023, date: "2023-06-10",
+            exam: "乌鲁木齐事业单位面试",
+            type: "综合分析", typeCategory: "综合分析", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'wlmq_10', num: 10,
+            text: "因工作繁忙，你有一项工作文件交上去以后领导没有审核，结果文件资料出了错，你的领导很生气并批评了你，你会怎么做？",
+            year: 2023, date: "2023-06-10",
+            exam: "乌鲁木齐事业单位面试",
+            type: "人际关系", typeCategory: "人际关系", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'wlmq_11', num: 11,
+            text: "毛泽东同志说没有调研就没有发言权。习近平总书记也多次强调，调研的重要性，请你谈谈你对调研工作重要性的理解。",
+            year: 2023, date: "2023-06-15",
+            exam: "乌鲁木齐人社局面试",
+            type: "综合分析", typeCategory: "综合分析", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'wlmq_12', num: 12,
+            text: '让你做一个关于"人人讲安全 人人会应急"的安全月工作规划，你会怎么做？',
+            year: 2023, date: "2023-06-13",
+            exam: "乌鲁木齐事业单位面试",
+            type: "计划组织", typeCategory: "计划组织", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'wlmq_13', num: 13,
+            text: "随着社会的发展，人工智能随处可见，大数据的应用也十分广泛，请你谈谈你在生活中遇到过哪些关于人工智能或大数据带来的一些问题？并就此谈谈你的看法。",
+            year: 2023, date: "2023-06-16",
+            exam: "乌鲁木齐事业单位面试",
+            type: "综合分析", typeCategory: "综合分析", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'wlmq_14', num: 14,
+            text: "你是你们单位负责保管公章的人员，你的同事拿了领导未签字审批的文件，说这个文件特别紧急，要求你现在就盖章，但是现在领导在外地调研，并且手机联系不上，这个时候你该怎么办？",
+            year: 2023, date: "2023-06-16",
+            exam: "乌鲁木齐事业单位面试",
+            type: "应急应变", typeCategory: "应急应变", source: "考生回忆",
+            caseIds: []
+          }
+        ],
+        cases: [
+          {
+            id: 'wlmq_c1', num: 1,
+            title: "一刻钟便民生活圈建设", year: 2025,
+            summary: "2025年乌鲁木齐市将“一刻钟便民生活圈”建设列入年度民生实事清单，计划全年新建、升级80个便民生活圈，覆盖社区居民超40万人，涵盖便民超市、老年助餐点、家政服务网点、快递驿站、社区卫生服务站、托育点等12类基础民生业态。",
+            data: [
+              { value: "80个", label: "便民生活圈" },
+              { value: "40万+", label: "覆盖居民" },
+              { value: "12类", label: "基础业态" }
+            ],
+            source: "乌鲁木齐市融媒体中心", sourceType: "media", sourceDate: "2025-08",
+            sourceUrl: "http://www.xinjiangnet.com.cn/yclm/202508/t20250814_30097829.html"
+          },
+          {
+            id: 'wlmq_c2', num: 2,
+            title: "152个老旧小区改造提升", year: 2025,
+            summary: "2025年乌鲁木齐市对152个老旧小区进行改造提升，惠及3.03万户居民。包含新建项目107个（涉及1.93万户）、续建项目45个（涉及1.1万户）。累计改造给水管线15362米、污水管线4.47万米、热力管线1.1万米，同步实施建筑节能改造11.8万平方米、屋面防水9.34万平方米。",
+            data: [
+              { value: "152个", label: "小区改造" },
+              { value: "3.03万", label: "户受益" },
+              { value: "11.8万㎡", label: "节能改造" }
+            ],
+            source: "乌鲁木齐市沙依巴克区政府", sourceType: "gov", sourceDate: "2025-12",
+            sourceUrl: "http://www.sayibak.gov.cn/sybkq/c123186/202512/004aefcc55284b759b9aad728266bfed.shtml"
+          },
+          {
+            id: 'wlmq_c3', num: 3,
+            title: "“美好家园”示范小区创建", year: 2025,
+            summary: "乌鲁木齐市从2024年开始推进“美好家园”小区创建工作，制定8大项18项具体标准。截至2025年11月累计创建201个美好家园示范小区。建立社区、业委会、物业公司“三方调解”机制，物业经理兼任社区副主任，推行“有事找管家”服务，管家平均5分钟内响应业主需求。",
+            data: [
+              { value: "201个", label: "示范小区" },
+              { value: "8大项", label: "18项标准" },
+              { value: "5分钟", label: "响应" }
+            ],
+            source: "乌鲁木齐市融媒体中心", sourceType: "media", sourceDate: "2025-11",
+            sourceUrl: "http://m.toutiao.com/group/7576688658724520500/"
+          },
+          {
+            id: 'wlmq_c4', num: 4,
+            title: "光华路片区绿色低碳综合改造", year: 2025,
+            summary: "天山区光华路片区由7个独立家属院组成的老旧小区集群，经中建方程综合改造后入选2024-2025年度全国绿色低碳“四好”优秀案例。拆除围墙整合空间，加装电梯，建筑节能率提升至75%，绿化率从6.9%提升至13.9%，447户居民直接受益，房价平均涨幅10%-20%。",
+            data: [
+              { value: "75%", label: "节能率" },
+              { value: "13.9%", label: "绿化率" },
+              { value: "447", label: "户受益" },
+              { value: "2.5km²", label: "改造面积" }
+            ],
+            source: "天山网", sourceType: "media", sourceDate: "2025-09",
+            sourceUrl: "https://www.ts.cn/zxpd/zx/202509/t20250903_30437218.shtml"
+          },
+          {
+            id: 'wlmq_c5', num: 5,
+            title: "2025年十件民生实事", year: 2025,
+            summary: "2025年乌鲁木齐市实施十件民生实事：新建2600个公共充电设施、150座公共厕所；打通7条断头路、新增停车泊位2000个以上；更新老旧电梯500部以上、筹集保障性住房1244套；归集就业岗位10万个以上、城镇新增就业10万人以上；新组建10个市级中小学教育集团覆盖30所学校。",
+            data: [
+              { value: "2600个", label: "充电桩" },
+              { value: "152个", label: "老旧小区" },
+              { value: "10万+", label: "就业岗位" },
+              { value: "500+", label: "电梯更新" }
+            ],
+            source: "乌鲁木齐市融媒体中心", sourceType: "media", sourceDate: "2025-03",
+            sourceUrl: "http://m.toutiao.com/group/7480470086785810979/"
+          }
+        ]
+      },
+
+      kashgar: {
+        name: '喀什',
+        fullName: '喀什',
+        questions: [
+          {
+            id: 'kashgar_1', num: 1,
+            text: "为打造文明旅游城市，积极倡导文明出行，领导让你组织一次面向游客的志愿服务活动，你会怎么组织？",
+            year: 2024, date: "",
+            exam: "喀什事业单位面试",
+            type: "计划组织", typeCategory: "计划组织", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'kashgar_2', num: 2,
+            text: "你的工作经常受到领导的表扬，但是同事们却说你不配合他们的工作，对你有意见，你该怎么办？",
+            year: 2024, date: "",
+            exam: "喀什事业单位面试",
+            type: "人际关系", typeCategory: "人际关系", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'kashgar_3', num: 3,
+            text: "近期事业单位报考出现热潮，有人说这是社会的退步，结合你报考本单位的目的及你的个人优势，谈谈你对这一现象的看法。",
+            year: 2023, date: "2023-07-03",
+            exam: "喀什市事业单位面试",
+            type: "综合分析", typeCategory: "综合分析", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'kashgar_4', num: 4,
+            text: "2023年正值中国共产党成立102周年，为此，你们单位准备举办一次庆祝活动，领导让你负责此次活动，你会怎么组织？",
+            year: 2023, date: "2023-07-03",
+            exam: "喀什市事业单位面试",
+            type: "计划组织", typeCategory: "计划组织", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'kashgar_5', num: 5,
+            text: "你负责单位的薪酬发放工作，同事小李负责考勤工作，但是由于小李工作怠慢，考勤统计不及时，进而导致薪酬发放不及时，同事对你不满意，领导也批评了你，接下来你要怎么办？",
+            year: 2023, date: "2023-07-03",
+            exam: "喀什市事业单位面试",
+            type: "人际关系", typeCategory: "人际关系", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'kashgar_6', num: 6,
+            text: "你和一位同事共同负责完成一项任务，但同事接到一个电话说有紧急情况需要请假，此时，你会怎么办？",
+            year: 2023, date: "2023-07-03",
+            exam: "喀什市事业单位面试",
+            type: "应急应变", typeCategory: "应急应变", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'kashgar_7', num: 7,
+            text: "书记说，就业最基本的民生，关乎着人民的幸福，关乎着国家的发展。对此你怎么理解？",
+            year: 2024, date: "2024-06-01",
+            exam: "喀什地区事业单位面试",
+            type: "综合分析", typeCategory: "综合分析", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'kashgar_8', num: 8,
+            text: "网红经济爆火，直播带货，有的人一天可以赚别人一辈子的钱。对此你怎么看？",
+            year: 2024, date: "2024-06-01",
+            exam: "喀什地区事业单位面试",
+            type: "综合分析", typeCategory: "综合分析", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'kashgar_9', num: 9,
+            text: "端午节临近，单位打算开展一次以民族团结为主题的联谊活动，如果你是活动的负责人，你会怎么开展？",
+            year: 2024, date: "2024-06-01",
+            exam: "喀什地区事业单位面试",
+            type: "计划组织", typeCategory: "计划组织", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'kashgar_10', num: 10,
+            text: "最近流行一种工作方式，即在下发正式通知之前先微信通知，让做好准备，但是正式通知与微信通知的内容不一样，反而耽误工作，你对此怎么看？",
+            year: 2024, date: "2024-06-03",
+            exam: "喀什地区事业单位面试",
+            type: "综合分析", typeCategory: "综合分析", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'kashgar_11', num: 11,
+            text: "单位有六个会议，但是只有五个会议室，时间分别是8:30，9:00，9:30，10:00，10:30，请问你会怎么安排？",
+            year: 2024, date: "2024-06-03",
+            exam: "喀什地区事业单位面试",
+            type: "计划组织", typeCategory: "计划组织", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'kashgar_12', num: 12,
+            text: "你上岗后发现岗位工作与自己的期待不符，你会怎么办？",
+            year: 2024, date: "2024-06-03",
+            exam: "喀什地区事业单位面试",
+            type: "应急应变", typeCategory: "应急应变", source: "考生回忆",
+            caseIds: []
+          }
+        ],
+        cases: []
+      },
+
+      ili: {
+        name: '伊犁',
+        fullName: '伊犁',
+        questions: [
+          {
+            id: 'ili_1', num: 1,
+            text: "《红石榴餐厅》的成功，为新疆文旅融通、新疆特色产业（如：艾特莱丝等）、民族团结宣传提供了一个很好的思路。请你谈谈如何通过文旅融合推进新疆发展。",
+            year: 2026, date: "",
+            exam: "伊犁事业单位联考面试",
+            type: "综合分析", typeCategory: "综合分析", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'ili_2', num: 2,
+            text: "你单位要开展一个关于旧物利用绿色发展的活动，根据单位人员工作情况，活动要分在工作日和周末开展，你会如何开展？",
+            year: 2026, date: "",
+            exam: "伊犁事业单位联考面试",
+            type: "计划组织", typeCategory: "计划组织", source: "考生回忆",
+            caseIds: []
+          }
+        ],
+        cases: []
+      },
+
+      aksu: {
+        name: '阿克苏',
+        fullName: '阿克苏',
+        questions: [
+          {
+            id: 'aksu_1', num: 1,
+            text: "单位内要组织一次关于“防中暑，珍惜生命安全”的演练活动，领导让你负责此项工作，你会怎么组织？",
+            year: 2023, date: "",
+            exam: "阿克苏事业单位面试",
+            type: "计划组织", typeCategory: "计划组织", source: "考生回忆",
+            caseIds: []
+          }
+        ],
+        cases: []
+      },
+
+      changji: {
+        name: '昌吉',
+        fullName: '昌吉',
+        questions: [
+          {
+            id: 'changji_1', num: 1,
+            text: "青年如何将个人理想和国家发展结合起来？请结合岗位谈谈你的理解。",
+            year: 2023, date: "",
+            exam: "昌吉事业单位面试",
+            type: "综合分析", typeCategory: "综合分析", source: "考生回忆",
+            caseIds: []
+          }
+        ],
+        cases: []
+      },
+
+      xj: {
+        name: '全疆通用',
+        fullName: '全疆通用',
+        questions: [
+          {
+            id: 'xj_1', num: 1,
+            text: "习总书记说“山再高，往上攀，总能登顶；路再长，走下去，定能到达。”对此，你怎么看？",
+            year: 2024, date: "",
+            exam: "新疆事业单位面试",
+            type: "综合分析", typeCategory: "综合分析", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'xj_2', num: 2,
+            text: "你是某小区的物业负责人，有业主冬天把车停到了小区草坪里，导致春天草坪枯萎，请问你要怎么解决这一问题？",
+            year: 2024, date: "",
+            exam: "新疆事业单位面试",
+            type: "应急应变", typeCategory: "应急应变", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'xj_3', num: 3,
+            text: "你是某社区的工作人员，近期老年人受骗事件频发，你社区打算组织一次老年人防诈骗宣传活动。领导让你来负责，你会如何组织？",
+            year: 2024, date: "",
+            exam: "新疆事业单位面试",
+            type: "计划组织", typeCategory: "计划组织", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'xj_4', num: 4,
+            text: "习总书记说“人民永远是我们战胜一切困难挑战的最大依靠。”请你谈谈对这句话的理解。",
+            year: 2024, date: "",
+            exam: "新疆事业单位面试",
+            type: "综合分析", typeCategory: "综合分析", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'xj_5', num: 5,
+            text: "有一批援疆人员即将任职结束，要返回原籍，单位领导让你负责举办一场援疆人员欢送会，你会怎么组织？",
+            year: 2024, date: "",
+            exam: "新疆事业单位面试",
+            type: "计划组织", typeCategory: "计划组织", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'xj_6', num: 6,
+            text: "居民张大爷老是在家门口堆放垃圾杂物，散发恶臭，有居民找他沟通此事，但张大爷却认为家门口是私人领域。假如你是楼道长，你该怎么办？",
+            year: 2024, date: "",
+            exam: "新疆事业单位面试",
+            type: "人际关系", typeCategory: "人际关系", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'xj_7', num: 7,
+            text: '习近平总书记说："人无精神则不立，国无精神则不强。精神是一个民族赖以长久生存的灵魂，唯有精神上达到一定的高度，这个民族才能在历史的洪流中屹立不倒、奋勇向前。"请谈谈你的理解。',
+            year: 2020, date: "2020-12-25",
+            exam: "新疆自治区公务员面试",
+            type: "综合分析", typeCategory: "综合分析", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'xj_8', num: 8,
+            text: "为维护国家安全意识，你所在的地区要组织全市中小学生参观关于国家安全的图片展，领导让你负责此项工作，如何开展？",
+            year: 2020, date: "2020-12-25",
+            exam: "新疆自治区公务员面试",
+            type: "计划组织", typeCategory: "计划组织", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'xj_9', num: 9,
+            text: "你是单位负责审核工作报告的工作人员，在审核过程中，你发现你同事小张的工作报告中有大量数据错误，甚至有一半都是造假数据，你怎么办？",
+            year: 2020, date: "2020-12-25",
+            exam: "新疆自治区公务员面试",
+            type: "人际关系", typeCategory: "人际关系", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'xj_10', num: 10,
+            text: '钟南山说"相信很多青年人会以科学家为偶像，但我们成为偶像的目的，是要更好的消除青年人对偶像的盲从，让他们通过偶像学到对问题的看法，更多的问为什么"，对此你怎么看？',
+            year: 2020, date: "2020-12-26",
+            exam: "新疆自治区公务员面试",
+            type: "综合分析", typeCategory: "综合分析", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'xj_11', num: 11,
+            text: '为了提高幼儿园幼儿和家长防流感意识，教育局计划邀请家长代表、专家和部分师生代表举行关于"冬季预防流感"的座谈会，你会怎么组织？',
+            year: 2020, date: "2020-12-26",
+            exam: "新疆自治区公务员面试",
+            type: "计划组织", typeCategory: "计划组织", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'xj_12', num: 12,
+            text: "单位计划第二天召开会议，你提前准备了会议的发言稿并保存在了你的电脑上，但会议当天早晨，单位整个楼都停电了，你的电脑也打不开，此时你该怎么办？",
+            year: 2020, date: "2020-12-26",
+            exam: "新疆自治区公务员面试",
+            type: "应急应变", typeCategory: "应急应变", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'xj_13', num: 13,
+            text: "立党百年纪念大会上，领导人说人民就是江山，江山就是人民。对此谈谈你的理解。",
+            year: 2021, date: "2021-11-27",
+            exam: "新疆自治区公务员面试",
+            type: "综合分析", typeCategory: "综合分析", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'xj_14', num: 14,
+            text: "摊贩影响市容交通，需要整改整治，领导让你负责此事的开展，你会怎么做？",
+            year: 2021, date: "2021-11-27",
+            exam: "新疆自治区公务员面试",
+            type: "计划组织", typeCategory: "计划组织", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'xj_15', num: 15,
+            text: "你看到别的科室单位窗口懒散，拖沓，于是跟对方科长反映了这些情况，对方却说你多管闲事，学好自己的业务才是正经，此时你该怎么办？",
+            year: 2021, date: "2021-11-27",
+            exam: "新疆自治区公务员面试",
+            type: "人际关系", typeCategory: "人际关系", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'xj_16', num: 16,
+            text: "古代经典舞蹈《洛神赋》、《唐宫夜宴》播放之后立即火起来了，网友们纷纷评价点赞。谈谈你对民族文化火了的看法？",
+            year: 2021, date: "2021-11-27",
+            exam: "新疆自治区公务员面试",
+            type: "综合分析", typeCategory: "综合分析", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'xj_17', num: 17,
+            text: "随着智能摄像头的普及，人们享受到先进科技带来便利的同时，也出现了一些信息泄露事件，对此你怎么看？",
+            year: 2022, date: "2022-06-13",
+            exam: "新疆自治区公务员面试",
+            type: "综合分析", typeCategory: "综合分析", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'xj_18', num: 18,
+            text: "为庆祝中国共青团成立100周年，你单位决定举办一次活动，领导让你负责，你怎么组织？",
+            year: 2022, date: "2022-06-13",
+            exam: "新疆自治区公务员面试",
+            type: "计划组织", typeCategory: "计划组织", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'xj_19', num: 19,
+            text: "单位组织登山徒步活动，但是在疫情期间，由于防控要求，领导让你减去一半参与人数，你怎么处理？",
+            year: 2022, date: "2022-06-13",
+            exam: "新疆自治区公务员面试",
+            type: "应急应变", typeCategory: "应急应变", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'xj_20', num: 20,
+            text: '新能源汽车发展过程中出现了一些不好的现象：第一点是原本宣传免费的东西变成了付费；第二点是在宣传过程中过度宣传关于"智驾"的内容；第三点是存在售后维权难等问题。你认为应该如何更好的推动其高质量发展？',
+            year: 2025, date: "2025-05-15",
+            exam: "新疆公务员面试",
+            type: "综合分析", typeCategory: "综合分析", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'xj_21', num: 21,
+            text: '围绕"促进乡村振兴"要开展一次活动，请从以下三种形式中任选其一进行组织开展：a.沙龙；b.拍摄短视频；c.金点子竞赛。',
+            year: 2025, date: "2025-05-15",
+            exam: "新疆公务员面试",
+            type: "计划组织", typeCategory: "计划组织", source: "考生回忆",
+            caseIds: []
+          },
+          {
+            id: 'xj_22', num: 22,
+            text: "你是刚进单位的一个新人，领导安排你去农村调研工作，但你没有调研经历，也对乡村不太熟悉，你也有畏难情绪。同时老王想去调研。此时，你怎么办？",
+            year: 2025, date: "2025-05-15",
+            exam: "新疆公务员面试",
+            type: "人际关系", typeCategory: "人际关系", source: "考生回忆",
+            caseIds: []
+          }
+        ],
+        cases: []
+      }
+    };
+
+    var regionOrder = ['shz', 'wlmq', 'kashgar', 'ili', 'aksu', 'changji', 'xj'];
+
+    // ===================== STATE =====================
+    var state = {
+      region: 'shz',
+      search: '',
+      yearFilter: 'all',
+      typeFilter: 'all',
+      view: 'questions',
+      selectedQId: null
+    };
+
+    // ===================== HELPERS =====================
+    function curRegion() { return regions[state.region]; }
+    function curQuestions() { return curRegion().questions; }
+    function curCases() { return curRegion().cases; }
+    function findQuestion(id) {
+      return curQuestions().find(function(q) { return q.id === id; });
+    }
+    function findCase(id) {
+      return curCases().find(function(c) { return c.id === id; });
+    }
+    function getCasesForQuestion(q) {
+      return q.caseIds.map(function(id) { return findCase(id); }).filter(Boolean);
+    }
+    function getQuestionsForCase(c) {
+      return curQuestions().filter(function(q) { return q.caseIds.indexOf(c.id) !== -1; });
+    }
+    function getYears() {
+      var s = {};
+      curQuestions().forEach(function(q) { s[q.year] = true; });
+      curCases().forEach(function(c) { s[c.year] = true; });
+      return Object.keys(s).sort(function(a, b) { return b - a; });
+    }
+    function getTypes() {
+      var s = {};
+      curQuestions().forEach(function(q) { s[q.typeCategory] = true; });
+      return Object.keys(s);
+    }
+    function sourceLabel(st) {
+      if (st === 'gov') return '政府官网';
+      if (st === 'media') return '官方媒体';
+      return '其他';
+    }
+    function sourceDotClass(st) {
+      if (st === 'gov') return 'dot-gov';
+      if (st === 'media') return 'dot-media';
+      return 'dot-other';
+    }
+    function esc(str) {
+      var d = document.createElement('div');
+      d.textContent = str == null ? '' : String(str);
+      return d.innerHTML;
+    }
+
+    // ===================== RENDER: Region Buttons =====================
+    function renderRegionButtons() {
+      var rc = document.getElementById('regionButtons');
+      rc.innerHTML = '';
+      regionOrder.forEach(function(key) {
+        var r = regions[key];
+        var b = document.createElement('button');
+        b.className = 'region-btn' + (key === state.region ? ' active' : '');
+        b.setAttribute('data-region', key);
+        b.textContent = r.name;
+        rc.appendChild(b);
+      });
+    }
+
+    // ===================== RENDER: Filters =====================
+    function renderFilters() {
+      var years = getYears();
+      var yc = document.getElementById('yearFilters');
+      yc.innerHTML = '<button class="filter-btn active" data-year="all">全部年份</button>';
+      years.forEach(function(y) {
+        var b = document.createElement('button');
+        b.className = 'filter-btn';
+        b.setAttribute('data-year', y);
+        b.textContent = y + '年';
+        yc.appendChild(b);
+      });
+
+      var types = getTypes();
+      var tc = document.getElementById('typeFilters');
+      tc.innerHTML = '<button class="filter-btn active" data-type="all">全部题型</button>';
+      types.forEach(function(t) {
+        var b = document.createElement('button');
+        b.className = 'filter-btn';
+        b.setAttribute('data-type', t);
+        b.textContent = t;
+        tc.appendChild(b);
+      });
+    }
+
+    // ===================== RENDER: Stats =====================
+    function updateStats() {
+      document.getElementById('stat-q').textContent = curQuestions().length;
+      document.getElementById('stat-c').textContent = curCases().length;
+      document.getElementById('stat-y').textContent = getYears().length;
+    }
+
+    // ===================== RENDER: List (Questions) =====================
+    function renderQuestionList() {
+      var container = document.getElementById('mainScroll');
+      var filtered = curQuestions().filter(function(q) {
+        if (state.yearFilter !== 'all' && q.year !== parseInt(state.yearFilter)) return false;
+        if (state.typeFilter !== 'all' && q.typeCategory !== state.typeFilter) return false;
+        if (state.search) {
+          var s = state.search.toLowerCase();
+          if ((q.text + ' ' + q.exam + ' ' + q.type + ' ' + q.source).toLowerCase().indexOf(s) === -1) return false;
+        }
+        return true;
+      });
+      if (filtered.length === 0) {
+        var pc = document.getElementById('panelCount');
+        if (pc) pc.textContent = '';
+        container.innerHTML = '<div class="empty-state"><div class="es-icon">\uD83D\uDD0E</div><p>没有匹配的真题</p><p class="es-hint">试试调整筛选条件或搜索关键词</p></div>';
+        return;
+      }
+      var pc = document.getElementById('panelCount');
+      if (pc) pc.textContent = '\u00b7 ' + filtered.length + ' \u9898';
+      var h = '';
+      filtered.forEach(function(q) {
+        var lc = getCasesForQuestion(q);
+        var sel = state.selectedQId === q.id ? ' selected' : '';
+        h += '<div class="q-card' + sel + '" data-qid="' + esc(q.id) + '">';
+        h += '  <div class="q-header"><span class="q-num">Q' + q.num + '</span><span class="q-text">' + esc(q.text) + '</span></div>';
+        h += '  <div class="q-meta"><span>' + esc(q.exam) + '</span><span class="case-count">' + lc.length + ' 个关联案例</span></div>';
+        h += '  <div class="q-tags">';
+        h += '    <span class="tag tag-year"' + (q.date ? '>' + q.year + '年<span class="td-full">\uD83D\uDCC5 ' + esc(q.date) + '</span>' : '>' + q.year + '年') + '</span>';
+        h += '    <span class="tag tag-exam">' + esc(q.exam) + '</span>';
+        h += '    <span class="tag tag-type">' + esc(q.type) + '</span>';
+        h += '    <span class="tag tag-source">' + esc(q.source) + '</span>';
+        lc.forEach(function(c) { h += '<span class="tag tag-match">' + esc(c.title) + '</span>'; });
+        h += '  </div>';
+        h += '</div>';
+      });
+      h += '<div class="list-end">\u5DF2\u5C55\u793A\u5168\u90E8</div>';
+      container.innerHTML = h;
+      container.querySelectorAll('.q-card').forEach(function(card) {
+        card.addEventListener('click', function() {
+          selectQuestion(this.getAttribute('data-qid'));
+        });
+      });
+    }
+
+    // ===================== RENDER: List (Cases) =====================
+    function renderCaseList() {
+      var container = document.getElementById('mainScroll');
+      if (curCases().length === 0) {
+        var pc0 = document.getElementById('panelCount');
+        if (pc0) pc0.textContent = '';
+        container.innerHTML = '<div class="empty-state"><div class="es-icon">\uD83D\uDCC2</div><p>该地区暂无案例素材</p><p class="es-hint">案例正在整理中，敬请期待</p></div>';
+        return;
+      }
+      var filtered = curCases().filter(function(c) {
+        if (state.yearFilter !== 'all' && c.year !== parseInt(state.yearFilter)) return false;
+        if (state.search) {
+          var s = state.search.toLowerCase();
+          if ((c.title + ' ' + c.summary + ' ' + c.source).toLowerCase().indexOf(s) === -1) return false;
+        }
+        return true;
+      });
+      if (filtered.length === 0) {
+        var pc1 = document.getElementById('panelCount');
+        if (pc1) pc1.textContent = '';
+        container.innerHTML = '<div class="empty-state"><div class="es-icon">\uD83D\uDD0E</div><p>没有匹配的案例</p><p class="es-hint">试试调整搜索关键词</p></div>';
+        return;
+      }
+      var pc2 = document.getElementById('panelCount');
+      if (pc2) pc2.textContent = '\u00b7 ' + filtered.length + ' \u4e2a';
+      var h = '';
+      filtered.forEach(function(c) {
+        var lq = getQuestionsForCase(c);
+        h += '<div class="q-card" data-cid="' + esc(c.id) + '">';
+        var yearTagHtml = c.sourceDate
+          ? '<span class="tag tag-date case-year-inline">' + c.year + '年<span class="td-full">\uD83D\uDCC5 ' + esc(c.sourceDate) + '</span></span>'
+          : '<span class="tag tag-year case-year-inline">' + c.year + '年</span>';
+        h += '  <div class="q-header"><span class="q-num">C' + c.num + '</span><span class="q-text">' + esc(c.title) + '</span>' + yearTagHtml + '</div>';
+        h += '  <div class="q-meta"><span>' + (c.sourceUrl ? '<a href="' + esc(c.sourceUrl) + '" target="_blank" rel="noopener" style="color:var(--accent2);text-decoration:none;">' + sourceLabel(c.sourceType) + ' · ' + esc(c.source) + '</a>' : sourceLabel(c.sourceType) + ' · ' + esc(c.source)) + '</span><span class="case-count">' + lq.length + ' 道关联真题</span></div>';
+        h += '  <div class="q-tags">';
+        if (c.data && c.data.length > 0) {
+          c.data.slice(0, 3).forEach(function(d) {
+            h += '<span class="tag tag-match">' + esc(d.value) + ' ' + esc(d.label) + '</span>';
+          });
+        }
+        h += '  </div></div>';
+      });
+      h += '<div class="list-end">\u5DF2\u5C55\u793A\u5168\u90E8</div>';
+      container.innerHTML = h;
+      container.querySelectorAll('.q-card[data-cid]').forEach(function(card) {
+        card.addEventListener('click', function(e) {
+          if (e.target.closest('a')) return;
+          showCaseDetail(this.getAttribute('data-cid'));
+        });
+      });
+    }
+
+    // ===================== RENDER: Case Card (shared) =====================
+    function renderCaseCard(c) {
+      var h = '<div class="case-card">';
+      // Title row with year tag inline
+      h += '  <div class="case-title-row">';
+      h += '    <span class="case-card-title">' + esc(c.title) + '</span>';
+      if (c.sourceDate) {
+        h += '    <span class="tag tag-date case-year-inline">' + c.year + '年<span class="td-full">\uD83D\uDCC5 ' + esc(c.sourceDate) + '</span></span>';
+      } else {
+        h += '    <span class="tag tag-year case-year-inline">' + c.year + '年</span>';
+      }
+      h += '  </div>';
+      h += '  <div class="case-body">' + esc(c.summary) + '</div>';
+      if (c.data && c.data.length > 0) {
+        h += '  <div class="case-data-row">';
+        c.data.forEach(function(d) {
+          h += '<span class="case-data-chip"><span class="cdv">' + esc(d.value) + '</span><span class="cdl">' + esc(d.label) + '</span></span>';
+        });
+        h += '  </div>';
+      }
+      if (c.quote) {
+        h += '  <div class="case-quote">\u201c' + esc(c.quote) + '\u201d<span class="cq-author">\u2014\u2014 ' + esc(c.quoteAuthor || '') + '</span></div>';
+      }
+      h += '  <div class="case-footer">';
+      var sourceText = sourceLabel(c.sourceType) + ' \u00b7 ' + esc(c.source);
+      if (c.sourceUrl) {
+        h += '    <span class="case-source-badge"><span class="case-source-dot ' + sourceDotClass(c.sourceType) + '"></span><a class="case-source-link" href="' + esc(c.sourceUrl) + '" target="_blank" rel="noopener">' + sourceText + '</a></span>';
+      } else {
+        h += '    <span class="case-source-badge"><span class="case-source-dot ' + sourceDotClass(c.sourceType) + '"></span>' + sourceText + '</span>';
+      }
+      h += '  </div>';
+      h += '</div>';
+      return h;
+    }
+
+    // ===================== RENDER: Question Detail (drawer) =====================
+    function renderQuestionDetail(q) {
+      var linkedCases = getCasesForQuestion(q);
+      var h = '';
+      h += '<div class="detail-question">' + esc(q.text) + '</div>';
+      h += '<div class="detail-exam">' + esc(q.exam) + '</div>';
+      h += '<div class="detail-tags">';
+      h += '  <span class="tag tag-year"' + (q.date ? '>' + q.year + '年<span class="td-full">\uD83D\uDCC5 ' + esc(q.date) + '</span>' : '>' + q.year + '年') + '</span>';
+      h += '  <span class="tag tag-exam">' + esc(q.exam) + '</span>';
+      h += '  <span class="tag tag-type">' + esc(q.type) + '</span>';
+      h += '  <span class="tag tag-source">' + esc(q.source) + '</span>';
+      h += '</div>';
+      // Answer template (now includes linked cases in Panel C)
+      var answerHtml = renderAnswerTemplate(q, linkedCases);
+      if (answerHtml) {
+        h += answerHtml;
+      }
+      document.getElementById('drawerScroll').innerHTML = h;
+      document.getElementById('drawerTitle').innerHTML =
+        '<span class="dt-region">' + esc(curRegion().name) + '</span>\u771F\u9898\u8BE6\u60C5 \u00b7 Q' + q.num;
+
+      // Bind independent panel toggles
+      var panelHeaders = document.querySelectorAll('.ans-panel-header');
+      panelHeaders.forEach(function(header) {
+        header.addEventListener('click', function() {
+          var panel = this.parentElement;
+          if (panel) panel.classList.toggle('collapsed');
+        });
+      });
+    }
+
+    // ===================== RENDER: Case Detail (drawer) =====================
+    function renderCaseDetail(c) {
+      var linkedQs = getQuestionsForCase(c);
+      var h = '';
+      h += '<div class="case-card" style="border-color:var(--accent2);">';
+      // Title row with year tag inline
+      h += '  <div class="case-title-row">';
+      h += '    <span class="case-card-title">' + esc(c.title) + '</span>';
+      if (c.sourceDate) {
+        h += '    <span class="tag tag-date case-year-inline">' + c.year + '年<span class="td-full">\uD83D\uDCC5 ' + esc(c.sourceDate) + '</span></span>';
+      } else {
+        h += '    <span class="tag tag-year case-year-inline">' + c.year + '年</span>';
+      }
+      h += '  </div>';
+      h += '  <div class="case-body">' + esc(c.summary) + '</div>';
+      if (c.data && c.data.length > 0) {
+        h += '  <div class="case-data-row">';
+        c.data.forEach(function(d) {
+          h += '<span class="case-data-chip"><span class="cdv">' + esc(d.value) + '</span><span class="cdl">' + esc(d.label) + '</span></span>';
+        });
+        h += '  </div>';
+      }
+      if (c.quote) {
+        h += '  <div class="case-quote">\u201c' + esc(c.quote) + '\u201d<span class="cq-author">\u2014\u2014 ' + esc(c.quoteAuthor || '') + '</span></div>';
+      }
+      h += '  <div class="case-footer">';
+      var sourceText = sourceLabel(c.sourceType) + ' \u00b7 ' + esc(c.source);
+      if (c.sourceUrl) {
+        h += '    <span class="case-source-badge"><span class="case-source-dot ' + sourceDotClass(c.sourceType) + '"></span><a class="case-source-link" href="' + esc(c.sourceUrl) + '" target="_blank" rel="noopener">' + sourceText + '</a></span>';
+      } else {
+        h += '    <span class="case-source-badge"><span class="case-source-dot ' + sourceDotClass(c.sourceType) + '"></span>' + sourceText + '</span>';
+      }
+      h += '  </div>';
+      h += '</div>';
+
+      if (linkedQs.length > 0) {
+        h += '<div class="cases-section-title">关联真题（' + linkedQs.length + '）</div>';
+        linkedQs.forEach(function(q) {
+          h += '<div class="linked-q-ref" data-goto-qid="' + esc(q.id) + '"><span class="lqr-num">Q' + q.num + '</span>' + esc(q.text.substring(0, 60)) + (q.text.length > 60 ? '...' : '') + '</div>';
+        });
+      }
+      document.getElementById('drawerScroll').innerHTML = h;
+      document.getElementById('drawerTitle').innerHTML =
+        '<span class="dt-region">' + esc(curRegion().name) + '</span>案例详情 \u00b7 C' + c.num;
+
+      // bind linked question navigation
+      document.getElementById('drawerScroll').querySelectorAll('.linked-q-ref').forEach(function(el) {
+        el.addEventListener('click', function() {
+          gotoQuestion(this.getAttribute('data-goto-qid'));
+        });
+      });
+    }
+
+    // ===================== ACTIONS =====================
+    function selectQuestion(qid) {
+      state.selectedQId = qid;
+      var q = findQuestion(qid);
+      if (!q) return;
+      document.querySelectorAll('#mainScroll .q-card').forEach(function(c) {
+        c.classList.toggle('selected', c.getAttribute('data-qid') === qid);
+      });
+      renderQuestionDetail(q);
+      openDrawer();
+    }
+
+    function showCaseDetail(cid) {
+      var c = findCase(cid);
+      if (!c) return;
+      renderCaseDetail(c);
+      openDrawer();
+    }
+
+    function gotoQuestion(qid) {
+      if (state.view !== 'questions') {
+        state.view = 'questions';
+        syncViewButtons();
+      }
+      renderAll();
+      selectQuestion(qid);
+    }
+
+    function openDrawer() {
+      document.getElementById('detailDrawer').classList.add('open');
+      document.getElementById('detailDrawer').setAttribute('aria-hidden', 'false');
+      document.getElementById('drawerBackdrop').classList.add('open');
+      document.getElementById('drawerScroll').scrollTop = 0;
+    }
+
+    function closeDrawer() {
+      document.getElementById('detailDrawer').classList.remove('open');
+      document.getElementById('detailDrawer').setAttribute('aria-hidden', 'true');
+      document.getElementById('drawerBackdrop').classList.remove('open');
+      state.selectedQId = null;
+      document.querySelectorAll('#mainScroll .q-card').forEach(function(c) {
+        c.classList.remove('selected');
+      });
+    }
+
+    function syncViewButtons() {
+      document.querySelectorAll('.view-btn').forEach(function(b) {
+        b.classList.toggle('active', b.getAttribute('data-view') === state.view);
+      });
+    }
+
+    function switchRegion(key) {
+      if (!regions[key] || key === state.region) {
+        // still allow re-select to reset filters
+      }
+      state.region = key;
+      state.search = '';
+      state.yearFilter = 'all';
+      state.typeFilter = 'all';
+      state.selectedQId = null;
+      document.getElementById('searchInput').value = '';
+      closeDrawer();
+      renderRegionButtons();
+      renderFilters();
+      updateStats();
+      renderAll();
+    }
+
+    // ===================== MAIN RENDER =====================
+    function renderAll() {
+      var r = curRegion();
+      document.getElementById('panelLabel').innerHTML =
+        '<span class="pl-region">' + esc(r.name) + '</span>' +
+        (state.view === 'questions' ? '真题列表' : '案例列表') +
+        '<span class="pl-count" id="panelCount"></span>';
+      if (state.view === 'questions') {
+        renderQuestionList();
+      } else {
+        renderCaseList();
+      }
+    }
+
+    // ===================== EVENTS =====================
+    document.getElementById('searchInput').addEventListener('input', function() {
+      state.search = this.value.trim();
+      renderAll();
+    });
+
+    document.getElementById('yearFilters').addEventListener('click', function(e) {
+      var b = e.target.closest('.filter-btn');
+      if (!b) return;
+      this.querySelectorAll('.filter-btn').forEach(function(x) { x.classList.remove('active'); });
+      b.classList.add('active');
+      state.yearFilter = b.getAttribute('data-year');
+      state.selectedQId = null;
+      renderAll();
+    });
+
+    document.getElementById('typeFilters').addEventListener('click', function(e) {
+      var b = e.target.closest('.filter-btn');
+      if (!b) return;
+      this.querySelectorAll('.filter-btn').forEach(function(x) { x.classList.remove('active'); });
+      b.classList.add('active');
+      state.typeFilter = b.getAttribute('data-type');
+      state.selectedQId = null;
+      renderAll();
+    });
+
+    document.querySelectorAll('.view-btn').forEach(function(b) {
+      b.addEventListener('click', function() {
+        document.querySelectorAll('.view-btn').forEach(function(x) { x.classList.remove('active'); });
+        this.classList.add('active');
+        state.view = this.getAttribute('data-view');
+        state.selectedQId = null;
+        renderAll();
+      });
+    });
+
+    document.getElementById('regionButtons').addEventListener('click', function(e) {
+      var b = e.target.closest('.region-btn');
+      if (!b) return;
+      switchRegion(b.getAttribute('data-region'));
+    });
+
+    document.getElementById('drawerClose').addEventListener('click', closeDrawer);
+    document.getElementById('drawerBackdrop').addEventListener('click', closeDrawer);
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeDrawer();
+    });
+
+    // ===================== INIT =====================
+    renderRegionButtons();
+    renderFilters();
+    updateStats();
+    renderAll();
+  })();
+  </script>
+</body>
+</html>
