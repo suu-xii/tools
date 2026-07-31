@@ -117,6 +117,28 @@
       --answer-section-bg: rgba(217,119,6,0.03);
     }
 
+    /* Tag colors for light theme */
+    [data-theme="light"] .tag-year {
+      background: rgba(5,150,105,0.12);
+      color: #047857;
+      border-color: rgba(5,150,105,0.2);
+    }
+    [data-theme="light"] .tag-exam {
+      background: rgba(219,39,119,0.1);
+      color: #be185d;
+      border-color: rgba(219,39,119,0.2);
+    }
+    [data-theme="light"] .tag-type {
+      background: rgba(37,99,235,0.1);
+      color: #2563eb;
+      border-color: rgba(37,99,235,0.2);
+    }
+    [data-theme="light"] .tag-source {
+      background: rgba(124,58,237,0.1);
+      color: #7c3aed;
+      border-color: rgba(124,58,237,0.2);
+    }
+
     /* ===== Eye-care theme (护眼) ===== */
     [data-theme="eye"] {
       --bg: #f0f4e8;
@@ -157,6 +179,28 @@
       --answer-bg: var(--surface);
       --answer-border: var(--rule);
       --answer-section-bg: rgba(107,142,35,0.04);
+    }
+
+    /* Tag colors for eye-care theme */
+    [data-theme="eye"] .tag-year {
+      background: rgba(46,139,87,0.15);
+      color: #246b45;
+      border-color: rgba(46,139,87,0.25);
+    }
+    [data-theme="eye"] .tag-exam {
+      background: rgba(192,80,77,0.12);
+      color: #9c3d3a;
+      border-color: rgba(192,80,77,0.22);
+    }
+    [data-theme="eye"] .tag-type {
+      background: rgba(59,111,165,0.12);
+      color: #2c5a8a;
+      border-color: rgba(59,111,165,0.22);
+    }
+    [data-theme="eye"] .tag-source {
+      background: rgba(107,90,140,0.12);
+      color: #5a4778;
+      border-color: rgba(107,90,140,0.22);
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -521,29 +565,29 @@
       line-height: 1.5;
     }
     .tag-year {
-      background: var(--bg3);
-      color: var(--muted);
-      border: 1px solid var(--rule);
+      background: rgba(123,184,150,0.15);
+      color: var(--accent2);
+      border: 1px solid rgba(123,184,150,0.25);
     }
     .tag-exam {
-      background: var(--bg3);
-      color: var(--muted);
-      border: 1px solid var(--rule);
+      background: rgba(244,114,182,0.12);
+      color: #e879a8;
+      border: 1px solid rgba(244,114,182,0.22);
     }
     .tag-type {
-      background: var(--bg3);
-      color: var(--ink2);
-      border: 1px solid var(--rule);
+      background: rgba(96,165,250,0.12);
+      color: #6ba4f0;
+      border: 1px solid rgba(96,165,250,0.22);
     }
     .tag-source {
-      background: var(--bg3);
-      color: var(--muted);
-      border: 1px solid var(--rule);
+      background: rgba(167,139,250,0.12);
+      color: #a88be0;
+      border: 1px solid rgba(167,139,250,0.22);
     }
     .tag-match {
       background: var(--accent-soft);
       color: var(--accent);
-      border: 1px solid rgba(245,166,35,0.12);
+      border: 1px solid rgba(245,166,35,0.15);
     }
 
     /* === Empty State === */
