@@ -391,25 +391,54 @@
       align-items: center;
       flex-wrap: wrap;
     }
-    .filter-btn {
-      padding: 0.3rem 0.7rem;
-      background: transparent;
-      border: 1px solid var(--rule);
-      border-radius: var(--radius-sm);
-      color: var(--muted);
+    .filter-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .filter-select-group {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .filter-select-group label {
       font-size: 0.72rem;
+      color: var(--muted);
       font-weight: 500;
-      cursor: pointer;
-      transition: all var(--t);
-      font-family: inherit;
       white-space: nowrap;
     }
-    .filter-btn:hover { color: var(--ink2); border-color: var(--rule3); }
-    .filter-btn.active {
-      background: var(--accent-soft);
-      color: var(--accent);
+    .filter-select {
+      padding: 0.38rem 0.7rem;
+      padding-right: 1.8rem;
+      background: var(--bg3);
+      border: 1px solid var(--rule);
+      border-radius: var(--radius-sm);
+      color: var(--ink);
+      font-size: 0.75rem;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      outline: none;
+      transition: all var(--t);
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%236e7791' d='M0 0h10L5 6z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.55rem center;
+    }
+    [data-theme="light"] .filter-select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath fill='%236b7280' d='M0 0h10L5 6z'/%3E%3C/svg%3E");
+    }
+    .filter-select:hover {
+      border-color: var(--rule3);
+    }
+    .filter-select:focus {
       border-color: var(--accent);
-      font-weight: 600;
+      box-shadow: 0 0 0 2px var(--accent-soft);
+    }
+    .filter-select option {
+      background: var(--surface);
+      color: var(--ink);
     }
 
     /* View toggle - segmented control style */
@@ -1195,7 +1224,9 @@
       .detail-question { font-size: 0.98rem; }
       .filter-bar { gap: 0.4rem; }
       .search-box { flex: 1 1 100%; }
-      .filter-group { flex: 1 1 auto; }
+      .filter-row { flex: 1 1 100%; justify-content: flex-start; }
+      .filter-select-group { flex: 1 1 auto; }
+      .filter-select { width: 100%; }
       .region-btn { padding: 0.38rem 0.8rem; font-size: 0.74rem; }
       .answer-step { padding: 0.7rem 0.85rem; }
       .answer-step .as-content { padding-left: 0; font-size: 0.78rem; }
@@ -1260,8 +1291,16 @@
             <span class="search-icon">&#x1F50D;</span>
             <input type="text" id="searchInput" placeholder="搜索关键词、题型、来源...">
           </div>
-          <div class="filter-group" id="yearFilters"></div>
-          <div class="filter-group" id="typeFilters"></div>
+          <div class="filter-row">
+            <div class="filter-select-group">
+              <label for="yearSelect">年份</label>
+              <select id="yearSelect" class="filter-select"></select>
+            </div>
+            <div class="filter-select-group">
+              <label for="typeSelect">题型</label>
+              <select id="typeSelect" class="filter-select"></select>
+            </div>
+          </div>
           <div class="view-toggle">
             <button class="view-btn active" data-view="questions">真题</button>
             <button class="view-btn" data-view="cases">案例</button>
@@ -4411,25 +4450,25 @@
     // ===================== RENDER: Filters =====================
     function renderFilters() {
       var years = getYears();
-      var yc = document.getElementById('yearFilters');
-      yc.innerHTML = '<button class="filter-btn active" data-year="all">全部年份</button>';
+      var yc = document.getElementById('yearSelect');
+      yc.innerHTML = '<option value="all">全部年份</option>';
       years.forEach(function(y) {
-        var b = document.createElement('button');
-        b.className = 'filter-btn';
-        b.setAttribute('data-year', y);
-        b.textContent = y + '年';
-        yc.appendChild(b);
+        var opt = document.createElement('option');
+        opt.value = y;
+        opt.textContent = y + '年';
+        if (String(y) === state.yearFilter) opt.selected = true;
+        yc.appendChild(opt);
       });
 
       var types = getTypes();
-      var tc = document.getElementById('typeFilters');
-      tc.innerHTML = '<button class="filter-btn active" data-type="all">全部题型</button>';
+      var tc = document.getElementById('typeSelect');
+      tc.innerHTML = '<option value="all">全部题型</option>';
       types.forEach(function(t) {
-        var b = document.createElement('button');
-        b.className = 'filter-btn';
-        b.setAttribute('data-type', t);
-        b.textContent = t;
-        tc.appendChild(b);
+        var opt = document.createElement('option');
+        opt.value = t;
+        opt.textContent = t;
+        if (t === state.typeFilter) opt.selected = true;
+        tc.appendChild(opt);
       });
     }
 
@@ -4742,22 +4781,14 @@
       renderAll();
     });
 
-    document.getElementById('yearFilters').addEventListener('click', function(e) {
-      var b = e.target.closest('.filter-btn');
-      if (!b) return;
-      this.querySelectorAll('.filter-btn').forEach(function(x) { x.classList.remove('active'); });
-      b.classList.add('active');
-      state.yearFilter = b.getAttribute('data-year');
+    document.getElementById('yearSelect').addEventListener('change', function() {
+      state.yearFilter = this.value;
       state.selectedQId = null;
       renderAll();
     });
 
-    document.getElementById('typeFilters').addEventListener('click', function(e) {
-      var b = e.target.closest('.filter-btn');
-      if (!b) return;
-      this.querySelectorAll('.filter-btn').forEach(function(x) { x.classList.remove('active'); });
-      b.classList.add('active');
-      state.typeFilter = b.getAttribute('data-type');
+    document.getElementById('typeSelect').addEventListener('change', function() {
+      state.typeFilter = this.value;
       state.selectedQId = null;
       renderAll();
     });
