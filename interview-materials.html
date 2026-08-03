@@ -4401,10 +4401,11 @@
       return curCases().find(function(c) { return c.id === id; });
     }
     function getCasesForQuestion(q) {
+      if (!q.caseIds) return [];
       return q.caseIds.map(function(id) { return findCase(id); }).filter(Boolean);
     }
     function getQuestionsForCase(c) {
-      return curQuestions().filter(function(q) { return q.caseIds.indexOf(c.id) !== -1; });
+      return curQuestions().filter(function(q) { return q.caseIds && q.caseIds.indexOf(c.id) !== -1; });
     }
     function getYears() {
       var s = {};
